@@ -32,8 +32,7 @@ export function usePaddleCheckout() {
   const [initialCheckout, setInitialCheckout] = useState(false)
   useEffect(() => {
     initializePaddle({
-      environment:
-        process.env.NODE_ENV === "production" ? "production" : "sandbox",
+      environment: "sandbox",
       token: paddleConfig.token,
       eventCallback: (data) => {
         if (data.name === "checkout.completed") {
