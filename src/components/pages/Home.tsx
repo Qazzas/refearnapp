@@ -4,9 +4,11 @@ import Features from "@/components/sections/Features"
 import HowItWorks from "@/components/sections/HowItWorks"
 import Testimonials from "@/components/sections/Testimonials"
 import Pricing from "@/components/sections/Pricing"
-import CTA from "@/components/sections/CTA"
+import CTA from "@/components/sections/FAQ"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import PricingClient from "@/components/ui-custom/Pricing/PricingClient"
+import FAQ from "@/components/sections/FAQ"
 
 const Home = () => {
   return (
@@ -18,8 +20,15 @@ const Home = () => {
         <Features />
         <HowItWorks />
         <Testimonials />
-        <Pricing />
-        <CTA />
+        <div id="pricing">
+          <PricingClient
+            dashboard={false}
+            plan={null}
+            showSubscription={true}
+            showPurchase={true}
+          />
+        </div>
+        <FAQ />
       </main>
 
       <Footer />

@@ -1,28 +1,32 @@
 import React from "react"
+import Link from "next/link"
+import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-secondary py-16 px-6">
-      <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">
-              Affiliate<span className="text-primary">SaaS</span>
-            </h3>
+    <footer className="bg-secondary py-16 px-3">
+      {/* Matches header width + padding exactly */}
+      <div className="max-w-5xl mx-auto px-4">
+        {/* Top: Branding left + Explore right */}
+        <div className="flex flex-col md:flex-row justify-between gap-12">
+          {/* Org Section */}
+          <div className="max-w-sm space-y-4">
+            <OrgHeader affiliate={false} isPreview={false} />
             <p className="text-muted-foreground">
               The most elegant way to build your affiliate marketing program for
               your SaaS business.
             </p>
           </div>
 
+          {/* Explore Section */}
           <div>
-            <h4 className="font-medium mb-4">Product</h4>
+            <h4 className="font-medium mb-4">Explore</h4>
             <ul className="space-y-2">
               <li>
                 <a
-                  href="#"
+                  href="#features"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Features
@@ -30,131 +34,59 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="#how-it-works"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  How It Works
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#testimonials"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Testimonials
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#pricing"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Pricing
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Integrations
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Updates
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Resources</h4>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Guides
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Support
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  API
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Company</h4>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  About
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Contact
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
+        {/* Bottom Section */}
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} AffiliateSaaS. All rights reserved.
+            &copy; {currentYear} RefearnApp. All rights reserved.
           </p>
+
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <a
-              href="#"
+            <Link
+              href="/terms"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Terms
-            </a>
-            <a
-              href="#"
+              Terms of Service
+            </Link>
+
+            <Link
+              href="/privacy-policy"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Privacy
-            </a>
-            <a
-              href="#"
+              Privacy Policy
+            </Link>
+
+            <Link
+              href="/refund-policy"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Cookies
-            </a>
+              Refund Policy
+            </Link>
           </div>
         </div>
       </div>

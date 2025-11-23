@@ -108,6 +108,13 @@
   h6 {
     @apply tracking-tight;
   }
+    .nav-link {
+        @apply text-foreground/80 hover:text-foreground transition-colors;
+    }
+
+    .mobile-link {
+        @apply block text-foreground/80 hover:text-foreground transition-colors;
+    }
 }
 
 @layer utilities {

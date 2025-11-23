@@ -38,6 +38,7 @@ export function PricingGrid({
     mode: "PRORATE" | "DO_NOT_BILL"
     modeType: "SUB_TO_SUB" | "SUB_TO_ONE_TIME"
   }>(null)
+  const isLoggedIn = !!plan
   const { openCheckout, showApplyingDialog, setShowApplyingDialog } =
     usePaddleCheckout()
   const mutation = useAppMutation(updateSubscriptionAction, {
@@ -319,44 +320,32 @@ Proceed?`
 
     return false
   }
-
+  const handlePlanClick = (plan: PlanInfo["plan"]) => {
+    if (!dashboard && !isLoggedIn) {
+      window.location.href = "/auth/signup"
+      return
+    }
+    handleBuyClick(plan)
+  }
   return (
     <>
       <div className="flex flex-wrap justify-center w-full gap-6">
-        {!dashboard && (
-          <PricingCard
-            title="Free"
-            price={getPrice("FREE")}
-            features={[
-              "Basic features",
-              "1 organization",
-              "No team member invitations",
-            ]}
-            buttonText="Start Free"
-            pendingMessage={
-              plan?.hasPendingPurchase
-                ? "This one-time payment will be applied when your subscription ends."
-                : undefined
-            }
-            disabled={plan?.plan === "FREE"}
-            onClick={() => handleBuyClick("FREE")}
-          />
-        )}
-
         <PricingCard
           title="Pro"
           price={getPrice("PRO")}
           oldPrice={getOldPrice("PRO")}
           discount={getDiscountPercent(getOldPrice("PRO"), getPrice("PRO"))}
           features={featuresList.filter((f) => f.pro).map((f) => f.name)}
-          buttonText={getButtonText("PRO", billingType)}
+          buttonText={
+            dashboard ? getButtonText("PRO", billingType) : "Start 7-Day Trial"
+          }
           disabled={isDisabled("PRO")}
           pendingMessage={
             plan?.hasPendingPurchase && plan.pendingPurchaseTier === "PRO"
               ? "This one-time payment will be applied when your subscription ends."
               : undefined
           }
-          onClick={() => handleBuyClick("PRO")}
+          onClick={() => handlePlanClick("PRO")}
         />
 
         <PricingCard
@@ -373,10 +362,14 @@ Proceed?`
               : undefined
           }
           features={featuresList.filter((f) => f.ultimate).map((f) => f.name)}
-          buttonText={getButtonText("ULTIMATE", billingType)}
+          buttonText={
+            dashboard
+              ? getButtonText("ULTIMATE", billingType)
+              : "Start 7-Day Trial"
+          }
           disabled={isDisabled("ULTIMATE")}
           highlight
-          onClick={() => handleBuyClick("ULTIMATE")}
+          onClick={() => handlePlanClick("ULTIMATE")}
         />
       </div>
 
