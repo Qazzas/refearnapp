@@ -10,6 +10,7 @@ export async function proxy(req: NextRequest) {
     host.includes("localhost:3000") ||
     host.includes("127.0.0.1:3000") ||
     host === "refearnapp.com" ||
+    host === "www.refearnapp.com" ||
     host === "affiliate-marketing-hazel.vercel.app"
   ) {
     return NextResponse.next()
