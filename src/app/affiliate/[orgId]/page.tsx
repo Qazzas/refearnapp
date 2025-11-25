@@ -1,15 +1,13 @@
-import React from "react"
+// app/affiliate/[orgId]/page.tsx
+import { redirect } from "next/navigation"
 
-const subDomainPage = async ({
+export default async function SubDomainPage({
   params,
 }: {
-  params: Promise<{ orgId: string }>
-}) => {
-  const { orgId } = await params
-  return (
-    <>
-      <div>the page: {orgId}</div>
-    </>
-  )
+  params: { orgId: string }
+}) {
+  const { orgId } = params
+
+  // Immediately redirect
+  redirect(`/affiliate/${orgId}/login`)
 }
-export default subDomainPage
