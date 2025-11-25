@@ -31,6 +31,9 @@ export async function proxy(req: NextRequest) {
   if (!foundDomain) {
     return NextResponse.rewrite(new URL("/404", req.url))
   }
+  if (req.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/login", `https://${host}`))
+  }
   if (foundDomain.isRedirect) {
     const [newDomain] = await db
       .select({ domainName: websiteDomain.domainName })
