@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RefearnApp – Launch Your Affiliate Program in Minutes",
     description: unifiedDescription,
-    images: ["/refearnapp-opengraph.png"],
+    images: ["/refearnapp-opengraph.png?v=2"],
   },
 }
 
