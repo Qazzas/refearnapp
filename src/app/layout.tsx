@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "RefearnApp",
     images: [
       {
-        url: "/refearnapp-opengraph.svg",
+        url: "/refearnapp-opengraph.png",
         width: 1200,
         height: 630,
         alt: "RefearnApp – Affiliate Program Platform for SaaS",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RefearnApp – Launch Your Affiliate Program in Minutes",
     description: unifiedDescription,
-    images: ["/refearnapp-opengraph.svg"],
+    images: ["/refearnapp-opengraph.png"],
   },
 }
 
