@@ -46,8 +46,8 @@ export const metadata: Metadata = {
     description: unifiedDescription,
     images: [
       {
-        url: "https://refearnapp.com/opengraph.png",
-        secureUrl: "https://refearnapp.com/opengraph.png",
+        url: "/opengraph.png",
+        secureUrl: "/opengraph.png",
         alt: "RefearnApp – Affiliate Program Platform for SaaS",
         type: "image/png",
         width: 1200,
