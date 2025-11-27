@@ -18,7 +18,7 @@ const unifiedDescription =
   "RefearnApp gives SaaS founders a simple, powerful way to run affiliate programs. Track referrals, understand performance, and grow revenue—without the technical overhead."
 
 export const metadata: Metadata = {
-  title: "RefearnApp – Launch Your Affiliate Program in Minutes",
+  title: "RefearnApp | Launch Your Affiliate Program in Minutes",
   description: unifiedDescription,
   icons: {
     icon: {
