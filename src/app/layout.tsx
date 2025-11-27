@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: "RefearnApp – Launch your affiliate program in minutes",
     description: "Launch your affiliate program in minutes",
     url: "https://refearnapp.com",
-    siteName: "Refearn App",
+    siteName: "RefearnApp",
     images: [
       {
         url: "/refearnapp-opengraph.svg",
