@@ -11,11 +11,34 @@ import { getAffiliateData } from "@/app/affiliate/[orgId]/dashboard/profile/acti
 import { CustomizationProvider } from "@/app/affiliate/[orgId]/dashboard/customizationProvider"
 import { requireAffiliateWithOrg } from "@/lib/server/authGuards"
 import React from "react"
+import { Metadata } from "next"
+import { getOrganization } from "@/lib/server/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { buildMetadata } from "@/util/BuildMetadata"
 
 interface AffiliateDashboardLayoutProps extends OrgIdProps {
   children: React.ReactNode
 }
+export async function generateMetadata({
+  params,
+}: {
+  params: { orgId: string }
+}): Promise<Metadata> {
+  const org = await getOrganization(params.orgId)
 
+  // fallback image if org has no custom OG image
+  const image = org.openGraphUrl ?? "/opengraph.png"
+  const orgBaseUrl = await getOrgBaseUrl(org.id)
+  return buildMetadata({
+    title: `${org.name} | Affiliate Dashboard Page`,
+    description: org.description ?? `Affiliate Dashboard Page for ${org.name}`,
+    image,
+    url: `${orgBaseUrl}/dashboard`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    indexable: false,
+  })
+}
 export default async function DashboardLayout({
   children,
   params,

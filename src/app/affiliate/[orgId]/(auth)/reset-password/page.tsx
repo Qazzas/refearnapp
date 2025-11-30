@@ -4,12 +4,29 @@ import InvalidToken from "@/components/pages/InvalidToken"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { validateResetToken } from "@/lib/server/validateResetToken"
 import { redirectIfAffiliateAuthed } from "@/lib/server/authGuards"
+import { Metadata } from "next"
+import { getOrganization } from "@/lib/server/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { buildMetadata } from "@/util/BuildMetadata"
 
 type Props = {
   searchParams: Promise<{ affiliateToken?: string }>
   params: Promise<{ orgId: string }>
 }
-
+export async function generateMetadata({
+  params,
+}: {
+  params: { orgId: string }
+}): Promise<Metadata> {
+  const org = await getOrganization(params.orgId)
+  const orgBaseUrl = await getOrgBaseUrl(org.id)
+  return buildMetadata({
+    title: `${org.name} | Reset Password Page`,
+    description: org.description ?? `Reset Password Page for ${org.name}`,
+    url: `${orgBaseUrl}/reset-password`,
+    indexable: false,
+  })
+}
 const ResetPasswordPage = async ({ searchParams, params }: Props) => {
   const { affiliateToken } = await searchParams
   const orgId = await getValidatedOrgFromParams({ params })

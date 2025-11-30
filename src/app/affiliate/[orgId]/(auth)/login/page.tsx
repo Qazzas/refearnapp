@@ -3,7 +3,24 @@ import Login from "@/components/pages/Login"
 import { OrgIdProps } from "@/lib/types/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { redirectIfAffiliateAuthed } from "@/lib/server/authGuards"
-
+import { Metadata } from "next"
+import { getOrganization } from "@/lib/server/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { buildMetadata } from "@/util/BuildMetadata"
+export async function generateMetadata({
+  params,
+}: {
+  params: { orgId: string }
+}): Promise<Metadata> {
+  const org = await getOrganization(params.orgId)
+  const orgBaseUrl = await getOrgBaseUrl(org.id)
+  return buildMetadata({
+    title: `${org.name} | Login Page`,
+    description: org.description ?? `Login Page for ${org.name}`,
+    url: `${orgBaseUrl}/login`,
+    indexable: false,
+  })
+}
 const AffiliateLoginPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await redirectIfAffiliateAuthed(orgId)

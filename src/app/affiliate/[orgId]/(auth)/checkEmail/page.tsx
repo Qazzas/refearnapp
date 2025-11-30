@@ -3,7 +3,24 @@ import { OrgIdProps } from "@/lib/types/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import CheckEmail from "@/components/pages/CheckEmail"
 import { redirectIfAffiliateAuthed } from "@/lib/server/authGuards"
-
+import { Metadata } from "next"
+import { getOrganization } from "@/lib/server/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { buildMetadata } from "@/util/BuildMetadata"
+export async function generateMetadata({
+  params,
+}: {
+  params: { orgId: string }
+}): Promise<Metadata> {
+  const org = await getOrganization(params.orgId)
+  const orgBaseUrl = await getOrgBaseUrl(org.id)
+  return buildMetadata({
+    title: `${org.name} | Check Email Page`,
+    description: org.description ?? `Check Email Page for ${org.name}`,
+    url: `${orgBaseUrl}/checkEmail`,
+    indexable: false,
+  })
+}
 const CheckEmailPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await redirectIfAffiliateAuthed(orgId)
