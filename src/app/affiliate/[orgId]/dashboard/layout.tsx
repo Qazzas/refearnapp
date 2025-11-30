@@ -21,10 +21,9 @@ interface AffiliateDashboardLayoutProps extends OrgIdProps {
 }
 export async function generateMetadata({
   params,
-}: {
-  params: { orgId: string }
-}): Promise<Metadata> {
-  const org = await getOrganization(params.orgId)
+}: OrgIdProps): Promise<Metadata> {
+  const orgId = await getValidatedOrgFromParams({ params })
+  const org = await getOrganization(orgId)
 
   // fallback image if org has no custom OG image
   const image = org.openGraphUrl ?? "/opengraph.png"

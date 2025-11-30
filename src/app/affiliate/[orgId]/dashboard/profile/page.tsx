@@ -11,10 +11,9 @@ import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
 export async function generateMetadata({
   params,
-}: {
-  params: { orgId: string }
-}): Promise<Metadata> {
-  const org = await getOrganization(params.orgId)
+}: OrgIdProps): Promise<Metadata> {
+  const orgId = await getValidatedOrgFromParams({ params })
+  const org = await getOrganization(orgId)
   const orgBaseUrl = await getOrgBaseUrl(org.id)
   return buildMetadata({
     title: `${org.name} | Dashboard Profile Page`,

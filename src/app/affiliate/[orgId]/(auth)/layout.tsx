@@ -5,16 +5,16 @@ import { Metadata } from "next"
 import { getOrganization } from "@/lib/server/getOrganization"
 import { buildMetadata } from "@/util/BuildMetadata"
 import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { OrgIdProps } from "@/lib/types/orgId"
 interface authLayoutProps {
   children: React.ReactNode
   params: Promise<{ orgId: string }>
 }
 export async function generateMetadata({
   params,
-}: {
-  params: { orgId: string }
-}): Promise<Metadata> {
-  const org = await getOrganization(params.orgId)
+}: OrgIdProps): Promise<Metadata> {
+  const orgId = await getValidatedOrgFromParams({ params })
+  const org = await getOrganization(orgId)
 
   // fallback image if org has no custom OG image
   const image = org.openGraphUrl ?? "/opengraph.png"
