@@ -88,7 +88,6 @@ export const FileUploadRef = forwardRef<FileUploadRef, FileUploadProps>(
 
     const handleDrop = (accepted: File[], fileRejections: any[]) => {
       setErrorMessage(uploadId, null)
-
       // Handle rejected files first
       if (fileRejections.length > 0) {
         fileRejections.forEach((rej: any) => {
@@ -98,7 +97,7 @@ export const FileUploadRef = forwardRef<FileUploadRef, FileUploadProps>(
               return triggerError(
                 `You can only upload up to ${maxFiles} files.`
               )
-            if (msg.includes("file too large") || msg.includes("size"))
+            if (msg.includes("file is larger"))
               return triggerError(`Each file must be under ${maxSizeMB}MB.`)
             if (msg.includes("invalid") || msg.includes("type"))
               return triggerError(

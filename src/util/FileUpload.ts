@@ -58,12 +58,9 @@ export async function validateAndUploadFile({
       }
     }
     if (field === "openGraphUrl") {
-      // SVG NOT allowed
-      const allowedMime = ["image/png", "image/jpeg", "image/jpg"]
-
-      if (!allowedMime.includes(mime)) {
+      if (file.type !== "image/png") {
         return triggerError(
-          `"${file.name}" is not supported. OpenGraph Image must be PNG, or JPG.`
+          `"${file.name}" is not supported. OpenGraph image must be a PNG file.`
         )
       }
     }
