@@ -13,10 +13,14 @@ export async function generateMetadata({
   const orgId = await getValidatedOrgFromParams({ params })
   const org = await getOrganization(orgId)
   const orgBaseUrl = await getOrgBaseUrl(org.id)
+
   return buildMetadata({
     title: `${org.name} | Check Email Page`,
     description: org.description ?? `Check Email Page for ${org.name}`,
     url: `${orgBaseUrl}/checkEmail`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    image: org.openGraphUrl ?? "/opengraph.png",
     indexable: false,
   })
 }

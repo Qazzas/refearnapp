@@ -21,6 +21,9 @@ export async function generateMetadata({
     title: `${org.name} | Verify Email Change Page`,
     description: org.description ?? `Verify Email Change Page for ${org.name}`,
     url: `${orgBaseUrl}/verify-email-change`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    image: org.openGraphUrl ?? "/opengraph.png",
     indexable: false,
   })
 }

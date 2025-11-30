@@ -24,6 +24,9 @@ export async function generateMetadata({
     title: `${org.name} | Reset Password Page`,
     description: org.description ?? `Reset Password Page for ${org.name}`,
     url: `${orgBaseUrl}/reset-password`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    image: org.openGraphUrl ?? "/opengraph.png",
     indexable: false,
   })
 }

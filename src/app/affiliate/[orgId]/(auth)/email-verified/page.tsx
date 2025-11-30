@@ -17,6 +17,9 @@ export async function generateMetadata({
     title: `${org.name} | Email Verified Page`,
     description: org.description ?? `Email Verified Page for ${org.name}`,
     url: `${orgBaseUrl}/email-verified`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    image: org.openGraphUrl ?? "/opengraph.png",
     indexable: false,
   })
 }

@@ -17,6 +17,9 @@ export async function generateMetadata({
     title: `${org.name} | Signup Page`,
     description: org.description ?? `Signup Page for ${org.name}`,
     url: `${orgBaseUrl}/signup`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    image: org.openGraphUrl ?? "/opengraph.png",
     indexable: false,
   })
 }

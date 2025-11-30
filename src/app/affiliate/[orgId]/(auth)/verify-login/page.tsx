@@ -21,6 +21,9 @@ export async function generateMetadata({
     title: `${org.name} | Verify Login Page`,
     description: org.description ?? `Verify Login Page for ${org.name}`,
     url: `${orgBaseUrl}/verify-login`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    image: org.openGraphUrl ?? "/opengraph.png",
     indexable: false,
   })
 }
