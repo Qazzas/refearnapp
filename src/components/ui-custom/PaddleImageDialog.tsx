@@ -16,8 +16,8 @@ export function PaddleImageDialog() {
         <Image
           src={selectedImage}
           alt="Preview"
-          width={3000}
-          height={2800}
+          width={1280}
+          height={800}
           className="rounded-lg h-auto"
         />
       )}
