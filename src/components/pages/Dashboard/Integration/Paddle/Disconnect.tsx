@@ -16,6 +16,8 @@ import {
   deleteTeamOrgPaddleAccount,
   getTeamOrgWebhookKey,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/integration/action"
+import PaddleImageButton from "@/components/ui-custom/PaddleImageButton"
+import { usePaddleImage } from "@/provider/PaddleImageProvider"
 
 interface DisconnectProps {
   orgId: string
@@ -27,6 +29,7 @@ const Disconnect = ({ orgId, isTeam = false }: DisconnectProps) => {
   const queryClient = useQueryClient()
   const deleteFn = isTeam ? deleteTeamOrgPaddleAccount : deleteOrgPaddleAccount
   const getFn = isTeam ? getTeamOrgWebhookKey : getOrgWebhookKey
+  const { openImage } = usePaddleImage()
   // Fetch webhook key
   const { data, isPending } = useQuery({
     queryKey: ["paddle-webhook-key", orgId],
@@ -81,12 +84,10 @@ const Disconnect = ({ orgId, isTeam = false }: DisconnectProps) => {
               Select <strong>Deactivate</strong>.
             </li>
           </ul>
-          <Image
+          <PaddleImageButton
             src="/images/paddle/paddle-5.png"
             alt="Deactivate Paddle Webhook"
-            width={800}
-            height={400}
-            className="rounded-xl border"
+            onClick={openImage}
           />
           <p className="text-muted-foreground text-sm">
             After deactivating your webhook in Paddle, click the button below to

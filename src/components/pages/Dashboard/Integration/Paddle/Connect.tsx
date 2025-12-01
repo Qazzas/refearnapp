@@ -9,11 +9,9 @@ import { useQuery } from "@tanstack/react-query"
 import { Loader2, CopyIcon, KeyRound } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { InputField } from "@/components/Auth/FormFields"
 import { Form } from "@/components/ui/form"
-import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 import {
   getOrgWebhookKey,
   savePaddleWebhookKey,
@@ -23,6 +21,8 @@ import {
   getTeamOrgWebhookKey,
   saveTeamPaddleWebhookKey,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/integration/action"
+import { usePaddleImage } from "@/provider/PaddleImageProvider"
+import PaddleImageButton from "@/components/ui-custom/PaddleImageButton"
 
 const webhookSchema = z.object({
   webhookKey: z.string().min(1, "Webhook key cannot be empty"),
@@ -45,14 +45,13 @@ export default function Connect({
   orgId,
   isTeam = false,
 }: ConnectProps) {
-  const { showCustomToast } = useCustomToast()
-
   const form = useForm<WebhookSchema>({
     resolver: zodResolver(webhookSchema),
     defaultValues: { webhookKey: "" },
   })
   const saveFn = isTeam ? saveTeamPaddleWebhookKey : savePaddleWebhookKey
   const getFn = isTeam ? getTeamOrgWebhookKey : getOrgWebhookKey
+  const { openImage } = usePaddleImage()
   const mutation = useAppMutation(
     async (key: string) => {
       return await saveFn({ orgId, webhookPublicKey: key })
@@ -107,12 +106,11 @@ export default function Connect({
                 <br />
                 <strong>Developer Tools → Notifications</strong>
               </p>
-              <Image
+
+              <PaddleImageButton
                 src="/images/paddle/paddle-1.png"
                 alt="Paddle Notifications Settings"
-                width={800}
-                height={400}
-                className="rounded-xl border"
+                onClick={openImage}
               />
             </CardContent>
           </Card>
@@ -136,30 +134,28 @@ export default function Connect({
                   Usage: <strong>Platform</strong> (or Platform and Simulation)
                 </li>
               </ul>
-              <Image
+              <PaddleImageButton
                 src="/images/paddle/paddle-2.png"
                 alt="Create Destination"
-                width={800}
-                height={400}
-                className="rounded-xl border"
+                onClick={openImage}
               />
               <p>
                 Then paste the following webhook URL into the destination URL
                 field:
               </p>
-              <div className="flex items-center justify-between bg-muted px-3 py-2 rounded-md border w-fit space-x-2">
-                <ScrollArea className="max-w-[400px] whitespace-nowrap text-sm">
-                  {WEBHOOK_URL}
-                </ScrollArea>
+              <div className="inline-flex items-start bg-muted px-3 py-2 rounded-md border max-w-full space-x-2">
+                <p className="text-md break-all">{WEBHOOK_URL}</p>
+
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={handleCopy}
-                  className="ml-2"
+                  className="shrink-0"
                 >
                   <CopyIcon className="w-4 h-4" />
                 </Button>
               </div>
+
               {copied && (
                 <span className="text-xs text-green-600">Copied!</span>
               )}
@@ -186,12 +182,10 @@ export default function Connect({
               <p>
                 Then click <strong>Save</strong> to finish the setup.
               </p>
-              <Image
+              <PaddleImageButton
                 src="/images/paddle/paddle-3.png"
                 alt="Select Events"
-                width={800}
-                height={400}
-                className="rounded-xl border"
+                onClick={openImage}
               />
             </CardContent>
           </Card>
@@ -209,12 +203,10 @@ export default function Connect({
                 click <strong>Edit</strong>. Scroll down and click{" "}
                 <strong>Copy Secret Key</strong>.
               </p>
-              <Image
+              <PaddleImageButton
                 src="/images/paddle/paddle-4.png"
                 alt="Copy Secret Key"
-                width={800}
-                height={400}
-                className="rounded-xl border"
+                onClick={openImage}
               />
               <p>Paste the copied Webhook Public Key below:</p>
 

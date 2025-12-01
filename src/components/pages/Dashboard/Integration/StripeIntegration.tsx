@@ -126,10 +126,17 @@ export default function StripeIntegration({ orgId }: { orgId: string }) {
                 ✅ Connected as {data.email || "Unknown Email"}
               </p>
             ) : (
-              <p className="text-muted-foreground">
-                Link your verified Stripe account to let us track your payment
-                events automatically.
-              </p>
+              <>
+                <p className="text-muted-foreground">
+                  Link your verified Stripe account to let us track your payment
+                  events automatically.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Note:</strong> A Google Authenticator recovery code
+                  will be generated during this setup. Please save it securely
+                  for future account recovery.
+                </p>
+              </>
             )}
             <Button
               onClick={() => connectMutation.mutate()}
