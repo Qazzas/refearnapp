@@ -18,7 +18,7 @@ export function PaddleImageDialog() {
           alt="Preview"
           width={3000}
           height={2800}
-          className="rounded-lg w-full h-auto"
+          className="rounded-lg h-auto"
         />
       )}
     </AppDialog>
