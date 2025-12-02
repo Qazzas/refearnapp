@@ -6,7 +6,12 @@ import { ThemeCustomizationOptions } from "@/components/ui-custom/Customization/
 import { CardCustomizationOptions } from "@/components/ui-custom/Customization/AuthCustomization/CardCustomizationOptions"
 import { useAuthCard } from "@/hooks/useAuthCard"
 import { useAtomValue } from "jotai"
-import { themeCustomizationAtom } from "@/store/AuthCustomizationAtom"
+import {
+  buttonCustomizationAtom,
+  themeCustomizationAtom,
+} from "@/store/AuthCustomizationAtom"
+import { Button } from "@/components/ui/button"
+import { ButtonCustomizationOptions } from "@/components/ui-custom/Customization/AuthCustomization/ButtonCustomizationOptions"
 
 type Props = {
   orgId?: string
@@ -17,8 +22,23 @@ type Props = {
 const CheckEmail = ({ isPreview, affiliate }: Props) => {
   const { backgroundColor, checkEmailPrimaryColor, checkEmailSecondaryColor } =
     useAtomValue(themeCustomizationAtom)
-
+  const { buttonBackgroundColor, buttonTextColor } = useAtomValue(
+    buttonCustomizationAtom
+  )
   const authCardStyle = useAuthCard(affiliate)
+  const handleClick = () => {
+    if (isPreview) {
+      window.open("https://mail.google.com", "_blank")
+      return
+    }
+    const isDev = process.env.NODE_ENV === "development"
+    if (isDev) {
+      window.location.href = "http://localhost:8025"
+      return
+    }
+    console.log("Production mode: open the user's email app.")
+  }
+
   return (
     <div
       className={`relative min-h-screen flex items-center justify-center p-4 ${
@@ -66,22 +86,37 @@ const CheckEmail = ({ isPreview, affiliate }: Props) => {
                 We’ve sent a verification email to your inbox. Please check your
                 email and follow the link to complete login.
               </p>
-              <p
-                className="text-muted-foreground mt-2"
-                style={{
-                  color: (affiliate && checkEmailSecondaryColor) || undefined,
-                }}
-              >
-                If you don’t see it, check your spam folder or try again.
-              </p>
-              {isPreview && (
-                <ThemeCustomizationOptions
-                  name="checkEmailSecondaryColor"
-                  showLabel={false}
-                  buttonSize="w-4 h-4"
-                />
-              )}
+              <div className="flex items-start justify-center gap-2 mt-2 mb-4">
+                <p
+                  className="text-muted-foreground"
+                  style={{
+                    color: (affiliate && checkEmailSecondaryColor) || undefined,
+                  }}
+                >
+                  If you don’t see it, check your spam folder or try again.
+                </p>
+
+                {isPreview && (
+                  <ThemeCustomizationOptions
+                    name="checkEmailSecondaryColor"
+                    showLabel={false}
+                    buttonSize="w-4 h-4"
+                  />
+                )}
+              </div>
             </div>
+            <Button
+              className="w-full mb-6 mt-2"
+              size="lg"
+              onClick={handleClick}
+              style={{
+                backgroundColor:
+                  (affiliate && buttonBackgroundColor) || undefined,
+                color: (affiliate && buttonTextColor) || undefined,
+              }}
+            >
+              Open Your Email App
+            </Button>
           </CardContent>
 
           {isPreview && (
@@ -90,6 +125,11 @@ const CheckEmail = ({ isPreview, affiliate }: Props) => {
                 triggerSize="w-6 h-6"
                 dropdownSize="w-[150px]"
               />
+            </div>
+          )}
+          {isPreview && (
+            <div className="absolute bottom-0 right-0 p-2">
+              <ButtonCustomizationOptions onlyShowEnabled size="w-6 h-6" />
             </div>
           )}
         </Card>
