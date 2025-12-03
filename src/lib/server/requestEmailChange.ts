@@ -121,6 +121,7 @@ export async function requestEmailChange({
       )
       verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email-change?organizationToken=${token}`
     }
+
     // 🧠 Step 3: send email or return redirect
     await sendVerificationEmail(newEmail, verifyUrl, "email-change")
     return { ok: true, message: "Verification link sent to new email" }

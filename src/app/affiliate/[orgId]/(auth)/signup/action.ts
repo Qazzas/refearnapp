@@ -101,7 +101,6 @@ export const SignupAffiliateServer = async ({
         redirectUrl,
       }
     }
-
     // Create new affiliate + credentials account
     const [newAffiliate] = await db
       .insert(affiliate)
@@ -151,6 +150,7 @@ export const SignupAffiliateServer = async ({
       baseUrl,
       partial: true,
     })
+
     await sendVerificationEmail(newAffiliate.email, verifyUrl, "signup")
     return {
       ok: true,

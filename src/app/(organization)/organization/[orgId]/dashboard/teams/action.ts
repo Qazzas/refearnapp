@@ -81,8 +81,6 @@ export const inviteTeamMember = async ({
         expiresAt,
       })
       .returning()
-
-    // Construct invite link using the generated token
     const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/organization/${orgId}/teams/signup?teamToken=${invite.token}`
     await sendVerificationEmail(email, inviteLink, "team-invite")
     return {

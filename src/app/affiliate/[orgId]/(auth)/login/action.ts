@@ -90,6 +90,7 @@ export const LoginAffiliateServer = async ({
       token,
       baseUrl,
     })
+
     const redirectUrl = buildAffiliateUrl({
       path: `checkEmail?email=${encodeURIComponent(existingAffiliate.email)}`,
       organizationId,

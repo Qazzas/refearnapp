@@ -89,7 +89,6 @@ export const LoginServer = async ({
       process.env.SECRET_KEY as string,
       { expiresIn: "15m" }
     )
-
     const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-login?organizationToken=${token}`
     await sendVerificationEmail(existingUser.email, verifyUrl, "login")
     return {

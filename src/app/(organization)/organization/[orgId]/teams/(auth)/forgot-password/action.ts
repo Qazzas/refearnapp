@@ -44,7 +44,6 @@ export const ForgotPasswordTeamServer = async ({
       role: existingTeam.role,
       action: "reset-password",
     }
-
     const token = jwt.sign(payload, process.env.SECRET_KEY as string, {
       expiresIn: "15m",
     })

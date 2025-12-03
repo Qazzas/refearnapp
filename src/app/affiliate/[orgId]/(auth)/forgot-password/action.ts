@@ -60,6 +60,7 @@ export const ForgotPasswordAffiliateServer = async ({
       baseUrl,
       partial: true,
     })
+
     await sendVerificationEmail(
       existingAffiliate.email,
       resetUrl,

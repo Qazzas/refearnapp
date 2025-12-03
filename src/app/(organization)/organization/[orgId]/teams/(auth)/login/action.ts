@@ -90,6 +90,7 @@ export const LoginTeamServer = async ({
       process.env.SECRET_KEY as string,
       { expiresIn: "15m" }
     )
+
     const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/organization/${organizationId}/teams/verify-login?teamToken=${token}`
     await sendVerificationEmail(existingTeam.email, verifyUrl, "login")
     return {
