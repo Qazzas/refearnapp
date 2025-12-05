@@ -425,6 +425,7 @@ export const organizationDashboardCustomization = pgTable(
         sideBarProfileTextPrimaryColor: string
         sideBarProfileTextSecondaryColor: string
         sideBarNavigationFocusRingColor: string
+        sideBarTriggerIconColor: string
       }
       useDashboardCardCustomization: {
         dashboardCardShadowThickness: string
@@ -515,6 +516,9 @@ export const organizationDashboardCustomization = pgTable(
         kpiLoadingColor: string
         kpiErrorColor: string
         kpiEmptyTextColor: string
+        kpiPopoverBackgroundColor: string
+        kpiPopoverTextPrimaryColor: string
+        kpiPopoverTextSecondaryColor: string
       }
       useChartCustomization: {
         chartHorizontalLineColor: string

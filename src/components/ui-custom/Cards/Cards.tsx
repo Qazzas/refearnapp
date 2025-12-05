@@ -326,7 +326,11 @@ const Cards = ({
                   (affiliate && kpiCard.cardPrimaryTextColor) || "inherit"
                 const secondaryTextColor =
                   (affiliate && kpiCard.cardSecondaryTextColor) || "#6b7280"
-
+                const popOverPrimaryTextColor =
+                  (affiliate && kpiCard.kpiPopoverTextPrimaryColor) || "inherit"
+                const popOverSecondaryTextColor =
+                  (affiliate && kpiCard.kpiPopoverTextSecondaryColor) ||
+                  "#6b7280"
                 return (
                   <div
                     key={label}
@@ -423,9 +427,24 @@ const Cards = ({
                         </div>
                       </PopoverTrigger>
 
-                      <PopoverContent className="w-fit p-3 rounded-md shadow-lg border bg-white">
-                        <div className="text-sm font-semibold">{label}</div>
-                        <div className="text-base font-bold mt-1">
+                      <PopoverContent
+                        affiliate={affiliate}
+                        className="w-fit p-3 rounded-md shadow-lg border bg-white"
+                      >
+                        <div
+                          className="text-sm font-semibold"
+                          style={{
+                            color: affiliate && popOverSecondaryTextColor,
+                          }}
+                        >
+                          {label}
+                        </div>
+                        <div
+                          className="text-base font-bold mt-1"
+                          style={{
+                            color: affiliate && popOverPrimaryTextColor,
+                          }}
+                        >
                           {formatValue(
                             label,
                             value as number,

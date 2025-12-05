@@ -24,6 +24,7 @@ export const SidebarCustomizationOptions = ({
       sideBarProfileTextPrimaryColor,
       sideBarProfileTextSecondaryColor,
       sideBarNavigationFocusRingColor,
+      sideBarTriggerIconColor,
     },
     setSidebarCustomization,
   ] = useAtom(sidebarCustomizationAtom)
@@ -82,6 +83,11 @@ export const SidebarCustomizationOptions = ({
           label: "Focus Ring Color",
           value: sideBarNavigationFocusRingColor,
           onChange: throttled.sideBarNavigationFocusRingColor,
+        },
+        sideBarTriggerIconColor: {
+          label: "Trigger Icon Color",
+          value: sideBarTriggerIconColor,
+          onChange: throttled.sideBarTriggerIconColor,
         },
       }}
     />

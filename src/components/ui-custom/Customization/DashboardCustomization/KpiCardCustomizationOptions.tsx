@@ -31,6 +31,9 @@ export const KpiCardCustomizationOptions = ({
       kpiLoadingColor,
       kpiErrorColor,
       kpiEmptyTextColor,
+      kpiPopoverBackgroundColor,
+      kpiPopoverTextPrimaryColor,
+      kpiPopoverTextSecondaryColor,
     },
     setKpiCardCustomization,
   ] = useAtom(kpiCardCustomizationAtom)
@@ -134,6 +137,21 @@ export const KpiCardCustomizationOptions = ({
           label: "KPI Empty Text Color",
           value: kpiEmptyTextColor,
           onChange: throttled.kpiEmptyTextColor,
+        },
+        popoverBackgroundColor: {
+          label: "KPI Popover Background",
+          value: kpiPopoverBackgroundColor,
+          onChange: throttled.kpiPopoverBackgroundColor,
+        },
+        popoverTextPrimaryColor: {
+          label: "KPI Popover Text Primary",
+          value: kpiPopoverTextPrimaryColor,
+          onChange: throttled.kpiPopoverTextPrimaryColor,
+        },
+        popoverTextSecondaryColor: {
+          label: "KPI Popover Text Secondary",
+          value: kpiPopoverTextSecondaryColor,
+          onChange: throttled.kpiPopoverTextSecondaryColor,
         },
       }}
     />

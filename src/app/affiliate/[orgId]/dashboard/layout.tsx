@@ -45,7 +45,7 @@ export default async function DashboardLayout({
           className="relative flex w-full flex-1 flex-col bg-background overflow-auto"
         >
           <div className="md:hidden px-6 pt-4">
-            <SidebarTrigger />
+            <SidebarTrigger affiliate />
           </div>
           <div className="py-6 px-6 w-full max-w-7xl mx-auto">{children}</div>
         </SidebarInset>

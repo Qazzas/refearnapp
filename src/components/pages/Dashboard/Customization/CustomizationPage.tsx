@@ -315,7 +315,7 @@ export default function CustomizationPage({
               <div className="relative lg:w-full">
                 {mainTab === "sidebar" && (
                   <div className="md:hidden p-2">
-                    <SidebarTrigger />
+                    <SidebarTrigger affiliate />
                   </div>
                 )}
 

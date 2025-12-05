@@ -10,6 +10,7 @@ export const defaultDashboardCustomization = {
     sideBarProfileTextPrimaryColor: "",
     sideBarProfileTextSecondaryColor: "",
     sideBarNavigationFocusRingColor: "",
+    sideBarTriggerIconColor: "",
   },
   useDashboardCardCustomization: {
     dashboardCardShadowThickness: "sm",
@@ -100,6 +101,9 @@ export const defaultDashboardCustomization = {
     kpiLoadingColor: "",
     kpiErrorColor: "",
     kpiEmptyTextColor: "",
+    kpiPopoverBackgroundColor: "",
+    kpiPopoverTextPrimaryColor: "",
+    kpiPopoverTextSecondaryColor: "",
   },
   useChartCustomization: {
     chartHorizontalLineColor: "",

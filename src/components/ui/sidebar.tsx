@@ -25,7 +25,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useAtomValue } from "jotai"
-import { dashboardThemeCustomizationAtom } from "@/store/DashboardCustomizationAtom"
+import {
+  dashboardThemeCustomizationAtom,
+  sidebarCustomizationAtom,
+} from "@/store/DashboardCustomizationAtom"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -272,13 +275,15 @@ const Sidebar = React.forwardRef<
   }
 )
 Sidebar.displayName = "Sidebar"
-
+type SidebarTriggerProps = React.ComponentProps<typeof Button> & {
+  affiliate?: boolean
+}
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
+  SidebarTriggerProps
+>(({ className, affiliate = false, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar()
-
+  const { sideBarTriggerIconColor } = useAtomValue(sidebarCustomizationAtom)
   return (
     <Button
       ref={ref}
@@ -289,6 +294,9 @@ const SidebarTrigger = React.forwardRef<
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
+      }}
+      style={{
+        color: (affiliate && sideBarTriggerIconColor) || undefined,
       }}
       {...props}
     >

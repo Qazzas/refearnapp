@@ -319,6 +319,9 @@ export const organization_dashboard_customization_seed = [
         kpiLoadingColor: "",
         kpiErrorColor: "",
         kpiEmptyTextColor: "",
+        kpiPopoverBackgroundColor: "",
+        kpiPopoverTextPrimaryColor: "",
+        kpiPopoverTextSecondaryColor: "",
       },
       useSidebarCustomization: {
         sideBarBackgroundColor: "",
@@ -331,6 +334,7 @@ export const organization_dashboard_customization_seed = [
         sideBarInActiveNavigationTextColor: "",
         sideBarHoverNavigationBackgroundColor: "",
         sideBarActiveNavigationBackgroundColor: "",
+        sideBarTriggerIconColor: "",
       },
       useYearSelectCustomization: {
         yearSelectTextColor: "",
