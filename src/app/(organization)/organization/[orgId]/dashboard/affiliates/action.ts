@@ -16,10 +16,16 @@ export async function getAffiliatesWithStats(
   orderDir?: OrderDir,
   offset?: number,
   email?: string
-): Promise<ResponseData<AffiliateStats[]>> {
+): Promise<
+  ResponseData<{
+    rows: AffiliateStats[]
+    hasNext: boolean
+  }>
+> {
   return handleAction("getAffiliatesWithStats", async () => {
     const ordered = orderBy === "none" ? undefined : orderBy
     const org = await getOrgAuth(orgId)
+    const PAGE_SIZE = 10
     const rows = (await getAffiliatesWithStatsAction(
       orgId,
       year,
@@ -29,8 +35,8 @@ export async function getAffiliatesWithStats(
         exclude: ["paypalEmail"],
         orderBy: ordered,
         orderDir,
-        limit: 10,
-        offset,
+        limit: PAGE_SIZE + 1,
+        offset: ((offset ?? 1) - 1) * PAGE_SIZE,
         email,
       }
     )) as AffiliateBasePayout[]
@@ -38,6 +44,12 @@ export async function getAffiliatesWithStats(
       org.currency,
       rows
     )
-    return { ok: true, data: converted }
+    return {
+      ok: true,
+      data: {
+        rows: converted.slice(0, PAGE_SIZE),
+        hasNext: converted.length > PAGE_SIZE,
+      },
+    }
   })
 }

@@ -22,24 +22,31 @@ export async function getTeamAffiliatePayouts(
   orderDir?: OrderDir,
   offset?: number,
   email?: string
-): Promise<ResponseData<AffiliatePayout[]>> {
+): Promise<ResponseData<{ rows: AffiliatePayout[]; hasNext: boolean }>> {
   return handleAction("getAffiliatePayouts", async () => {
     const org = await getTeamAuthAction(orgId)
+    const PAGE_SIZE = 10
     const rows = (await getAffiliatePayoutAction(
       orgId,
       year,
       month,
       orderBy === "none" ? undefined : orderBy,
       orderDir,
-      10,
-      offset,
+      PAGE_SIZE + 1,
+      ((offset ?? 1) - 1) * PAGE_SIZE,
       email
     )) as AffiliatePayout[]
     const converted = await convertedCurrency<AffiliatePayout>(
       org.currency,
       rows
     )
-    return { ok: true, data: converted }
+    return {
+      ok: true,
+      data: {
+        rows: converted.slice(0, PAGE_SIZE),
+        hasNext: converted.length > PAGE_SIZE,
+      },
+    }
   })
 }
 export async function getTeamAffiliatePayoutsBulk(
@@ -49,23 +56,30 @@ export async function getTeamAffiliatePayoutsBulk(
   orderDir?: OrderDir,
   offset?: number,
   email?: string
-): Promise<ResponseData<AffiliatePayout[]>> {
+): Promise<ResponseData<{ rows: AffiliatePayout[]; hasNext: boolean }>> {
   return handleAction("getAffiliatePayoutsBulk", async () => {
     const org = await getTeamAuthAction(orgId)
+    const PAGE_SIZE = 10
     const rows = (await getAffiliatePayoutBulkAction(
       orgId,
       months,
       orderBy === "none" ? undefined : orderBy,
       orderDir,
-      10,
-      offset,
+      PAGE_SIZE + 1,
+      ((offset ?? 1) - 1) * PAGE_SIZE,
       email
     )) as AffiliatePayout[]
     const converted = await convertedCurrency<AffiliatePayout>(
       org.currency,
       rows
     )
-    return { ok: true, data: converted }
+    return {
+      ok: true,
+      data: {
+        rows: converted.slice(0, PAGE_SIZE),
+        hasNext: converted.length > PAGE_SIZE,
+      },
+    }
   })
 }
 

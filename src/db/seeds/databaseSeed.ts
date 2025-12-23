@@ -19,11 +19,7 @@ const PAYPAL_PERSONAL_EMAILS = Array.from(
   { length: 20 },
   (_, i) => `personal-sb-${i + 1}@test.example.com`
 )
-const INVOICE_REASONS = [
-  "one_time",
-  "subscription_create",
-  "subscription_update",
-] as const
+const INVOICE_REASONS = ["subscription_create"] as const
 const randomInt = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min
 
@@ -93,7 +89,7 @@ export const affiliate_click_seed = affiliate_link_seed.flatMap((link) => {
 })
 
 export const affiliate_invoice_seed = affiliate_link_seed.flatMap((link) => {
-  const invoiceCount = randomInt(0, 2)
+  const invoiceCount = randomInt(1, 2)
 
   return Array.from({ length: invoiceCount }, () => {
     const date = randomDateIn2025()

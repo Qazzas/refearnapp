@@ -9,7 +9,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import MonthSelect from "@/components/ui-custom/MonthSelect"
 import { getAffiliatesWithStats } from "@/app/(organization)/organization/[orgId]/dashboard/affiliates/action"
 import { TableTop } from "@/components/ui-custom/TableTop"
@@ -77,7 +76,8 @@ export default function AffiliatesTable({
       enabled: !!(!affiliate && orgId),
     }
   )
-  const tableData = searchData ?? []
+  const tableData = searchData?.rows ?? []
+  const hasNext = searchData?.hasNext ?? false
   const table = useReactTable({
     data: tableData,
     columns,
@@ -152,6 +152,7 @@ export default function AffiliatesTable({
             <PaginationControls
               offset={filters.offset}
               tableDataLength={tableData.length}
+              hasNext={hasNext}
               setFilters={setFilters}
             />
           )}

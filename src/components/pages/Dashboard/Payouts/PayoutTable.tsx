@@ -12,7 +12,6 @@ import {
 import { Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
   createAffiliatePayouts,
   getAffiliatePayouts,
@@ -256,8 +255,10 @@ export default function PayoutTable({
       setUnpaidMonths(unpaidMonthData)
     }
   }, [unpaidMonthData])
-  const tableData = (isUnpaidMode ? unpaidPayouts : regularPayouts) ?? []
-
+  const tableData =
+    (isUnpaidMode ? unpaidPayouts?.rows : regularPayouts?.rows) ?? []
+  const hasNext =
+    (isUnpaidMode ? unpaidPayouts?.hasNext : regularPayouts?.hasNext) ?? false
   const noPaypalEmails =
     tableData.length > 0 &&
     tableData.every((r) => !r.paypalEmail || r.paypalEmail.trim() === "")
@@ -418,6 +419,7 @@ export default function PayoutTable({
 
           <PaginationControls
             offset={filters.offset}
+            hasNext={hasNext}
             tableDataLength={tableData.length}
             setFilters={setFilters}
           />

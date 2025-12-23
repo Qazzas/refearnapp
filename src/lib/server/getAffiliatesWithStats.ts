@@ -139,6 +139,6 @@ export async function getAffiliatesWithStatsAction(
     )
     .where(and(...whereConditions))
     .groupBy(affiliate.id, affiliate.email)
-    .orderBy(...(orderExpr ? [orderExpr] : []))
+    .orderBy(...(orderExpr ? [orderExpr] : []), affiliate.id)
   return applyOptionalLimitAndOffset(chained, opts?.limit, opts?.offset)
 }
