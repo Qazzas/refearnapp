@@ -1,20 +1,27 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import {
+  useQuery,
+  UseQueryResult,
+  QueryObserverResult,
+} from "@tanstack/react-query"
 import { ActionResult } from "@/lib/types/response"
-import { UnpaidMonth } from "@/lib/types/unpaidMonth"
-
+type QueryKeyPrimitive = string | number | boolean | null | undefined | object
 interface UseAppQueryOptions {
   enabled?: boolean
 }
-
+type AppQueryResponse<T> = {
+  data?: T
+  toast?: string
+}
 interface AppQueryResult<TData> {
   data: TData | undefined
   error: string | undefined
   isPending: boolean
+  refetch: () => Promise<QueryObserverResult<AppQueryResponse<TData>, Error>>
   queryResult: UseQueryResult<{ data?: TData; toast?: string }>
 }
 
 export function useAppQuery<Args extends unknown[], TData>(
-  queryKey: (string | number | undefined | UnpaidMonth[])[],
+  queryKey: readonly QueryKeyPrimitive[],
   fetchFn: (...args: Args) => Promise<ActionResult<TData>>,
   fetchArgs: Args,
   options?: UseAppQueryOptions
@@ -36,6 +43,7 @@ export function useAppQuery<Args extends unknown[], TData>(
     data: queryResult.data?.data,
     error: queryResult.data?.toast,
     isPending: queryResult.isPending,
+    refetch: queryResult.refetch,
     queryResult,
   }
 }

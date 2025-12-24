@@ -16,6 +16,8 @@ import {
   createAffiliatePayouts,
   getAffiliatePayouts,
   getAffiliatePayoutsBulk,
+  getExportAffiliatePayouts,
+  getExportAffiliatePayoutsBulk,
   getUnpaidMonths,
 } from "@/app/(organization)/organization/[orgId]/dashboard/payout/action"
 import { useEffect, useState } from "react"
@@ -36,9 +38,14 @@ import {
   createTeamAffiliatePayouts,
   getTeamAffiliatePayouts,
   getTeamAffiliatePayoutsBulk,
+  getTeamExportAffiliatePayouts,
+  getTeamExportAffiliatePayoutsBulk,
   getTeamUnpaidMonths,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/payout/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
+import { useAppMutation } from "@/hooks/useAppMutation"
+import { InsertedRef } from "@/lib/types/insertedRef"
+import { ActionResult } from "@/lib/types/response"
 
 interface AffiliatesTablePayoutProps {
   orgId: string
@@ -61,7 +68,6 @@ export default function PayoutTable({
   const { filters, setFilters } = useQueryFilter()
   const [unpaidOpen, setUnpaidOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [, setDialogMessage] = useState("")
   const fetchPayouts = isTeam ? getTeamAffiliatePayouts : getAffiliatePayouts
   const fetchPayoutsBulk = isTeam
     ? getTeamAffiliatePayoutsBulk
@@ -75,6 +81,18 @@ export default function PayoutTable({
     selectedMonths,
     filters
   )
+  const createPayoutMutation = useAppMutation<
+    ActionResult<InsertedRef[]>,
+    {
+      orgId: string
+      affiliateIds: string[]
+      isUnpaid: boolean
+      months: { year: number; month: number }[]
+    }
+  >(createPayouts, {
+    affiliate,
+    disableSuccessToast: true,
+  })
   const {
     data: unpaidPayouts,
     error: isErrorUnpaid,
@@ -113,6 +131,52 @@ export default function PayoutTable({
       ),
     }
   )
+  const exportQuery = isUnpaidMode
+    ? useAppQuery(
+        [
+          "export-payouts-bulk",
+          orgId,
+          normalizedMonths,
+          filters.orderBy,
+          filters.orderDir,
+          filters.email,
+        ],
+        isTeam
+          ? getTeamExportAffiliatePayoutsBulk
+          : getExportAffiliatePayoutsBulk,
+        [
+          orgId,
+          normalizedMonths.map((m) => ({
+            year: m.year,
+            month: m.month ?? 0,
+          })),
+          filters.orderBy,
+          filters.orderDir,
+          filters.email,
+        ],
+        { enabled: false }
+      )
+    : useAppQuery(
+        [
+          "export-payouts",
+          orgId,
+          filters.year,
+          filters.month,
+          filters.orderBy,
+          filters.orderDir,
+          filters.email,
+        ],
+        isTeam ? getTeamExportAffiliatePayouts : getExportAffiliatePayouts,
+        [
+          orgId,
+          filters.year,
+          filters.month,
+          filters.orderBy,
+          filters.orderDir,
+          filters.email,
+        ],
+        { enabled: false }
+      )
   async function generateCSV(tableData: any[]) {
     const header = "PayPal Email,Amount,Currency,Note\n"
 
@@ -129,76 +193,57 @@ export default function PayoutTable({
     return header + rows.join("\n")
   }
   const handleExport = async () => {
-    if (disableActions) {
-      setDialogMessage(
-        "At least one affiliate must have unpaid commission and a PayPal email."
-      )
-      setDialogOpen(true)
-      return
+    // 1️⃣ Fetch export data (non-paginated, validated)
+    const res = await exportQuery.refetch()
+
+    if (!res.data?.data) return
+
+    const exportRows = res.data.data.rows
+    exportRows.map((r) => r.id)
+
+    // 2️⃣ Create payouts (refs)
+    type MonthFilter = { year: number; month: number }
+
+    let months: MonthFilter[] = []
+    if (isUnpaidMode) {
+      months = normalizedMonths.map((m) => ({
+        year: m.year,
+        month: m.month ?? 0,
+      }))
+    } else if (filters.year) {
+      months = [{ year: filters.year, month: filters.month ?? 0 }]
     }
-    const affiliateIds = tableData
-      .filter((r) => r.unpaid > 0 && r.paypalEmail)
-      .map((r) => r.id)
 
-    if (affiliateIds.length === 0) {
-      setDialogMessage("No affiliates available for payout.")
-      setDialogOpen(true)
-      return
-    }
-
-    try {
-      type MonthFilter = { year: number; month: number }
-
-      let months: MonthFilter[] = []
-
-      if (isUnpaidMode) {
-        months = normalizedMonths.map((m) => ({
-          year: m.year,
-          month: m.month ?? 0,
-        }))
-      } else if (filters.year) {
-        months = [
-          {
-            year: filters.year,
-            month: filters.month ?? 0,
-          },
-        ]
-      }
-      const insertedRefs = await createPayouts({
+    createPayoutMutation.mutate(
+      {
         orgId,
-        affiliateIds,
+        affiliateIds: exportRows.map((r) => r.id),
         isUnpaid: isUnpaidMode,
         months,
-      })
-      if (!insertedRefs.ok) {
-        throw new Error(insertedRefs.error)
+      },
+      {
+        onSuccess: async (mutationRes) => {
+          if (!mutationRes.ok || !mutationRes.data) return
+
+          // 3️⃣ Attach refs
+          const refMap = Object.fromEntries(
+            mutationRes.data.map((r) => [r.affiliateId, r.refId])
+          )
+
+          const enrichedRows = exportRows.map((row) => ({
+            ...row,
+            refId: refMap[row.id] ?? null,
+          }))
+
+          // 4️⃣ Generate & download CSV
+          const csv = await generateCSV(enrichedRows)
+          downloadCSV(csv)
+        },
       }
-
-      const refMap = Object.fromEntries(
-        insertedRefs.data.map((r) => [r.affiliateId, r.refId])
-      )
-
-      const enrichedTable = tableData.map((row) => ({
-        ...row,
-        refId: refMap[row.id] || null,
-      }))
-      const csv = await generateCSV(enrichedTable)
-      downloadCSV(csv)
-    } catch (err) {
-      console.error("Error creating payouts:", err)
-      setDialogMessage("Something went wrong while creating payouts.")
-      setDialogOpen(true)
-    }
+    )
   }
 
   const handleMassPayout = () => {
-    if (disableActions) {
-      setDialogMessage(
-        "At least one affiliate must have unpaid commission and a PayPal email."
-      )
-      setDialogOpen(true)
-      return
-    }
     const isDev = process.env.NODE_ENV === "development"
     const baseUrl = isDev
       ? "https://www.sandbox.paypal.com/mep/payoutsweb"
@@ -264,12 +309,6 @@ export default function PayoutTable({
   const payoutData = isUnpaidMode ? unpaidPayouts : regularPayouts
   const tableData = payoutData?.mode === "TABLE" ? payoutData.rows : []
   const hasNext = payoutData?.mode === "TABLE" ? payoutData.hasNext : false
-  const noPaypalEmails =
-    tableData.length > 0 &&
-    tableData.every((r) => !r.paypalEmail || r.paypalEmail.trim() === "")
-  const totalUnpaid = tableData.reduce((sum, r) => sum + (r.unpaid ?? 0), 0)
-  const noUnpaidCommission = totalUnpaid <= 0
-  const disableActions = noPaypalEmails || noUnpaidCommission
   const downloadCSV = (csv: string) => {
     const blob = new Blob([csv], { type: "text/csv" })
     const url = URL.createObjectURL(blob)
@@ -393,6 +432,9 @@ export default function PayoutTable({
                 variant="outline"
                 onClick={handleExport}
                 className="w-full sm:w-auto"
+                disabled={
+                  exportQuery.isPending || createPayoutMutation.isPending
+                }
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
