@@ -13,6 +13,7 @@ import {
   createOrganizationAffiliatePayout,
   CreatePayoutInput,
 } from "@/lib/organizationAction/createOrganizationAffiliatePayout"
+import { PayoutResult } from "@/lib/types/payoutResult"
 export async function getAffiliatePayouts(
   orgId: string,
   year?: number,
@@ -20,28 +21,41 @@ export async function getAffiliatePayouts(
   orderBy?: OrderBy,
   orderDir?: OrderDir,
   offset?: number,
-  email?: string
-): Promise<ResponseData<{ rows: AffiliatePayout[]; hasNext: boolean }>> {
+  email?: string,
+  mode: "TABLE" | "EXPORT" = "TABLE"
+): Promise<ResponseData<PayoutResult<AffiliatePayout>>> {
   return handleAction("getAffiliatePayouts", async () => {
     const org = await getOrgAuth(orgId)
     const PAGE_SIZE = 10
+    const isExport = mode === "EXPORT"
     const rows = (await getAffiliatePayoutAction(
       orgId,
       year,
       month,
       orderBy === "none" ? undefined : orderBy,
       orderDir,
-      PAGE_SIZE + 1,
-      ((offset ?? 1) - 1) * PAGE_SIZE,
+      isExport ? undefined : PAGE_SIZE + 1,
+      isExport ? undefined : ((offset ?? 1) - 1) * PAGE_SIZE,
       email
     )) as AffiliatePayout[]
     const converted = await convertedCurrency<AffiliatePayout>(
       org.currency,
       rows
     )
+    if (isExport) {
+      return {
+        ok: true,
+        data: {
+          mode: "EXPORT",
+          rows: converted,
+        },
+      }
+    }
+
     return {
       ok: true,
       data: {
+        mode: "TABLE",
         rows: converted.slice(0, PAGE_SIZE),
         hasNext: converted.length > PAGE_SIZE,
       },
@@ -54,27 +68,40 @@ export async function getAffiliatePayoutsBulk(
   orderBy?: OrderBy,
   orderDir?: OrderDir,
   offset?: number,
-  email?: string
-): Promise<ResponseData<{ rows: AffiliatePayout[]; hasNext: boolean }>> {
+  email?: string,
+  mode: "TABLE" | "EXPORT" = "TABLE"
+): Promise<ResponseData<PayoutResult<AffiliatePayout>>> {
   return handleAction("getAffiliatePayoutsBulk", async () => {
     const org = await getOrgAuth(orgId)
     const PAGE_SIZE = 10
+    const isExport = mode === "EXPORT"
     const rows = (await getAffiliatePayoutBulkAction(
       orgId,
       months,
       orderBy === "none" ? undefined : orderBy,
       orderDir,
-      PAGE_SIZE + 1,
-      ((offset ?? 1) - 1) * PAGE_SIZE,
+      isExport ? undefined : PAGE_SIZE + 1,
+      isExport ? undefined : ((offset ?? 1) - 1) * PAGE_SIZE,
       email
     )) as AffiliatePayout[]
     const converted = await convertedCurrency<AffiliatePayout>(
       org.currency,
       rows
     )
+    if (isExport) {
+      return {
+        ok: true,
+        data: {
+          mode: "EXPORT",
+          rows: converted,
+        },
+      }
+    }
+
     return {
       ok: true,
       data: {
+        mode: "TABLE",
         rows: converted.slice(0, PAGE_SIZE),
         hasNext: converted.length > PAGE_SIZE,
       },

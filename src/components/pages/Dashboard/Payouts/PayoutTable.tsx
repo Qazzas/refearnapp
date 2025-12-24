@@ -97,6 +97,7 @@ export default function PayoutTable({
       filters.orderDir,
       filters.offset,
       filters.email,
+      "TABLE",
     ],
     {
       enabled: !!(
@@ -225,6 +226,7 @@ export default function PayoutTable({
       filters.orderDir,
       filters.offset,
       filters.email,
+      "TABLE",
     ],
     {
       enabled: !!(!affiliate && orgId) && !isUnpaidMode,
@@ -255,10 +257,9 @@ export default function PayoutTable({
       setUnpaidMonths(unpaidMonthData)
     }
   }, [unpaidMonthData])
-  const tableData =
-    (isUnpaidMode ? unpaidPayouts?.rows : regularPayouts?.rows) ?? []
-  const hasNext =
-    (isUnpaidMode ? unpaidPayouts?.hasNext : regularPayouts?.hasNext) ?? false
+  const payoutData = isUnpaidMode ? unpaidPayouts : regularPayouts
+  const tableData = payoutData?.mode === "TABLE" ? payoutData.rows : []
+  const hasNext = payoutData?.mode === "TABLE" ? payoutData.hasNext : false
   const noPaypalEmails =
     tableData.length > 0 &&
     tableData.every((r) => !r.paypalEmail || r.paypalEmail.trim() === "")

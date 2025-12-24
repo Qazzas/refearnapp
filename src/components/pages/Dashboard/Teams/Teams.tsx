@@ -79,7 +79,7 @@ export default function Teams({
     [orgId, filters.offset, filters.email],
     { enabled: !!orgId }
   )
-  const teamCount = searchData?.length ?? 0
+
   // Invite mutation
   const inviteMutation = useAppMutation(inviteTeamMember, {
     onSuccess: (res) => {
@@ -142,7 +142,9 @@ export default function Teams({
       }),
     []
   )
-  const tableData = searchData ?? []
+  const tableData = searchData?.rows ?? []
+  const hasNext = searchData?.hasNext ?? false
+  const teamCount = tableData.length
   const table = useReactTable({
     data: tableData,
     columns,
@@ -219,6 +221,7 @@ export default function Teams({
           />
           <PaginationControls
             offset={filters.offset}
+            hasNext={hasNext}
             tableDataLength={tableData.length}
             setFilters={setFilters}
           />

@@ -24,7 +24,7 @@ export function useQueryFilter(
     emailKey = "email",
   } = keys
 
-  const { debounceMs = 300 } = options
+  const { debounceMs = 2000 } = options
 
   const router = useRouter()
   const searchParams = useSearchParams()

@@ -3,14 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Loader2, Power, PowerOff, Trash2 } from "lucide-react"
-
-interface TeamRow {
-  id: string
-  email: string
-  isActive: boolean
-  orgId: string
-}
+import { Power, PowerOff, Trash2 } from "lucide-react"
+import { TeamRow } from "@/lib/types/teamsRow"
 
 export const TeamsColumns = ({
   onToggle,

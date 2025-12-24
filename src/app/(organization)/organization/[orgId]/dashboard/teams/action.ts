@@ -8,6 +8,7 @@ import { MutationData, ResponseData } from "@/lib/types/response"
 import { getUserPlan } from "@/lib/server/getUserPlan"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { sendVerificationEmail } from "@/lib/mail"
+import { TeamRow } from "@/lib/types/teamsRow"
 
 export const inviteTeamMember = async ({
   email,
@@ -96,10 +97,15 @@ export async function getTeams(
   orgId: string,
   offset?: number,
   email?: string
-): Promise<ResponseData<any[]>> {
+): Promise<
+  ResponseData<{
+    rows: TeamRow[]
+    hasNext: boolean
+  }>
+> {
   return handleAction("getTeams", async () => {
     await getOrgAuth(orgId)
-    const limit = 10
+    const PAGE_SIZE = 10
     const whereClauses = [eq(team.organizationId, orgId)]
 
     if (email) {
@@ -114,11 +120,17 @@ export async function getTeams(
       })
       .from(team)
       .where(and(...whereClauses))
-      .limit(limit)
-      .offset(((offset ?? 1) - 1) * limit)
+      .limit(PAGE_SIZE + 1)
+      .offset(((offset ?? 1) - 1) * PAGE_SIZE)
       .orderBy(team.createdAt)
 
-    return { ok: true, data: rows }
+    return {
+      ok: true,
+      data: {
+        rows: rows.slice(0, PAGE_SIZE),
+        hasNext: rows.length > PAGE_SIZE,
+      },
+    }
   })
 }
 export async function toggleTeamStatus({

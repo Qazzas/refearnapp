@@ -11,10 +11,10 @@ import {
   account,
   affiliateAccount,
   websiteDomain,
-  subscription,
   team,
   teamAccount,
   affiliatePayoutMethod,
+  purchase,
 } from "@/db/schema"
 import {
   account_seed,
@@ -27,7 +27,7 @@ import {
   organization_auth_customization_seed,
   organization_dashboard_customization_seed,
   organization_seed,
-  subscription_seed,
+  purchase_seed,
   team_account_seed,
   team_seed,
   user_seed,
@@ -55,7 +55,7 @@ async function seedFun() {
     await tx.insert(affiliateInvoice).values(affiliate_invoice_seed)
 
     // 5️⃣ Subscription & team
-    await tx.insert(subscription).values(subscription_seed)
+    await tx.insert(purchase).values(purchase_seed)
     await tx.insert(team).values(team_seed)
     await tx.insert(teamAccount).values(team_account_seed)
 
