@@ -146,6 +146,7 @@ export const websiteDomain_seed = [
     isActive: true,
     isRedirect: false,
     isPrimary: true,
+    dnsStatus: "Verified" as const,
     createdAt: parseDate("2025-10-14 04:00:00"),
     updatedAt: parseDate("2025-10-14 04:00:00"),
   },

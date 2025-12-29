@@ -28,9 +28,7 @@ export const hostnameSchema = z
     }
 
     const last = labels[labels.length - 1]
-    if (!/^[a-z]{2,63}$/.test(last) && last.length < 2) return false
-
-    return true
+    return !(!/^[a-z]{2,63}$/.test(last) && last.length < 2)
   }, "Invalid hostname or domain")
   // 🚫 Add extra refine for multi-level refearnapp.com
   .refine((raw) => {
@@ -54,3 +52,7 @@ export const hostnameSchema = z
 
     return true // For custom domains
   }, "Invalid subdomain: only one level allowed before refearnapp.com (e.g., shipfast.refearnapp.com)")
+export const domainCreateSchema = z.object({
+  defaultDomain: z.union([subdomainSchema, hostnameSchema]),
+})
+export type DomainCreateForm = z.infer<typeof domainCreateSchema>

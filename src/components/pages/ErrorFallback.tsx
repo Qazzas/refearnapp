@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { AlertCircle, Rocket } from "lucide-react"
+import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 
 export default function ErrorFallback({
   error,
@@ -19,13 +20,9 @@ export default function ErrorFallback({
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-background to-muted/40 p-6">
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10">
-          <Rocket className="w-6 h-6 text-primary" strokeWidth={2.5} />
-        </div>
-        <span className="text-2xl font-bold tracking-tight text-foreground">
-          Refearn
-        </span>
+      <OrgHeader affiliate={false} isPreview={false} noRedirect />
+      <div className="text-sm font-medium text-muted-foreground truncate max-w-[150px] text-right">
+        RefearnApp
       </div>
 
       {/* Error Card */}
@@ -61,7 +58,7 @@ export default function ErrorFallback({
 
       {/* Footer */}
       <p className="mt-6 text-xs text-muted-foreground">
-        &copy; {new Date().getFullYear()} Refearn. All rights reserved.
+        &copy; {new Date().getFullYear()} RefearnApp. All rights reserved.
       </p>
     </div>
   )

@@ -16,9 +16,16 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { TableView } from "@/components/ui-custom/TableView"
 import { getDomains } from "@/app/(organization)/organization/[orgId]/dashboard/manageDomains/action"
 import { manageDomainsColumns } from "@/components/pages/Dashboard/manageDomains/manageDomainsColumns"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { getTeamDomains } from "@/app/(organization)/organization/[orgId]/teams/dashboard/manageDomains/action"
+import { Button } from "@/components/ui/button"
+import { AppDialog } from "@/components/ui-custom/AppDialog"
+import { DomainInputField } from "@/components/ui-custom/DomainInputField"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Form } from "@/components/ui/form"
+import { DomainCreateForm, domainCreateSchema } from "@/lib/schema/domainSchema"
+import { useForm } from "react-hook-form"
 interface AffiliatesTableManageDomainsProps {
   orgId: string
   affiliate: boolean
@@ -34,7 +41,14 @@ export function ManageDomainsTable({
   const [columnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection] = useState({})
-
+  const [open, setOpen] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const domainForm = useForm<DomainCreateForm>({
+    resolver: zodResolver(domainCreateSchema),
+    defaultValues: {
+      defaultDomain: "",
+    },
+  })
   const { filters, setFilters } = useQueryFilter({
     emailKey: "domain",
   })
@@ -83,6 +97,40 @@ export function ManageDomainsTable({
           onOrderChange={() => {}}
           table={table}
           placeholder="Filter domains..."
+          hideOrder
+          rightActions={
+            <>
+              <Button onClick={() => setOpen(true)}>Add Domain</Button>
+              <AppDialog
+                open={open}
+                onOpenChange={setOpen}
+                title="Add Domain"
+                description="Add a new domain to your organization"
+                confirmText="Add Domain"
+                onConfirm={() => formRef.current?.requestSubmit()}
+                affiliate={affiliate}
+              >
+                {/* 👇 reuse your existing component */}
+                <Form {...domainForm}>
+                  <form
+                    ref={formRef}
+                    onSubmit={domainForm.handleSubmit((data) => {
+                      console.log(data.defaultDomain)
+                      domainForm.reset()
+                      setOpen(false)
+                    })}
+                    className="space-y-4"
+                  >
+                    <DomainInputField
+                      control={domainForm.control}
+                      form={domainForm}
+                      createMode
+                    />
+                  </form>
+                </Form>
+              </AppDialog>
+            </>
+          }
         />
         <TableView
           isPending={isPending}

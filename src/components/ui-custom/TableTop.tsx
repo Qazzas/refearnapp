@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, Settings2 } from "lucide-react"
-import * as React from "react"
 import { Table as ReactTable } from "@tanstack/react-table"
 import { OrderDir, OrderBy } from "@/lib/types/orderTypes"
 import OrderSelect from "@/components/ui-custom/OrderSelect"
 import { SearchInput } from "@/components/ui-custom/SearchInput"
+import { ReactNode } from "react"
 
 type TableProps<TData> = {
   table: ReactTable<TData>
@@ -21,6 +21,7 @@ type TableProps<TData> = {
   mode?: "default" | "top"
   hideOrder?: boolean
   placeholder?: string
+  rightActions?: ReactNode
 }
 
 export const TableTop = <TData,>({
@@ -32,6 +33,7 @@ export const TableTop = <TData,>({
   mode = "default",
   hideOrder = false,
   placeholder = "Filter emails...",
+  rightActions,
 }: TableProps<TData>) => {
   const iconHiddenAt = hideOrder ? "md:hidden" : "lg:hidden"
   const textVisibleAt = hideOrder ? "hidden md:flex" : "hidden lg:flex"
@@ -46,33 +48,37 @@ export const TableTop = <TData,>({
             placeholder={placeholder}
             className="w-full md:w-[240px]"
           />
+          <div className="flex items-center gap-2">
+            {rightActions}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="px-2 lg:px-4">
+                  <Settings2 className={`h-4 w-4 ${iconHiddenAt}`} />
+                  <div className={`${textVisibleAt} items-center gap-2`}>
+                    Columns <ChevronDown className="h-4 w-4" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="px-2 lg:px-4">
-                <Settings2 className={`h-4 w-4 ${iconHiddenAt}`} />
-                <div className={`${textVisibleAt} items-center gap-2`}>
-                  Columns <ChevronDown className="h-4 w-4" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(value)}
-                    className="capitalize"
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(value)
+                      }
+                      className="capitalize"
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       ) : (
         <>
@@ -90,7 +96,7 @@ export const TableTop = <TData,>({
               affiliate={affiliate}
               mode={mode}
             />
-
+            {rightActions}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="px-2 lg:px-4">
