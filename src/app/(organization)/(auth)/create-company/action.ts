@@ -106,6 +106,7 @@ export const CreateOrganization = async (
       isActive: true,
       isPrimary: true,
       isRedirect: false,
+      isVerified: true,
     })
 
     await Promise.all([
