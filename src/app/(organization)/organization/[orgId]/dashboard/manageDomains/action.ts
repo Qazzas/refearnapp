@@ -1,3 +1,4 @@
+"use server"
 import { handleAction } from "@/lib/handleAction"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { ActionResult, MutationData } from "@/lib/types/response"

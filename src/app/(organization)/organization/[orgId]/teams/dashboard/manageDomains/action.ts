@@ -1,3 +1,4 @@
+"use server"
 import { handleAction } from "@/lib/handleAction"
 import { ActionResult, MutationData } from "@/lib/types/response"
 import { DomainRow } from "@/lib/types/domainRow"

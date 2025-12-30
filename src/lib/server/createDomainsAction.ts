@@ -1,3 +1,4 @@
+"use server"
 import { mapDomainType } from "@/util/MapDomainType"
 import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
