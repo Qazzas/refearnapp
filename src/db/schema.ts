@@ -74,7 +74,11 @@ export const dnsStatusEnum = pgEnum("dns_status", [
   "Verified",
   "Failed",
 ])
-export const domainTypeEnum = pgEnum("domain_type", ["DEFAULT", "CUSTOM"])
+export const domainTypeEnum = pgEnum("domain_type", [
+  "DEFAULT",
+  "CUSTOM_DOMAIN",
+  "CUSTOM_SUBDOMAIN",
+])
 export const affiliateInvoiceReasonEnum = pgEnum("affiliate_invoice_reason", [
   "subscription_create",
   "subscription_update",
