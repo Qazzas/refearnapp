@@ -28,6 +28,7 @@ interface AppDialogProps {
   affiliate: boolean
   showFooter?: boolean
   hideCloseIcon?: boolean
+  confirmColor?: string
 }
 
 export function AppDialog({
@@ -43,6 +44,7 @@ export function AppDialog({
   affiliate = false,
   showFooter = true,
   hideCloseIcon = false,
+  confirmColor,
 }: AppDialogProps) {
   const {
     buttonDisabledTextColor,
@@ -83,8 +85,12 @@ export function AppDialog({
                 disabled={confirmLoading}
                 style={{
                   backgroundColor: confirmLoading
-                    ? (affiliate && buttonDisabledBackgroundColor) || undefined
-                    : (affiliate && buttonBackgroundColor) || undefined,
+                    ? confirmColor ||
+                      (affiliate && buttonDisabledBackgroundColor) ||
+                      undefined
+                    : confirmColor ||
+                      (affiliate && buttonBackgroundColor) ||
+                      undefined,
                   color: confirmLoading
                     ? (affiliate && buttonDisabledTextColor) || undefined
                     : (affiliate && buttonTextColor) || undefined,

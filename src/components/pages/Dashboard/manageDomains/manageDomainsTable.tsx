@@ -16,14 +16,22 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { TableView } from "@/components/ui-custom/TableView"
 import {
   createDomains,
+  deleteDomain,
   getDomains,
+  makeDomainPrimary,
+  toggleDomainActive,
+  toggleDomainRedirect,
 } from "@/app/(organization)/organization/[orgId]/dashboard/manageDomains/action"
 import { manageDomainsColumns } from "@/components/pages/Dashboard/manageDomains/manageDomainsColumns"
 import { useRef, useState } from "react"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import {
   createTeamDomains,
+  deleteTeamDomain,
   getTeamDomains,
+  makeTeamDomainPrimary,
+  toggleTeamDomainActive,
+  toggleTeamDomainRedirect,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/manageDomains/action"
 import { Button } from "@/components/ui/button"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
@@ -35,6 +43,10 @@ import { useForm } from "react-hook-form"
 import { DomainInputType } from "@/lib/types/createDomainType"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAppMutation } from "@/hooks/useAppMutation"
+import {
+  DomainActionState,
+  useDomainActionMeta,
+} from "@/hooks/useDomainActionDialog"
 interface AffiliatesTableManageDomainsProps {
   orgId: string
   affiliate: boolean
@@ -53,6 +65,11 @@ export function ManageDomainsTable({
   const [domainType, setDomainType] = useState<DomainInputType | null>(null)
   const [open, setOpen] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
+  const [actionDialog, setActionDialog] = useState<DomainActionState | null>(
+    null
+  )
+
+  const actionMeta = useDomainActionMeta(actionDialog)
   const domainForm = useForm<DomainCreateForm>({
     resolver: zodResolver(domainCreateSchema),
     defaultValues: {
@@ -64,6 +81,16 @@ export function ManageDomainsTable({
   })
   const getManageDomains = isTeam ? getTeamDomains : getDomains
   const createManageDomains = isTeam ? createTeamDomains : createDomains
+  const toggleManageDomainActive = isTeam
+    ? toggleTeamDomainActive
+    : toggleDomainActive
+  const makeManageDomainPrimary = isTeam
+    ? makeTeamDomainPrimary
+    : makeDomainPrimary
+  const toggleManageDomainRedirect = isTeam
+    ? toggleTeamDomainRedirect
+    : toggleDomainRedirect
+  const deleteManageDomain = isTeam ? deleteTeamDomain : deleteDomain
   const queryClient = useQueryClient()
   const { data, error, isPending } = useAppQuery(
     ["org-domains", orgId, filters.offset, filters.email],
@@ -71,6 +98,68 @@ export function ManageDomainsTable({
     [orgId, filters.offset, filters.email],
     { enabled: !!orgId }
   )
+  const toggleActiveMutation = useAppMutation(toggleManageDomainActive, {
+    affiliate,
+  })
+  const makePrimaryMutation = useAppMutation(makeManageDomainPrimary, {
+    affiliate,
+  })
+  const toggleRedirectMutation = useAppMutation(toggleManageDomainRedirect, {
+    affiliate,
+  })
+  const deleteDomainMutation = useAppMutation(deleteManageDomain, { affiliate })
+  const handleConfirmAction = () => {
+    if (!actionDialog) return
+
+    const { domainId, type } = actionDialog
+
+    const onSuccess = () => {
+      queryClient
+        .invalidateQueries({
+          queryKey: ["org-domains", orgId],
+        })
+        .then(() => console.log("Invalidated domains query"))
+      setActionDialog(null)
+    }
+
+    switch (type) {
+      case "activate":
+        toggleActiveMutation.mutate(
+          { orgId, domainId, nextActive: true },
+          { onSuccess }
+        )
+        break
+
+      case "deactivate":
+        toggleActiveMutation.mutate(
+          { orgId, domainId, nextActive: false },
+          { onSuccess }
+        )
+        break
+
+      case "make-primary":
+        makePrimaryMutation.mutate({ orgId, domainId }, { onSuccess })
+        break
+
+      case "enable-redirect":
+        toggleRedirectMutation.mutate(
+          { orgId, domainId, nextRedirect: true },
+          { onSuccess }
+        )
+        break
+
+      case "disable-redirect":
+        toggleRedirectMutation.mutate(
+          { orgId, domainId, nextRedirect: false },
+          { onSuccess }
+        )
+        break
+
+      case "delete":
+        deleteDomainMutation.mutate({ orgId, domainId }, { onSuccess })
+        break
+    }
+  }
   const createDomainMutation = useAppMutation(createManageDomains, {
     affiliate,
   })
@@ -80,18 +169,35 @@ export function ManageDomainsTable({
   const table = useReactTable({
     data: tableData,
     columns: manageDomainsColumns({
-      onToggleActive: (id, isActive) => {
-        console.log("Toggle active:", id, !isActive)
-      },
-      onMakePrimary: (id) => {
-        console.log("Make primary:", id)
-      },
-      onToggleRedirect: (id, isRedirect) => {
-        console.log("Toggle redirect:", id, !isRedirect)
-      },
-      onDelete: (id) => {
-        console.log("Delete domain:", id)
-      },
+      onToggleActive: (id, isActive, domainName) =>
+        setActionDialog({
+          domainId: id,
+          domainName,
+          type: isActive ? "deactivate" : "activate",
+        }),
+
+      onMakePrimary: (id, domainName) =>
+        setActionDialog({
+          domainId: id,
+          domainName,
+          type: "make-primary",
+        }),
+
+      onToggleRedirect: (id, isRedirect, domainName) =>
+        setActionDialog({
+          domainId: id,
+          domainName,
+          type: isRedirect ? "disable-redirect" : "enable-redirect",
+        }),
+
+      onDelete: (id, domainName) =>
+        setActionDialog({
+          domainId: id,
+          domainName,
+          type: "delete",
+        }),
+
+      onVerifyDns: (id) => console.log("Verify DNS for", id),
     }),
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -133,6 +239,7 @@ export function ManageDomainsTable({
                 confirmText="Add Domain"
                 onConfirm={() => formRef.current?.requestSubmit()}
                 affiliate={affiliate}
+                confirmLoading={createDomainMutation.isPending}
               >
                 {/* 👇 reuse your existing component */}
                 <Form {...domainForm}>
@@ -191,6 +298,22 @@ export function ManageDomainsTable({
           setFilters={setFilters}
         />
       </CardContent>
+      <AppDialog
+        open={!!actionDialog}
+        onOpenChange={(open) => !open && setActionDialog(null)}
+        title={actionMeta?.title}
+        description={actionMeta?.description}
+        confirmText={actionMeta?.confirmText}
+        confirmColor={actionMeta?.color}
+        onConfirm={handleConfirmAction}
+        affiliate={affiliate}
+        confirmLoading={
+          toggleActiveMutation.isPending ||
+          makePrimaryMutation.isPending ||
+          toggleRedirectMutation.isPending ||
+          deleteDomainMutation.isPending
+        }
+      />
     </Card>
   )
 }

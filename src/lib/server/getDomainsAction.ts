@@ -27,6 +27,7 @@ export async function getDomainsAction(
     .select({
       id: websiteDomain.id,
       domainName: websiteDomain.domainName,
+      type: websiteDomain.type,
       isActive: websiteDomain.isActive,
       isRedirect: websiteDomain.isRedirect,
       dnsStatus: websiteDomain.dnsStatus,

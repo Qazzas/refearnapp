@@ -6,6 +6,10 @@ import { DomainRow } from "@/lib/types/domainRow"
 import { getDomainsAction } from "@/lib/server/getDomainsAction"
 import { CreateDomainType } from "@/lib/types/createDomainType"
 import { createDomainsAction } from "@/lib/server/createDomainsAction"
+import { toggleDomainActiveAction } from "@/lib/server/toggleDomainActiveAction"
+import { makeDomainPrimaryAction } from "@/lib/server/makeDomainPrimaryAction"
+import { toggleDomainRedirectAction } from "@/lib/server/toggleDomainRedirectAction"
+import { deleteDomainAction } from "@/lib/server/deleteDomainAction"
 export async function getDomains(
   orgId: string,
   offset?: number,
@@ -35,5 +39,69 @@ export async function createDomains({
       domainType,
     })
     return { ok: true, toast: "Domain added successfully" }
+  })
+}
+export async function toggleDomainActive({
+  orgId,
+  domainId,
+  nextActive,
+}: {
+  orgId: string
+  domainId: string
+  nextActive: boolean
+}): Promise<MutationData> {
+  return handleAction("Toggle domain active", async () => {
+    await getOrgAuth(orgId)
+    await toggleDomainActiveAction({
+      orgId,
+      domainId,
+      nextActive,
+    })
+    return { ok: true, toast: "Domain status updated" }
+  })
+}
+export async function makeDomainPrimary({
+  orgId,
+  domainId,
+}: {
+  orgId: string
+  domainId: string
+}): Promise<MutationData> {
+  return handleAction("Make domain primary", async () => {
+    await getOrgAuth(orgId)
+    await makeDomainPrimaryAction({ orgId, domainId })
+    return { ok: true, toast: "Primary domain updated" }
+  })
+}
+export async function toggleDomainRedirect({
+  orgId,
+  domainId,
+  nextRedirect,
+}: {
+  orgId: string
+  domainId: string
+  nextRedirect: boolean
+}): Promise<MutationData> {
+  return handleAction("Toggle redirect", async () => {
+    await getOrgAuth(orgId)
+    await toggleDomainRedirectAction({
+      orgId,
+      domainId,
+      nextRedirect,
+    })
+    return { ok: true, toast: "Redirect updated" }
+  })
+}
+export async function deleteDomain({
+  orgId,
+  domainId,
+}: {
+  orgId: string
+  domainId: string
+}): Promise<MutationData> {
+  return handleAction("Delete domain", async () => {
+    await getOrgAuth(orgId)
+    await deleteDomainAction({ orgId, domainId })
+    return { ok: true, toast: "Domain deleted" }
   })
 }

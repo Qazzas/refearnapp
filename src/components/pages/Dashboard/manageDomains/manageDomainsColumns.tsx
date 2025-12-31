@@ -3,19 +3,39 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Power, PowerOff, Trash2, Star, ArrowRightLeft } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import {
+  Power,
+  PowerOff,
+  Trash2,
+  Star,
+  ArrowRightLeft,
+  MoreHorizontal,
+  ShieldCheck,
+} from "lucide-react"
 import { DomainRow } from "@/lib/types/domainRow"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 export const manageDomainsColumns = ({
   onToggleActive,
   onMakePrimary,
   onToggleRedirect,
   onDelete,
+  onVerifyDns,
 }: {
-  onToggleActive: (id: string, isActive: boolean) => void
-  onMakePrimary: (id: string) => void
-  onToggleRedirect: (id: string, isRedirect: boolean) => void
-  onDelete: (id: string) => void
+  onToggleActive: (id: string, isActive: boolean, domainName: string) => void
+  onMakePrimary: (id: string, domainName: string) => void
+  onToggleRedirect: (
+    id: string,
+    isRedirect: boolean,
+    domainName: string
+  ) => void
+  onDelete: (id: string, domainName: string) => void
+  onVerifyDns: (id: string) => void
 }): ColumnDef<DomainRow>[] => [
   /* ---------------- Domain ---------------- */
   {
@@ -116,65 +136,118 @@ export const manageDomainsColumns = ({
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const { id, isActive, isPrimary, isRedirect, dnsStatus, isVerified } =
-        row.original
+      const {
+        id,
+        type,
+        isActive,
+        isPrimary,
+        isRedirect,
+        dnsStatus,
+        isVerified,
+        domainName,
+      } = row.original
 
-      const canDelete = !isActive && (!isVerified || dnsStatus !== "Verified")
+      const isCustom = type === "CUSTOM_DOMAIN" || type === "CUSTOM_SUBDOMAIN"
+
+      const needsVerification =
+        isCustom &&
+        !isVerified &&
+        (dnsStatus === "Pending" || dnsStatus === "Failed")
+
+      const canDelete = !isPrimary && (isCustom || type === "DEFAULT")
+      const canActivate = isVerified && dnsStatus === "Verified"
+      if (isPrimary) {
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-400">
+            Primary domain
+          </Badge>
+        )
+      }
 
       return (
-        <div className="flex flex-wrap gap-2">
-          {/* Activate / Deactivate */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onToggleActive(id, isActive)}
-          >
-            {isActive ? (
-              <>
-                <PowerOff className="w-4 h-4 mr-1" />
-                Deactivate
-              </>
-            ) : (
-              <>
-                <Power className="w-4 h-4 mr-1" />
-                Activate
-              </>
-            )}
-          </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
 
-          {/* Make Primary */}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!isActive || isPrimary}
-            onClick={() => onMakePrimary(id)}
-          >
-            <Star className="w-4 h-4 mr-1" />
-            {isPrimary ? "Primary" : "Make Primary"}
-          </Button>
+          <PopoverContent align="end" className="w-48 p-1">
+            <div className="flex flex-col">
+              {/* Activate / Deactivate */}
+              {canActivate && (
+                <Button
+                  variant="ghost"
+                  className="justify-start gap-2"
+                  onClick={() => onToggleActive(id, isActive, domainName)}
+                >
+                  {isActive ? (
+                    <>
+                      <PowerOff className="h-4 w-4 text-orange-500" />
+                      Deactivate
+                    </>
+                  ) : (
+                    <>
+                      <Power className="h-4 w-4 text-green-600" />
+                      Activate
+                    </>
+                  )}
+                </Button>
+              )}
 
-          {/* Redirect */}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!isActive || isPrimary}
-            onClick={() => onToggleRedirect(id, isRedirect)}
-          >
-            <ArrowRightLeft className="w-4 h-4 mr-1" />
-            {isRedirect ? "Disable Redirect" : "Redirect"}
-          </Button>
+              {/* Verify */}
+              {needsVerification && (
+                <Button
+                  variant="ghost"
+                  className="justify-start gap-2"
+                  onClick={() => onVerifyDns(id)}
+                >
+                  <ShieldCheck className="h-4 w-4 text-blue-600" />
+                  Verify DNS
+                </Button>
+              )}
 
-          {/* Delete */}
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={!canDelete}
-            onClick={() => onDelete(id)}
-          >
-            <Trash2 className="w-4 h-4 mr-1" />
-            Delete
-          </Button>
-        </div>
+              {/* Make Primary */}
+              {isActive && (
+                <Button
+                  variant="ghost"
+                  className="justify-start gap-2"
+                  onClick={() => onMakePrimary(id, domainName)}
+                >
+                  <Star className="h-4 w-4 text-yellow-500" />
+                  Make Primary
+                </Button>
+              )}
+
+              {/* Redirect */}
+              {isActive && (
+                <Button
+                  variant="ghost"
+                  className="justify-start gap-2"
+                  onClick={() => onToggleRedirect(id, isRedirect, domainName)}
+                >
+                  <ArrowRightLeft className="h-4 w-4 text-purple-500" />
+                  {isRedirect ? "Disable Redirect" : "Enable Redirect"}
+                </Button>
+              )}
+
+              {/* Delete */}
+              {canDelete && (
+                <>
+                  <Separator className="my-1" />
+                  <Button
+                    variant="ghost"
+                    className="justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => onDelete(id, domainName)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete Domain
+                  </Button>
+                </>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
       )
     },
   },
