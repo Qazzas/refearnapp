@@ -357,7 +357,7 @@ export function ManageDomainsTable({
                   <b>Name:</b> @
                 </div>
                 <div>
-                  <b>Value:</b> 76.76.21.21
+                  <b>Value:</b> 216.198.79.1
                 </div>
               </div>
             ) : (
@@ -369,7 +369,7 @@ export function ManageDomainsTable({
                   <b>Name:</b> {actionDialog.domainName?.split(".")[0]}
                 </div>
                 <div>
-                  <b>Value:</b> cname.vercel-dns.com
+                  <b>Value:</b> abf46c59de406f48.vercel-dns-017.com.
                 </div>
               </div>
             )}
