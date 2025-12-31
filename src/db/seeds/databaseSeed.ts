@@ -185,7 +185,7 @@ export const user_seed = [
   {
     id: "29022934-eb52-49af-aca4-b6ed553c89dd",
     name: "zak",
-    email: "zak@gmail.com",
+    email: "zekariyasberihun8@gmail.com",
     role: "OWNER" as const,
     type: "ORGANIZATION" as const,
     createdAt: parseDate("2025-07-16 11:43:21.288497"),
