@@ -39,7 +39,7 @@ export async function proxy(req: NextRequest) {
    * 🔁 Redirect case
    * inactive + redirect = true
    */
-  if (!domain.isActive && domain.isRedirect) {
+  if (domain.isRedirect && !domain.isPrimary) {
     const [primary] = await db
       .select({ domainName: websiteDomain.domainName })
       .from(websiteDomain)
