@@ -149,10 +149,7 @@ export const manageDomainsColumns = ({
 
       const isCustom = type === "CUSTOM_DOMAIN" || type === "CUSTOM_SUBDOMAIN"
 
-      const needsVerification =
-        isCustom &&
-        !isVerified &&
-        (dnsStatus === "Pending" || dnsStatus === "Failed")
+      const needsVerification = isCustom
 
       const canDelete = !isPrimary && (isCustom || type === "DEFAULT")
       const canActivate = isVerified && dnsStatus === "Verified"

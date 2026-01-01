@@ -64,3 +64,20 @@ export async function deleteDomainFromVercel(domain: string) {
     }
   }
 }
+export async function getVercelDomainConfig(domain: string) {
+  const res = await fetch(
+    `https://api.vercel.com/v6/domains/${domain}/config`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`,
+      },
+    }
+  )
+
+  if (!res.ok) {
+    throw { ok: false, toast: "Failed to fetch domain config from Vercel" }
+  }
+
+  return await res.json()
+}
