@@ -7,34 +7,49 @@ export type EmailType =
   | "email-change"
   | "reset-password"
   | "team-invite"
+type EmailPayload = {
+  subject: string
+  heading: string
+  button: string
+  description?: string | null
+}
 
-const EMAIL_CONTENT = {
-  login: {
+type EmailContentResolver = (extra?: {
+  title?: string
+  description?: string
+}) => EmailPayload
+const EMAIL_CONTENT: Record<EmailType, EmailContentResolver> = {
+  login: () => ({
     subject: "Verify Your Login",
     heading: "Approve Login Request",
     button: "Verify Login",
-  },
-  signup: {
+  }),
+
+  signup: () => ({
     subject: "Verify Your Email to Complete Signup",
     heading: "Verify Your Email",
     button: "Verify Email",
-  },
-  "email-change": {
+  }),
+
+  "email-change": () => ({
     subject: "Confirm Your New Email Address",
     heading: "Confirm Your New Email",
     button: "Confirm Email Change",
-  },
-  "reset-password": {
+  }),
+
+  "reset-password": () => ({
     subject: "Reset Your Password",
     heading: "Reset Your Password",
     button: "Reset Password",
-  },
-  "team-invite": {
-    subject: "You're Invited to Join a Team",
-    heading: "Team Invitation",
+  }),
+
+  "team-invite": (extra) => ({
+    subject: extra?.title ?? "You're Invited to Join a Team",
+    heading: extra?.title ?? "Team Invitation",
     button: "Accept Invitation",
-  },
-} as const
+    description: extra?.description ?? null,
+  }),
+}
 
 function buildEmailTemplate(
   heading: string,
@@ -75,20 +90,10 @@ export const sendVerificationEmail = async (
   type: EmailType,
   extra?: { title?: string; description?: string }
 ) => {
-  const base = EMAIL_CONTENT[type]
+  const { subject, heading, button, description } = EMAIL_CONTENT[type](extra)
 
-  // If not team invite → use defaults (NO CHANGE)
-  const subject =
-    type === "team-invite" && extra?.title ? extra.title : base.subject
+  const html = buildEmailTemplate(heading, description ?? null, button, link)
 
-  const heading =
-    type === "team-invite" && extra?.title ? extra.title : base.heading
-
-  const description = type === "team-invite" ? (extra?.description ?? "") : null
-
-  const html = buildEmailTemplate(heading, description, base.button, link)
-
-  // 📌 DEV MODE → MailDev
   if (process.env.NODE_ENV === "development") {
     const transporter = nodemailer.createTransport({
       host: "localhost",
@@ -103,7 +108,7 @@ export const sendVerificationEmail = async (
       html,
     })
   }
-  // 📌 PROD MODE → ZOHO ZEPTOMAIL
+
   const client = new SendMailClient({
     url: "https://api.zeptomail.com/v1.1/email",
     token: process.env.ZEPTO_TOKEN!,
@@ -114,11 +119,7 @@ export const sendVerificationEmail = async (
       address: "noreply@refearnapp.com",
       name: "RefearnApp",
     },
-    to: [
-      {
-        email_address: { address: to },
-      },
-    ],
+    to: [{ email_address: { address: to } }],
     subject,
     htmlbody: html,
   })

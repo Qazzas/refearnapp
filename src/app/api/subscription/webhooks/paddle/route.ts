@@ -4,6 +4,8 @@ import { purchase, subscription } from "@/db/schema"
 import { db } from "@/db/drizzle"
 import { eq } from "drizzle-orm"
 import { decodeOrgFromCustomData } from "@/util/DecodeOrgFromCustomData"
+import { redis } from "@/lib/redis"
+import { updateRedisObject } from "@/util/UpdateRedisObject"
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
   environment: Environment.sandbox,
 })
@@ -75,6 +77,7 @@ export async function POST(req: Request) {
           console.log("🔼 One-time upgrade: PRO → ULTIMATE")
 
           // remove previous PRO purchase
+          await redis.del(`one:${decodedOrg.id}`)
           await db.delete(purchase).where(eq(purchase.userId, decodedOrg.id))
         }
         const existingSub = await db.query.subscription.findFirst({
@@ -95,13 +98,17 @@ export async function POST(req: Request) {
               priceId,
               isActive: false,
             })
-
+            await redis.hset(`one:${decodedOrg.id}`, {
+              userId: decodedOrg.id,
+              tier: planType,
+              isActive: false,
+            })
             return NextResponse.json({ ok: true })
           }
 
           // ❌ No downgrade pending — user is switching to one-time immediately
           console.log("🗑 Removing active subscription — switching to one-time")
-
+          await redis.del(`sub:${decodedOrg.id}`)
           await db
             .delete(subscription)
             .where(eq(subscription.userId, decodedOrg.id))
@@ -114,7 +121,10 @@ export async function POST(req: Request) {
           priceId,
           currency,
         })
-
+        await redis.hset(`one:${decodedOrg.id}`, {
+          userId: decodedOrg.id,
+          tier: planType,
+        })
         console.log(`💾 Saved ONE-TIME ${planType} for user ${decodedOrg.id}`)
       } else {
         //
@@ -131,7 +141,7 @@ export async function POST(req: Request) {
 
         // Remove one-time purchases
         await db.delete(purchase).where(eq(purchase.userId, decodedOrg.id))
-
+        await redis.del(`one:${decodedOrg.id}`)
         // Update existing subscription (free → paid)
         await db
           .update(subscription)
@@ -147,7 +157,12 @@ export async function POST(req: Request) {
               : null,
           })
           .where(eq(subscription.userId, decodedOrg.id))
-
+        await redis.hset(`sub:${decodedOrg.id}`, {
+          plan: planType,
+          expiresAt: data.billingPeriod?.endsAt
+            ? new Date(data.billingPeriod.endsAt).toISOString()
+            : null,
+        })
         // Only insert customer if not already there
 
         console.log(
@@ -197,7 +212,9 @@ export async function POST(req: Request) {
             expiresAt: nextBill,
           })
           .where(eq(subscription.userId, userId))
-
+        await updateRedisObject(`sub:${decodedOrg.id}`, {
+          expiresAt: nextBill?.toISOString(),
+        })
         return NextResponse.json({ ok: true })
       }
       // 🎯 CASE: Undo cancel OR subscription cycle
@@ -223,7 +240,9 @@ export async function POST(req: Request) {
             ...(isSamePeriod ? {} : { expiresAt: nextBill }),
           })
           .where(eq(subscription.userId, userId))
-
+        await updateRedisObject(`sub:${decodedOrg.id}`, {
+          ...(isSamePeriod ? {} : { expiresAt: nextBill.toISOString() }),
+        })
         return NextResponse.json({ ok: true })
       }
     }
@@ -247,9 +266,11 @@ export async function POST(req: Request) {
           .update(purchase)
           .set({ isActive: true })
           .where(eq(purchase.userId, decodedOrg.id))
+        await updateRedisObject(`one:${decodedOrg.id}`, { isActive: true })
         await db
           .delete(subscription)
           .where(eq(subscription.userId, decodedOrg.id))
+        await redis.del(`sub:${decodedOrg.id}`)
       } else {
         console.log("ℹ️ No pending one-time purchase — user becomes FREE")
       }
@@ -266,7 +287,10 @@ export async function POST(req: Request) {
           updatedAt: new Date(),
         })
         .where(eq(subscription.userId, decodedOrg.id))
-
+      await redis.hset(`sub:${decodedOrg.id}`, {
+        plan: "FREE",
+        expiresAt: new Date().toISOString(),
+      })
       console.log(
         `🧹 Subscription canceled → reset to FREE for ${decodedOrg.id}`
       )

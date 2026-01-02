@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
     const { ref: refCode, host } = data
     const [affiliateLinkRecord] = await db
       .select({
-        linkId: affiliateLink.id,
         orgId: affiliateLink.organizationId,
         orgDomain: organization.websiteUrl,
       })
