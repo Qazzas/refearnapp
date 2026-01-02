@@ -1,29 +1,35 @@
 import { redis } from "@/lib/redis"
 
 /**
- * Updates a Redis Hash.
- * Dates are converted to ISO strings, but the object is saved field-by-field.
+ * Updates any Redis Hash with type safety.
+ * Automatically handles Dates, Nulls, and Objects.
  */
-export async function updateRedisObject(
+export async function updateRedisObject<T extends Record<string, any>>(
   key: string,
-  updates: Record<string, any>
+  updates: T
 ) {
-  // 1️⃣ Prepare the updates
-  // We still need to make sure Dates are strings because Redis fields are strings.
   const processedUpdates: Record<string, string | number> = {}
 
   for (const [k, v] of Object.entries(updates)) {
-    if (v instanceof Date) {
+    // 1. Handle Nulls (essential for your Cloudflare Worker checks)
+    if (v === null) {
+      processedUpdates[k] = "null"
+    }
+    // 2. Handle Dates
+    else if (v instanceof Date) {
       processedUpdates[k] = v.toISOString()
-    } else if (typeof v === "object" && v !== null) {
-      // If it's a nested object, we still need to stringify that specific field
+    }
+    // 3. Handle Objects/Arrays
+    else if (typeof v === "object") {
       processedUpdates[k] = JSON.stringify(v)
-    } else {
-      processedUpdates[k] = v
+    }
+    // 4. Handle Strings/Numbers
+    else {
+      processedUpdates[k] = v as string | number
     }
   }
 
-  // 2️⃣ Save to Redis using HSET
-  // This will add new fields or update existing ones without touching other data!
-  await redis.hset(key, processedUpdates)
+  if (Object.keys(processedUpdates).length > 0) {
+    await redis.hset(key, processedUpdates)
+  }
 }

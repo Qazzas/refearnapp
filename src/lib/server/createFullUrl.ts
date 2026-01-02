@@ -2,6 +2,7 @@
 import { db } from "@/db/drizzle"
 import { generateAffiliateCode } from "@/util/idGenerators"
 import { affiliateLink } from "@/db/schema"
+import { redis } from "@/lib/redis"
 
 export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
   const org = await db.query.organization.findFirst({
@@ -30,6 +31,20 @@ export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
     id: code,
     affiliateId: decoded.id,
     organizationId: decoded.orgId,
+  })
+  await redis.hset(`ref:${code}`, {
+    orgId: org.id,
+    name: org.name,
+    websiteUrl: domain,
+    referralParam: org.referralParam || "ref",
+    cookieLifetimeValue: String(org.cookieLifetimeValue),
+    cookieLifetimeUnit: org.cookieLifetimeUnit || "day",
+    commissionType: org.commissionType || "percentage",
+    commissionValue: org.commissionValue || "0.00",
+    commissionDurationValue: String(org.commissionDurationValue),
+    commissionDurationUnit: org.commissionDurationUnit || "day",
+    attributionModel: org.attributionModel,
+    currency: org.currency,
   })
   return { org, fullUrl }
 }
