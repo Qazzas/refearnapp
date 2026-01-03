@@ -11,6 +11,7 @@ import {
   Layers,
   User,
   Globe,
+  MailQuestion,
 } from "lucide-react"
 import {
   Sidebar,
@@ -88,6 +89,11 @@ const OrganizationDashboardSidebar = ({
       title: "Manage Domains",
       url: `/organization/${orgId}/dashboard/manageDomains`,
       icon: Globe,
+    },
+    {
+      title: "Support Email",
+      url: `/organization/${orgId}/dashboard/supportEmail`,
+      icon: MailQuestion,
     },
   ]
   if (plan.plan === "PRO" || plan.plan === "ULTIMATE") {

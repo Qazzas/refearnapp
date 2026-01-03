@@ -47,5 +47,8 @@ export async function getTeamAuthAction(orgId: string): Promise<OrgAuthResult> {
 
   if (!org) throw { status: 404, toast: "Organization not found" }
 
-  return org
+  return {
+    ...org,
+    email: teamData.email,
+  }
 }

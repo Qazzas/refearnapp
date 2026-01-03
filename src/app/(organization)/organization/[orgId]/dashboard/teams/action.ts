@@ -7,7 +7,7 @@ import { handleAction } from "@/lib/handleAction"
 import { ActionResult, MutationData } from "@/lib/types/response"
 import { getUserPlan } from "@/lib/server/getUserPlan"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
-import { sendVerificationEmail } from "@/lib/mail"
+import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { TeamRow } from "@/lib/types/teamsRow"
 
 export const inviteTeamMember = async ({

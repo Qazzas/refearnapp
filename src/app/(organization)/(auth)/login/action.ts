@@ -3,7 +3,7 @@
 import { db } from "@/db/drizzle"
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import { sendVerificationEmail } from "@/lib/mail"
+import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 

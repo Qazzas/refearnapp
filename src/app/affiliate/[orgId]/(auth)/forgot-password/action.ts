@@ -2,7 +2,7 @@
 
 import { db } from "@/db/drizzle"
 import jwt from "jsonwebtoken"
-import { sendVerificationEmail } from "@/lib/mail"
+import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { MutationData } from "@/lib/types/response"

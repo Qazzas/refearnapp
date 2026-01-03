@@ -11,6 +11,7 @@ import {
   Layers,
   User,
   Globe,
+  MailQuestion,
 } from "lucide-react"
 import {
   Sidebar,
@@ -74,6 +75,11 @@ const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
       title: "Manage Domains",
       url: `/organization/${orgId}/teams/dashboard/manageDomains`,
       icon: Globe,
+    },
+    {
+      title: "Support Email",
+      url: `/organization/${orgId}/teams/dashboard/supportEmail`,
+      icon: MailQuestion,
     },
   ]
 

@@ -44,6 +44,7 @@ export const payoutProviderEnum = pgEnum("payout_provider", [
   "wise",
   "payoneer",
 ])
+export const supportTypeEnum = pgEnum("support_type", ["FEEDBACK", "SUPPORT"])
 export const purchaseReasonEnum = pgEnum("purchase_reason", [
   "UPGRADE_NO_BILL",
   "UPGRADE_PRORATED",
@@ -99,6 +100,31 @@ export const user = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [index("user_created_at_idx").on(table.createdAt)]
+)
+export const supportMessage = pgTable(
+  "support_message",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    type: supportTypeEnum("type").notNull(),
+    subject: text("subject").notNull(),
+    message: text("message").notNull(),
+    orgId: text("org_id").references(() => organization.id, {
+      onDelete: "set null",
+    }),
+    isTeam: boolean("is_team").notNull().default(false),
+    email: text("email"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("support_message_type_created_at_idx").on(
+      table.type,
+      table.createdAt
+    ),
+    index("support_message_org_id_created_at_idx").on(
+      table.orgId,
+      table.createdAt
+    ),
+  ]
 )
 export const team = pgTable(
   "team",

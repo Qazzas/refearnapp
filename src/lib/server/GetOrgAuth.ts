@@ -2,7 +2,7 @@ import "server-only"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import { db } from "@/db/drizzle"
-import { organization } from "@/db/schema"
+import { organization, user } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { OrgAuthResult } from "@/lib/types/orgAuth"
 
@@ -18,8 +18,10 @@ export async function getOrgAuth(orgId: string): Promise<OrgAuthResult> {
       param: organization.referralParam,
       currency: organization.currency,
       userId: organization.userId,
+      email: user.email,
     })
     .from(organization)
+    .innerJoin(user, eq(user.id, organization.userId))
     .where(eq(organization.id, orgId))
     .then((r) => r[0])
   if (!org) throw { status: 404, toast: "Org not found" }
