@@ -168,12 +168,12 @@ export function PricingGrid({
       const monthlyPrice = tier === "PRO" ? 25 : 40
       if (subscriptionCycle === "MONTHLY") return `$${monthlyPrice} / month`
       if (subscriptionCycle === "YEARLY") {
-        const yearlyPrice = Math.round(monthlyPrice * 12 * 0.84)
+        const yearlyPrice = tier === "PRO" ? 252 : 403
         return `$${yearlyPrice} / year`
       }
     } else {
-      const proPrice = 85
-      const ultimatePrice = 125
+      const proPrice = 199
+      const ultimatePrice = 299
       if (tier === "PRO") return `$${proPrice} one-time`
       if (tier === "ULTIMATE") {
         const proOwned =
@@ -201,9 +201,9 @@ export function PricingGrid({
         return `$${yearlyPrice} / year`
       }
     } else {
-      const oldProPrice = 100
-      const oldUltimatePrice = 150
-      if (tier === "PRO") return "$100 one-time"
+      const oldProPrice = 250
+      const oldUltimatePrice = 350
+      if (tier === "PRO") return `$${oldProPrice} one-time`
       if (tier === "ULTIMATE") {
         const proOwned =
           (plan?.type === "PURCHASE" && plan.plan === "PRO") ||
