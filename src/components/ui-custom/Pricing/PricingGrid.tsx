@@ -214,7 +214,7 @@ export function PricingGrid({
           return `$${discountedOld} one-time`
         }
 
-        return "$150 one-time"
+        return `${oldUltimatePrice} one-time`
       }
     }
     return null
