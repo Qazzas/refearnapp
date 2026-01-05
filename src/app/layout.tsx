@@ -16,13 +16,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 export const metadata: Metadata = buildMetadata({
-  title: "RefearnApp | Launch Your Affiliate Program in Minutes",
-  description:
-    "RefearnApp gives SaaS founders a simple, powerful way to run affiliate programs. Track referrals, understand performance, and grow revenue—without the technical overhead.",
-  image: "https://refearnapp.com/opengraph.png",
-  url: "https://refearnapp.com",
-  icon: "https://refearnapp.com/refearnapp.svg",
-  siteName: "RefearnApp",
   indexable: true,
 })
 
