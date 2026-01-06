@@ -1,6 +1,8 @@
 name = "tracking-worker"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
-
+[vars]
+MAIN_APP_URL = "https://refearnapp.com"
+UPSTASH_REDIS_REST_URL = "https://key-walleye-8950.upstash.io"
 [triggers]
 crons = ["*/5 * * * *"]
