@@ -118,6 +118,7 @@ export default {
 		return new Response('Not Found', { status: 404, headers: corsHeaders });
 	},
 	async scheduled(_: any, env: any) {
+		console.log('⏰ Scheduled Cron Triggered at:', new Date().toISOString());
 		const redis = Redis.fromEnv(env);
 		const exists = await redis.exists('sync_batch');
 		if (!exists) return;
