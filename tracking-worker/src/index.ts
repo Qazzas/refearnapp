@@ -94,19 +94,21 @@ export default {
 			const dateStr = now.toISOString().slice(0, 10);
 			const hour = now.getUTCHours();
 			const monthStr = now.toISOString().slice(0, 7);
+			const cleanReferrer = beautifyReferrer(data.referrer);
+			const usageKey = `usage:total_clicks:${org.ownerId}:${monthStr}`;
 			const aggKey = [
 				code,
 				org.orgId,
 				dateStr,
 				hour,
 				data.host || 'unknown',
-				data.referrer || 'direct',
+				cleanReferrer,
 				data.deviceType || 'desktop',
 				data.browser || 'unknown',
 				data.os || 'unknown',
 				data.url || 'unknown',
 			].join(':::');
-			ctx.waitUntil(Promise.all([redis.hincrby('sync_batch', aggKey, 1), redis.incr(`usage:total_clicks:${org.ownerId}:${monthStr}`)]));
+			ctx.waitUntil(Promise.all([redis.hincrby('sync_batch', aggKey, 1), redis.incr(usageKey), redis.expire(usageKey, 5184000)]));
 			return new Response(
 				JSON.stringify({
 					success: true,
