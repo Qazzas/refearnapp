@@ -30,7 +30,12 @@ import { UAParser } from "ua-parser-js"
   async function storeRefCode(code: string) {
     try {
       const res = await fetch(
-        `${ORGID_ENDPOINT}?code=${encodeURIComponent(code)}`
+        `${ORGID_ENDPOINT}?code=${encodeURIComponent(code)}`,
+        {
+          headers: {
+            "x-refearnapp-token": "refearnapp-v1-human",
+          },
+        }
       )
       if (!res.ok) throw new Error("Failed to fetch organization info")
       type OrgTrackingConfig = {
@@ -107,12 +112,18 @@ import { UAParser } from "ua-parser-js"
   }
 
   function sendTrackingData(data: any) {
-    const payload = JSON.stringify(data)
+    const payload = JSON.stringify({
+      ...data,
+      token: "refearnapp-v1-human",
+    })
     const sent = navigator.sendBeacon(TRACKING_ENDPOINT, payload)
     if (!sent) {
       fetch(TRACKING_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-refearnapp-token": "refearnapp-v1-human",
+        },
         body: payload,
         keepalive: true,
       }).catch(() => {})
