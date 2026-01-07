@@ -4,7 +4,6 @@ import { getOrgSettings } from './getOrgSettings';
 import { beautifyReferrer } from './beautifyReferrer';
 const BOT_REGEX =
 	/bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot|TelegramBot|WhatsApp|Snapchat|Discordbot|Mastodon|pinit/i;
-const CLIENT_TOKEN = 'refearnapp-v1-human';
 export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
@@ -20,8 +19,9 @@ export default {
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
 			const ua = request.headers.get('user-agent') || '';
+			const trusted = Boolean(request.headers.get('cookie')?.includes('refearnapp_affiliate_click_tracked'));
 			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
-			if (isBot) {
+			if (isBot || !trusted) {
 				return new Response('Bot blocked', { status: 403, headers: corsHeaders });
 			}
 			const code = url.searchParams.get('code');
@@ -75,11 +75,11 @@ export default {
 				browser?: string;
 				os?: string;
 				deviceType?: string;
-				token?: string;
 			};
 			const ua = data.userAgent || request.headers.get('user-agent') || '';
 			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
-			if (isBot || data.token !== CLIENT_TOKEN) {
+			const trusted = Boolean(request.headers.get('cookie')?.includes('refearnapp_affiliate_click_tracked'));
+			if (isBot || !trusted) {
 				return new Response(JSON.stringify({ success: false, reason: 'Bot excluded' }), {
 					status: 403,
 					headers: corsHeaders,

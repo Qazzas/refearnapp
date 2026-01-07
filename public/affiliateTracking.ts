@@ -105,12 +105,18 @@ import { UAParser } from "ua-parser-js"
       deviceType: result.device.type || "desktop",
     }
   }
+  let interacted = false
 
+  window.addEventListener("pointerdown", () => (interacted = true), {
+    once: true,
+  })
+  window.addEventListener("keydown", () => (interacted = true), { once: true })
+  window.addEventListener("touchstart", () => (interacted = true), {
+    once: true,
+  })
   function sendTrackingData(data: any) {
-    const payload = JSON.stringify({
-      ...data,
-      token: "refearnapp-v1-human",
-    })
+    if (!interacted) return
+    const payload = JSON.stringify(data)
     const sent = navigator.sendBeacon(TRACKING_ENDPOINT, payload)
     if (!sent) {
       fetch(TRACKING_ENDPOINT, {
