@@ -68,7 +68,18 @@ export default {
 				os?: string;
 				deviceType?: string;
 			};
+			const ua = data.userAgent || '';
+			const isBot =
+				/bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot/i.test(
+					ua,
+				);
 
+			if (isBot) {
+				return new Response(JSON.stringify({ success: false, reason: 'Bot excluded' }), {
+					status: 200,
+					headers: corsHeaders,
+				});
+			}
 			const code = data.ref;
 			if (!code) {
 				return new Response('Missing ref', { status: 400, headers: corsHeaders });
@@ -96,6 +107,7 @@ export default {
 			const hour = now.getUTCHours();
 			const monthStr = now.toISOString().slice(0, 7);
 			const cleanReferrer = beautifyReferrer(data.referrer);
+			const cleanUrl = data.url ? data.url.split('?')[0] : 'unknown';
 			const usageKey = `usage:total_clicks:${org.ownerId}:${monthStr}`;
 			const aggKey = [
 				code,
@@ -107,7 +119,7 @@ export default {
 				data.deviceType || 'desktop',
 				data.browser || 'unknown',
 				data.os || 'unknown',
-				data.url || 'unknown',
+				cleanUrl,
 			].join(':::');
 			ctx.waitUntil(Promise.all([redis.hincrby('sync_batch', aggKey, 1), redis.incr(usageKey), redis.expire(usageKey, 5184000)]));
 			return new Response(
