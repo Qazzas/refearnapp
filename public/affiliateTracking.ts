@@ -73,7 +73,7 @@ import { UAParser } from "ua-parser-js"
 
   function getReferralCode(): string | null {
     const botPattern =
-      /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot|TelegramBot|WhatsApp|Snapchat|Discordbot|Mastodon|pinit/i
+      /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog/i
     if (botPattern.test(navigator.userAgent)) {
       console.log("RefEarn: Bot ignored")
       return null
