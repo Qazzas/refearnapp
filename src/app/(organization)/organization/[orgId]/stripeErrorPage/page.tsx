@@ -26,7 +26,7 @@ const stripeErrorPage = async ({
   const { message } = await searchParams
   return (
     <>
-      <StripeError message={message} />
+      <StripeError message={message} orgId={orgId} />
     </>
   )
 }

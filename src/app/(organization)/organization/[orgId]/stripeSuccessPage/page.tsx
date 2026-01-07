@@ -26,7 +26,7 @@ const stripeSuccessPage = async ({
   const { account } = await searchParams
   return (
     <>
-      <StripeSuccess account={account} />
+      <StripeSuccess account={account} orgId={orgId} />
     </>
   )
 }
