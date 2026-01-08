@@ -29,14 +29,17 @@ export async function getAffiliateLinksWithStatsAction(
 
       conversionRate: sql<number>`CASE
   WHEN COUNT(DISTINCT ${affiliateClick.id}) = 0 THEN 0
-  ELSE (
-    COUNT(DISTINCT CASE 
-      WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time') 
+      ELSE ROUND(
+      (
+      COUNT(DISTINCT CASE
+      WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time')
       THEN ${affiliateInvoice.id} END
-    )::float
-    / COUNT(DISTINCT ${affiliateClick.id})::float
-  ) * 100
-END`.mapWith(Number),
+      )::numeric
+      / COUNT(DISTINCT ${affiliateClick.id})::numeric
+      ) * 100,
+      2
+      )
+      END`.mapWith(Number),
       fullUrl: sql<string>`
   COALESCE(
     MIN('https://' || ${organization.websiteUrl} || '?' || ${organization.referralParam} || '=' || ${affiliateLink.id}),
