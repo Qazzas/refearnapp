@@ -49,6 +49,7 @@ import { AffiliatePayout } from "@/lib/types/affiliateStats"
 import { ActionResult } from "@/lib/types/response"
 import { useCachedValidation } from "@/hooks/useCachedValidation"
 import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
+import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
 
 interface AffiliatesTablePayoutProps {
   orgId: string
@@ -466,6 +467,12 @@ export default function PayoutTable({
 
             {/* RIGHT SIDE → Upload + Export + Mass payout */}
             <div className="flex flex-col gap-3 lg:flex-row lg:gap-2 lg:items-center">
+              <FeatureDemo
+                videoId="91532e767a2a4111baf074db8a948f8c"
+                title="Payouts Walkthrough"
+                description="Learn how to manage and export your payments."
+                affiliate={affiliate}
+              />
               <CsvUploadPopover orgId={orgId} />
               <Button
                 variant="outline"

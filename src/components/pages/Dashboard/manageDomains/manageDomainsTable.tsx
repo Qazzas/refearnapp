@@ -49,6 +49,7 @@ import {
   DomainActionState,
   useDomainActionMeta,
 } from "@/hooks/useDomainActionDialog"
+import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
 interface AffiliatesTableManageDomainsProps {
   orgId: string
   affiliate: boolean
@@ -249,6 +250,12 @@ export function ManageDomainsTable({
           hideOrder
           rightActions={
             <>
+              <FeatureDemo
+                videoId="04d5b016ea60451ca8942a49f5154961"
+                title="Domain Setup Guide"
+                description="Learn how to add and verify your custom domains or subdomains."
+                affiliate={affiliate}
+              />
               <Button onClick={() => setOpen(true)}>Add Domain</Button>
               <AppDialog
                 open={open}
