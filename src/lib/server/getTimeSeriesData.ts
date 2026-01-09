@@ -1,6 +1,6 @@
 "use server"
 import { db } from "@/db/drizzle"
-import { inArray, sql } from "drizzle-orm"
+import { and, inArray, sql } from "drizzle-orm"
 import { affiliateClick, affiliateInvoice } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
 export async function getTimeSeriesData<T>(
@@ -33,26 +33,30 @@ export async function getTimeSeriesData<T>(
       .select({
         day: invoiceDay,
         subscriptionId: affiliateInvoice.subscriptionId,
-        subs: sql<number>`count(distinct ${affiliateInvoice.subscriptionId})`.mapWith(
+        subs: sql<number>`count(distinct case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.subscriptionId} end)`.mapWith(
           Number
-        ), // unique subs that day
+        ),
         singles:
-          sql<number>`sum(case when ${affiliateInvoice.subscriptionId} is null then 1 else 0 end)`.mapWith(
+          sql<number>`sum(case when ${affiliateInvoice.subscriptionId} is null and ${affiliateInvoice.refundedAt} is null then 1 else 0 end)`.mapWith(
             Number
           ), // null subs (one-off)
         commission:
-          sql<number>`coalesce(sum(${affiliateInvoice.commission}), 0)`.mapWith(
+          sql<number>`coalesce(sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission} else 0 end), 0)`.mapWith(
             Number
           ),
+        isRefunded: sql<boolean>`${affiliateInvoice.refundedAt} is not null`,
       })
       .from(affiliateInvoice)
       .where(
-        buildWhereWithDate(
-          [inArray(affiliateInvoice.affiliateLinkId, linkIds)],
-          affiliateInvoice,
-          year,
-          month,
-          true
+        and(
+          sql`${affiliateInvoice.refundedAt} IS NULL`,
+          buildWhereWithDate(
+            [inArray(affiliateInvoice.affiliateLinkId, linkIds)],
+            affiliateInvoice,
+            year,
+            month,
+            true
+          )
         )
       )
       .groupBy(invoiceDay, affiliateInvoice.subscriptionId),

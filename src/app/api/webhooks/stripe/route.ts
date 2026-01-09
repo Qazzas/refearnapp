@@ -288,6 +288,94 @@ export async function POST(req: NextRequest) {
 
       break
     }
+    case "charge.succeeded": {
+      const charge = event.data.object as Stripe.Charge
+      const customerId = charge.customer as string
+      const chargeId = charge.id
+      const maxRetries = 5
+      for (let i = 0; i <= maxRetries; i++) {
+        const latestPendingInvoice = await db.query.affiliateInvoice.findFirst({
+          where: (table, { eq, and, isNull }) =>
+            and(eq(table.customerId, customerId), isNull(table.transactionId)),
+          orderBy: (table, { desc }) => [desc(table.createdAt)],
+        })
+
+        if (latestPendingInvoice) {
+          await db
+            .update(affiliateInvoice)
+            .set({
+              transactionId: chargeId,
+              updatedAt: new Date(),
+            })
+            .where(eq(affiliateInvoice.id, latestPendingInvoice.id))
+
+          console.log(
+            `✅ Success: Linked Stripe Charge ${chargeId} to Invoice ${latestPendingInvoice.id}`
+          )
+          break
+        }
+
+        if (i < maxRetries) {
+          console.log(
+            `⏳ Retry ${i + 1}/${maxRetries}: Waiting for invoice record...`
+          )
+          await new Promise((res) => setTimeout(res, 2000))
+        } else {
+          console.warn(
+            `❌ Failed: No pending invoice found for customer ${customerId} after retries.`
+          )
+        }
+      }
+      break
+    }
+    case "charge.refunded": {
+      const charge = event.data.object as Stripe.Charge
+      const chargeId = charge.id
+      const invoice = await db.query.affiliateInvoice.findFirst({
+        where: eq(affiliateInvoice.transactionId, chargeId),
+      })
+      if (!invoice) {
+        console.warn(
+          `⚠️ Stripe refund received for unknown charge: ${chargeId}`
+        )
+        break
+      }
+      const rawRefundCurrency = charge.currency ?? "usd"
+      const rawRefundAmount = charge.amount_refunded
+      const refundDecimals = getCurrencyDecimals(rawRefundCurrency)
+      const { amount: refundAmountInUSD } = await convertToUSD(
+        rawRefundAmount,
+        rawRefundCurrency,
+        refundDecimals
+      )
+      const originalCommissionUSD = parseFloat(invoice.commission || "0")
+      const originalAmountUSD = parseFloat(invoice.amount || "0")
+      if (originalAmountUSD <= 0) break
+      const refundAmountUSDNum = parseFloat(refundAmountInUSD)
+      const refundRatio = refundAmountUSDNum / originalAmountUSD
+
+      const commissionReduction = originalCommissionUSD * refundRatio
+      const newCommission = Math.max(
+        0,
+        originalCommissionUSD - commissionReduction
+      )
+      const isFullRefund =
+        charge.refunded || refundAmountUSDNum >= originalAmountUSD - 0.01
+      await db
+        .update(affiliateInvoice)
+        .set({
+          refundedAt: isFullRefund ? new Date() : null,
+          commission: newCommission.toFixed(2),
+          unpaidAmount: newCommission.toFixed(2),
+          updatedAt: new Date(),
+        })
+        .where(eq(affiliateInvoice.id, invoice.id))
+
+      console.log(
+        `📉 Stripe Refund: Adjusted USD Commission ${originalCommissionUSD} -> ${newCommission.toFixed(2)} for charge: ${chargeId}`
+      )
+      break
+    }
     default:
       console.log(`Unhandled event type: ${event.type}`)
   }

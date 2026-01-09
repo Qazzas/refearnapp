@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       case "transaction.completed": {
         const tx = payload.data
         const isSubscription = Boolean(tx.subscription_id)
-
+        const transactionId = tx.id
         const customerId = tx.customer_id
         const subscriptionId = tx.subscription_id || null
         const rawCurrency = tx.details?.totals?.currency_code || "USD"
@@ -185,6 +185,7 @@ export async function POST(request: NextRequest) {
           }
           await db.insert(affiliateInvoice).values({
             paymentProvider: "paddle",
+            transactionId,
             subscriptionId,
             customerId,
             amount: amount.toString(),
@@ -202,6 +203,7 @@ export async function POST(request: NextRequest) {
           // One-time purchase
           await db.insert(affiliateInvoice).values({
             paymentProvider: "paddle",
+            transactionId,
             subscriptionId: null,
             customerId,
             amount: amount.toString(),
@@ -274,6 +276,72 @@ export async function POST(request: NextRequest) {
           subscriptionId,
           expirationDate: expirationDate.toISOString(),
         })
+        break
+      }
+      case "adjustment.updated": {
+        const adjustment = payload.data
+        const status = adjustment.status
+        const action = adjustment.action
+        const transactionId = adjustment.transaction_id
+
+        if (status === "approved" && action === "refund") {
+          const invoice = await db.query.affiliateInvoice.findFirst({
+            where: eq(affiliateInvoice.transactionId, transactionId),
+          })
+
+          if (!invoice) {
+            console.warn(
+              `⚠️ Refund received for unknown transaction: ${transactionId}`
+            )
+            break
+          }
+
+          // 1. Convert the Refunded Amount from Paddle (Local Currency) to USD
+          const rawRefundCurrency = adjustment.totals?.currency_code || "USD"
+          const rawRefundAmount = parseFloat(adjustment.totals?.total || "0")
+          const refundDecimals = getCurrencyDecimals(rawRefundCurrency)
+
+          // We use your convertToUSD function to get the USD value of the refund
+          const { amount: refundAmountInUSD } = await convertToUSD(
+            rawRefundAmount,
+            rawRefundCurrency,
+            refundDecimals
+          )
+
+          // 2. Safely parse the original values (Fixes TS2345)
+          // We use || "0" to provide a fallback string for null values
+          const originalCommissionUSD = parseFloat(invoice.commission || "0")
+          const originalAmountUSD = parseFloat(invoice.amount || "0")
+
+          if (originalAmountUSD <= 0) break
+
+          // 3. Calculate the Ratio and Reduction in USD
+          const refundAmountUSDNum = parseFloat(refundAmountInUSD)
+          const refundRatio = refundAmountUSDNum / originalAmountUSD
+
+          const commissionReduction = originalCommissionUSD * refundRatio
+          const newCommission = Math.max(
+            0,
+            originalCommissionUSD - commissionReduction
+          )
+
+          // 4. Mathematical Full Refund Check (using USD values)
+          const isFullRefund = refundAmountUSDNum >= originalAmountUSD - 0.01
+
+          await db
+            .update(affiliateInvoice)
+            .set({
+              refundedAt: isFullRefund ? new Date() : null,
+              commission: newCommission.toFixed(2),
+              unpaidAmount: newCommission.toFixed(2),
+              updatedAt: new Date(),
+            })
+            .where(eq(affiliateInvoice.id, invoice.id))
+
+          console.log(
+            `📉 Refund (USD): Adjusted ${originalCommissionUSD} -> ${newCommission.toFixed(2)} (Ratio: ${refundRatio.toFixed(4)})`
+          )
+        }
         break
       }
 

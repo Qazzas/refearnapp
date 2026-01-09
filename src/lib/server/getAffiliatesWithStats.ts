@@ -65,24 +65,26 @@ export async function getAffiliatesWithStatsAction(
           (
             COUNT(DISTINCT ${affiliateInvoice.subscriptionId})
             + COUNT(DISTINCT CASE 
-                WHEN ${affiliateInvoice.subscriptionId} IS NULL 
+                WHEN ${affiliateInvoice.subscriptionId} IS NULL
+                AND ${affiliateInvoice.refundedAt} IS NULL
                 THEN ${affiliateInvoice.id} END
               )
           )::float / COUNT(DISTINCT ${affiliateClick.id})::float
         ) * 100
       END
     `
-    const commissionSql = sql`COALESCE(SUM(${affiliateInvoice.commission}), 0)`
+    const commissionSql = sql`COALESCE(SUM(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.commission} ELSE 0 END), 0)`
     const salesSql = sql`
       COUNT(DISTINCT ${affiliateInvoice.subscriptionId})
       + COUNT(DISTINCT CASE 
-          WHEN ${affiliateInvoice.subscriptionId} IS NULL 
+          WHEN ${affiliateInvoice.subscriptionId} IS NULL
+          AND ${affiliateInvoice.refundedAt} IS NULL
           THEN ${affiliateInvoice.id} END
         )
     `
     const visitsSql = sql`COUNT(DISTINCT ${affiliateClick.id})`
-    const commissionPaidSql = sql`COALESCE(SUM(${affiliateInvoice.paidAmount}), 0)`
-    const commissionUnpaidSql = sql`COALESCE(SUM(${affiliateInvoice.unpaidAmount}), 0)`
+    const commissionPaidSql = sql`COALESCE(SUM(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.paidAmount} ELSE 0 END), 0)`
+    const commissionUnpaidSql = sql`COALESCE(SUM(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.unpaidAmount} ELSE 0 END), 0)`
     const emailSql = affiliate.email
     const orderByMap: Record<string, any> = {
       conversionRate: conversionRateSql,
@@ -119,13 +121,16 @@ export async function getAffiliatesWithStatsAction(
     )
     .leftJoin(
       affiliateInvoice,
-      buildWhereWithDate(
-        [eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)],
-        affiliateInvoice,
-        year,
-        month,
-        false,
-        months
+      and(
+        sql`${affiliateInvoice.refundedAt} IS NULL`,
+        buildWhereWithDate(
+          [eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)],
+          affiliateInvoice,
+          year,
+          month,
+          false,
+          months
+        )
       )
     )
     .leftJoin(organization, eq(organization.id, orgId))

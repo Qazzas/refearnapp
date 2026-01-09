@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -177,6 +176,9 @@ export default function Connect({
                 </li>
                 <li>
                   <code>subscription.created</code>
+                </li>
+                <li>
+                  <code>adjustment.updated</code>
                 </li>
               </ul>
               <p>

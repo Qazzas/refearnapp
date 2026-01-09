@@ -26,23 +26,22 @@ export async function getOrganizationKpiStatsAction(
         Number
       ),
       sales: sql<number>`COUNT(DISTINCT CASE
-        WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time') THEN ${affiliateInvoice.id}
+        WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time')
+      AND ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.id}
       END)`.mapWith(Number),
 
-      commission:
-        sql<number>`COALESCE(SUM(${affiliateInvoice.commission}),0)`.mapWith(
-          Number
-        ),
-      paid: sql<number>`COALESCE(SUM(${affiliateInvoice.paidAmount}),0)`.mapWith(
-        Number
-      ),
-      unpaid:
-        sql<number>`COALESCE(SUM(${affiliateInvoice.unpaidAmount}),0)`.mapWith(
-          Number
-        ),
-      amount: sql<number>`COALESCE(SUM(${affiliateInvoice.amount}),0)`.mapWith(
-        Number
-      ),
+      commission: sql<number>`COALESCE(SUM(CASE 
+        WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.commission}
+      ELSE 0 END), 0)`.mapWith(Number),
+      paid: sql<number>`COALESCE(SUM(CASE 
+        WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.paidAmount}
+      ELSE 0 END), 0)`.mapWith(Number),
+      unpaid: sql<number>`COALESCE(SUM(CASE 
+        WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.unpaidAmount}
+      ELSE 0 END), 0)`.mapWith(Number),
+      amount: sql<number>`COALESCE(SUM(CASE 
+        WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.amount}
+      ELSE 0 END), 0)`.mapWith(Number),
     })
     .from(affiliate)
     .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))

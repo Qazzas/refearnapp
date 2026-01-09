@@ -1,6 +1,6 @@
 "use server"
 import { db } from "@/db/drizzle"
-import { and, eq, sql } from "drizzle-orm"
+import { and, eq, isNull, sql } from "drizzle-orm"
 import { affiliateInvoice, affiliateLink } from "@/db/schema"
 export async function getAffiliateCommissionByMonthAction(
   decoded: {
@@ -13,14 +13,17 @@ export async function getAffiliateCommissionByMonthAction(
     .select({
       month: sql<string>`to_char(${affiliateInvoice.createdAt}, 'YYYY-MM')`,
       linkId: affiliateLink.id,
-      totalCommission: sql<number>`sum(${affiliateInvoice.commission})`.mapWith(
-        Number
-      ),
-      paidCommission: sql<number>`sum(${affiliateInvoice.paidAmount})`.mapWith(
-        Number
-      ),
-      unpaidCommission:
-        sql<number>`sum(${affiliateInvoice.unpaidAmount})`.mapWith(Number),
+      totalCommission: sql<number>`
+        sum(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.commission} ELSE 0 END)
+      `.mapWith(Number),
+
+      paidCommission: sql<number>`
+        sum(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.paidAmount} ELSE 0 END)
+      `.mapWith(Number),
+
+      unpaidCommission: sql<number>`
+        sum(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.unpaidAmount} ELSE 0 END)
+      `.mapWith(Number),
     })
     .from(affiliateInvoice)
     .innerJoin(
@@ -31,7 +34,8 @@ export async function getAffiliateCommissionByMonthAction(
       and(
         sql`extract(year from ${affiliateInvoice.createdAt}) = ${targetYear}`,
         eq(affiliateLink.organizationId, decoded.orgId),
-        eq(affiliateLink.affiliateId, decoded.id)
+        eq(affiliateLink.affiliateId, decoded.id),
+        isNull(affiliateInvoice.refundedAt)
       )
     )
     .groupBy(
