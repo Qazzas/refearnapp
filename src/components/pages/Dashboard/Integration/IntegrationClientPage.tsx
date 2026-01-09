@@ -86,7 +86,7 @@ const IntegrationClientPage = ({
             <StripeIntegration orgId={orgId} />
           </TabsContent>
           <TabsContent value="paddle" className="w-full">
-            <PaddleIntegration orgId={orgId} isTeam />
+            <PaddleIntegration orgId={orgId} isTeam={isTeam} />
           </TabsContent>
         </div>
       </Tabs>

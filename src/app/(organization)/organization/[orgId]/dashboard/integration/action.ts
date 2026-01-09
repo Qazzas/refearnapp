@@ -18,6 +18,7 @@ export async function savePaddleWebhookKey({
 }): Promise<MutationData> {
   return handleAction("savePaddleWebhookKey", async () => {
     // 🔐 Authorization
+    console.log("Saving webhook key for org:", orgId, webhookPublicKey)
     await getOrgAuth(orgId)
     await saveOrgPaddleWebhookKey({ orgId, webhookPublicKey })
     return {

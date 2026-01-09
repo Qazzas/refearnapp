@@ -10,7 +10,6 @@ export async function getOrgAuth(orgId: string): Promise<OrgAuthResult> {
   const cookieStore = await cookies()
   const token = cookieStore.get("organizationToken")?.value
   if (!token) throw { status: 401, toast: "Unauthorized" }
-
   const { id: userId } = jwt.decode(token) as { id: string }
   const org = await db
     .select({
