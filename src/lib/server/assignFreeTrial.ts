@@ -9,7 +9,7 @@ export async function assignFreeTrialSubscription(userId: string) {
   const exists = await redis.exists(redisKey)
   if (exists) return
   const expiresAt = new Date()
-  expiresAt.setDate(expiresAt.getDate() + 7)
+  expiresAt.setDate(expiresAt.getDate() + 14)
   await db.insert(subscription).values({
     userId,
     plan: "FREE",

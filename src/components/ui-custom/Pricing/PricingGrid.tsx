@@ -367,7 +367,7 @@ Proceed?`
           discount={getDiscountPercent(getOldPrice("PRO"), getPrice("PRO"))}
           features={featuresList.filter((f) => f.pro).map((f) => f.name)}
           buttonText={
-            dashboard ? getButtonText("PRO", billingType) : "Start 7-Day Trial"
+            dashboard ? getButtonText("PRO", billingType) : "Start 14-Day Trial"
           }
           disabled={isDisabled("PRO")}
           pendingMessage={
@@ -395,7 +395,7 @@ Proceed?`
           buttonText={
             dashboard
               ? getButtonText("ULTIMATE", billingType)
-              : "Start 7-Day Trial"
+              : "Start 14-Day Trial"
           }
           disabled={isDisabled("ULTIMATE")}
           highlight
