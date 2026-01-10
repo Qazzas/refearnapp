@@ -132,6 +132,27 @@ export default {
 				{ headers: corsHeaders },
 			);
 		}
+		if (url.pathname === '/health') {
+			const secret = request.headers.get('x-internal-secret');
+			if (secret !== env.INTERNAL_SECRET) {
+				return new Response('Unauthorized', { status: 401 });
+			}
+
+			const type = url.searchParams.get('type');
+
+			if (type === 'sync') {
+				// We pass a mock event object to trick the handler
+				await handleScheduled({ cron: '*/5 * * * *' }, env, ctx);
+				return new Response('Sync triggered manually', { status: 200 });
+			}
+
+			if (type === 'seed') {
+				await handleScheduled({ cron: '0 0 * * *' }, env, ctx);
+				return new Response('Currency seed triggered manually', { status: 200 });
+			}
+
+			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
+		}
 
 		return new Response('Not Found', { status: 404, headers: corsHeaders });
 	},
