@@ -181,9 +181,16 @@ export default {
 
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
-		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
-		newRequest.headers.set('host', PRIMARY_HOST);
-		newRequest.headers.set('x-forwarded-host', PRIMARY_HOST);
+		const headers = new Headers(request.headers);
+		headers.set('host', PRIMARY_HOST);
+		headers.set('x-forwarded-host', PRIMARY_HOST);
+		headers.set('x-forwarded-proto', 'https');
+		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
+			method: request.method,
+			headers: headers,
+			body: request.body,
+			redirect: 'manual',
+		});
 
 		return fetch(newRequest);
 	},
