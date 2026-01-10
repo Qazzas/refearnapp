@@ -2,6 +2,7 @@ import { Redis } from '@upstash/redis/cloudflare';
 import { shouldTrackRedis } from './shouldTrackRedis';
 import { getOrgSettings } from './getOrgSettings';
 import { beautifyReferrer } from './beautifyReferrer';
+import { handleScheduled } from './scheduled';
 const BOT_REGEX = /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog/i;
 export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
@@ -134,69 +135,7 @@ export default {
 
 		return new Response('Not Found', { status: 404, headers: corsHeaders });
 	},
-	async scheduled(_: any, env: any) {
-		console.log('⏰ Scheduled Cron Triggered at:', new Date().toISOString());
-		const redis = Redis.fromEnv(env);
-		const exists = await redis.exists('sync_batch');
-		if (!exists) return;
-
-		// 1. Isolate the data with a timestamped key
-		const processingKey = `sync_processing_${Date.now()}`;
-		await redis.rename('sync_batch', processingKey);
-
-		let cursor = '0';
-		const fullBatch: Record<string, string> = {};
-
-		// 2. Efficiently pull data into memory
-		do {
-			const [nextCursor, items] = await redis.hscan(processingKey, cursor, { count: 1000 });
-			cursor = nextCursor;
-
-			for (let i = 0; i < items.length; i += 2) {
-				// ✅ FIX: Explicitly cast key and value to String to resolve TS2322
-				const key = String(items[i]);
-				fullBatch[key] = String(items[i + 1]);
-			}
-		} while (cursor !== '0');
-
-		// 3. Prevent empty pings
-		const batchKeys = Object.keys(fullBatch);
-		if (batchKeys.length === 0) {
-			await redis.del(processingKey);
-			return;
-		}
-
-		try {
-			const response = await fetch(`${env.MAIN_APP_URL}/api/internal/sync-batch`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'x-internal-secret': env.INTERNAL_SECRET,
-				},
-				body: JSON.stringify({ batch: fullBatch }),
-			});
-
-			if (response.ok) {
-				// SUCCESS: Cleanup temp data
-				await redis.del(processingKey);
-				console.log(`✅ Synced ${batchKeys.length} items to Vercel.`);
-			} else {
-				throw new Error(`Server returned ${response.status}`);
-			}
-		} catch (error) {
-			console.error('❌ Sync failed, merging data back to main batch:', error);
-
-			/** * SAFE FAIL-BACK:
-			 * We iterate the fullBatch and use HINCRBY to merge it back into 'sync_batch'.
-			 * This ensures if new clicks happened while we were trying to sync,
-			 * we don't overwrite them; we add to them.
-			 */
-			const pipeline = redis.pipeline();
-			for (const [key, val] of Object.entries(fullBatch)) {
-				pipeline.hincrby('sync_batch', key, parseInt(val));
-			}
-			await pipeline.exec();
-			await redis.del(processingKey);
-		}
+	async scheduled(event: any, env: any, ctx: any) {
+		ctx.waitUntil(handleScheduled(event, env, ctx));
 	},
 };
