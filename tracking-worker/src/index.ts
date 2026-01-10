@@ -28,6 +28,7 @@ export default {
 			'/pricing.js',
 			'/style.css',
 			'/testimonials.js',
+			'/output.css',
 		];
 		const isAsset = marketingAssets.some((path) => url.pathname === path);
 
