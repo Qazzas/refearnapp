@@ -196,36 +196,57 @@ export async function POST(req: NextRequest) {
     case "invoice.paid": {
       const invoice = event.data.object as Stripe.Invoice
       const invoiceCreatedDate = new Date(invoice.created * 1000)
+
+      // Note: Standardize how we get sub ID from the invoice object
       const subscriptionId = invoice.parent?.subscription_details
         ?.subscription as string
       const customerId = invoice.customer as string
       const reason = invoice.billing_reason
 
-      if (!subscriptionId) {
-        console.warn("❌ No valid subscriptionId found.")
-        return
-      }
-
       if (reason === "subscription_update" || reason === "subscription_cycle") {
-        const isExpired = await checkSubscriptionExpired(
-          subscriptionId,
-          invoiceCreatedDate
-        )
-        if (isExpired) {
-          console.warn("❌ Subscription expired — skipping:", subscriptionId)
-          break
+        // 1. Check Expiration
+        if (subscriptionId) {
+          const isExpired = await checkSubscriptionExpired(
+            subscriptionId,
+            invoiceCreatedDate
+          )
+          if (isExpired) {
+            console.warn("❌ Subscription expired — skipping:", subscriptionId)
+            break
+          }
         }
-        const latestInvoice = await db.query.affiliateInvoice.findFirst({
-          where: (table, { eq }) => eq(table.subscriptionId, subscriptionId),
+
+        // 2. THE NEW PLACEHOLDER LOOKUP (By customer + reasons)
+        const placeholder = await db.query.affiliateInvoice.findFirst({
+          where: (table, { eq, and, or }) =>
+            and(
+              eq(table.customerId, customerId),
+              or(
+                eq(table.reason, "placeholder_from_charge"),
+                eq(table.reason, "placeholder_from_subscription")
+              )
+            ),
           orderBy: (table, { desc }) => [desc(table.createdAt)],
         })
 
-        if (!latestInvoice || !latestInvoice.affiliateLinkId) {
-          console.warn("❌ No affiliate record found to link this payment to.")
+        // 3. Fallback: If no placeholder, we still need the Affiliate Link from any past invoice
+        // to know WHO to give the commission to for this renewal.
+        const referenceInvoice =
+          placeholder ||
+          (await db.query.affiliateInvoice.findFirst({
+            where: (table, { eq }) => eq(table.customerId, customerId),
+            orderBy: (table, { desc }) => [desc(table.createdAt)],
+          }))
+
+        if (!referenceInvoice || !referenceInvoice.affiliateLinkId) {
+          console.warn("❌ No affiliate record found for this customer.")
           return
         }
+
+        // 4. Get Org Data
         const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-          where: (link, { eq }) => eq(link.id, latestInvoice.affiliateLinkId!),
+          where: (link, { eq }) =>
+            eq(link.id, referenceInvoice.affiliateLinkId!),
         })
         if (!affiliateLinkRecord) break
 
@@ -233,27 +254,26 @@ export async function POST(req: NextRequest) {
           affiliateLinkRecord.organizationId
         )
         if (!organizationRecord) break
-        const placeholderId =
-          latestInvoice.reason === "placeholder_from_charge"
-            ? latestInvoice.id
-            : null
 
+        // 5. Extract Totals
         const total = String(invoice.total_excluding_tax ?? 0)
         const currency = invoice.currency
         const commissionType = organizationRecord.commissionType ?? "percentage"
         const commissionValue = organizationRecord.commissionValue ?? "0.00"
+
+        // 6. CALL UTILITY
         await invoicePaidUpdate(
           total,
           currency,
           customerId,
-          subscriptionId,
-          latestInvoice.affiliateLinkId,
+          subscriptionId || "", // Ensure it's a string
+          referenceInvoice.affiliateLinkId,
           commissionType,
           commissionValue,
-          placeholderId
+          placeholder?.id // If found, updates it. If null, inserts new.
         )
 
-        console.log(`✅ Handled ${reason} for sub: ${subscriptionId}`)
+        console.log(`✅ Handled ${reason} via placeholder/customer lookup.`)
       }
       break
     }
