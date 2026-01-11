@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event
   try {
     event = stripe.webhooks.constructEvent(body, sig, endpointSecret)
+    console.log(`🔔 Webhook hit: ${event.type} for account ${event.account}`)
   } catch (err: any) {
     console.error("❌ Webhook signature verification failed.", err.message)
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 })
@@ -299,36 +300,40 @@ export async function POST(req: NextRequest) {
     case "charge.refunded": {
       const charge = event.data.object as Stripe.Charge
       const chargeId = charge.id
+
       const invoice = await db.query.affiliateInvoice.findFirst({
-        where: eq(affiliateInvoice.transactionId, chargeId),
+        where: (table, { eq }) => eq(table.transactionId, chargeId),
       })
+
       if (!invoice) {
-        console.warn(
-          `⚠️ Stripe refund received for unknown charge: ${chargeId}`
-        )
+        console.warn(`⚠️ Refund received for unknown charge: ${chargeId}`)
         break
       }
-      const rawRefundCurrency = charge.currency ?? "usd"
+
       const rawRefundAmount = charge.amount_refunded
-      const refundDecimals = getCurrencyDecimals(rawRefundCurrency)
+      const refundDecimals = getCurrencyDecimals(charge.currency)
       const { amount: refundAmountInUSD } = await convertToUSD(
         rawRefundAmount,
-        rawRefundCurrency,
+        charge.currency,
         refundDecimals
       )
-      const originalCommissionUSD = parseFloat(invoice.commission || "0")
-      const originalAmountUSD = parseFloat(invoice.amount || "0")
-      if (originalAmountUSD <= 0) break
-      const refundAmountUSDNum = parseFloat(refundAmountInUSD)
-      const refundRatio = refundAmountUSDNum / originalAmountUSD
 
-      const commissionReduction = originalCommissionUSD * refundRatio
-      const newCommission = Math.max(
-        0,
-        originalCommissionUSD - commissionReduction
-      )
+      const originalAmountUSD = parseFloat(invoice.amount || "0")
+      const originalCommissionUSD = parseFloat(invoice.commission || "0")
+
+      let newCommission = originalCommissionUSD
+      if (originalAmountUSD > 0) {
+        const refundAmountUSDNum = parseFloat(refundAmountInUSD)
+        const refundRatio = refundAmountUSDNum / originalAmountUSD
+        const commissionReduction = originalCommissionUSD * refundRatio
+        newCommission = Math.max(0, originalCommissionUSD - commissionReduction)
+      }
+
       const isFullRefund =
-        charge.refunded || refundAmountUSDNum >= originalAmountUSD - 0.01
+        charge.refunded ||
+        (originalAmountUSD > 0 &&
+          parseFloat(refundAmountInUSD) >= originalAmountUSD - 0.01)
+
       await db
         .update(affiliateInvoice)
         .set({
@@ -340,12 +345,10 @@ export async function POST(req: NextRequest) {
         .where(eq(affiliateInvoice.id, invoice.id))
 
       console.log(
-        `📉 Stripe Refund: Adjusted USD Commission ${originalCommissionUSD} -> ${newCommission.toFixed(2)} for charge: ${chargeId}`
+        `✅ Refund processed for ${chargeId}. Full refund: ${isFullRefund}`
       )
       break
     }
-    default:
-      console.log(`Unhandled event type: ${event.type}`)
   }
 
   return NextResponse.json({ received: true })
