@@ -7,23 +7,25 @@ export async function getAffiliateCommissionByMonthAction(
     id: string
     orgId: string
   },
-  targetYear?: number
+  targetYear: number
 ) {
   return db
     .select({
       month: sql<string>`to_char(${affiliateInvoice.createdAt}, 'YYYY-MM')`,
       linkId: affiliateLink.id,
-      totalCommission: sql<number>`
-        sum(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.commission} ELSE 0 END)
-      `.mapWith(Number),
-
-      paidCommission: sql<number>`
-        sum(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.paidAmount} ELSE 0 END)
-      `.mapWith(Number),
-
-      unpaidCommission: sql<number>`
-        sum(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.unpaidAmount} ELSE 0 END)
-      `.mapWith(Number),
+      // Since we filter in WHERE, we don't need CASE WHEN inside the SUM
+      totalCommission:
+        sql<number>`sum(CAST(${affiliateInvoice.commission} AS NUMERIC))`.mapWith(
+          Number
+        ),
+      paidCommission:
+        sql<number>`sum(CAST(${affiliateInvoice.paidAmount} AS NUMERIC))`.mapWith(
+          Number
+        ),
+      unpaidCommission:
+        sql<number>`sum(CAST(${affiliateInvoice.unpaidAmount} AS NUMERIC))`.mapWith(
+          Number
+        ),
     })
     .from(affiliateInvoice)
     .innerJoin(
@@ -32,9 +34,11 @@ export async function getAffiliateCommissionByMonthAction(
     )
     .where(
       and(
+        // Ensure we are looking at the correct year
         sql`extract(year from ${affiliateInvoice.createdAt}) = ${targetYear}`,
         eq(affiliateLink.organizationId, decoded.orgId),
         eq(affiliateLink.affiliateId, decoded.id),
+        // This is the most important line:
         isNull(affiliateInvoice.refundedAt)
       )
     )
