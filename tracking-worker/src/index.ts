@@ -8,19 +8,32 @@ export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
-		const PAGES_URL = 'https://refearnapp-landing-nextjs.pages.dev';
+		const PAGES_URL = 'https://refearnapp-landing.pages.dev';
 		const VERCEL_ORIGIN = 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = 'www.refearnapp.com';
-		// 1. ROUTE THE HOME PAGE
 		if (url.pathname === '/') {
-			// Fetch index.html specifically from your Pages root
-			const resp = await fetch(`${PAGES_URL}/index.html`);
+			const resp = await fetch(PAGES_URL);
 			return new Response(resp.body, resp);
 		}
+		const marketingAssets = [
+			'/refearnapp.svg',
+			'/opengraph-update.png',
+			'/brand.js',
+			'/faq.js',
+			'/feature.js',
+			'/footer.js',
+			'/header.js',
+			'/hero.js',
+			'/how-it-works.js',
+			'/pricing.js',
+			'/style.css',
+			'/testimonials.js',
+			'/output.css',
+		];
+		const isAsset = marketingAssets.some((path) => url.pathname === path);
 
-		// 2. ROUTE ALL LANDING ASSETS (Images, JS, CSS, Icons)
-		// Any path starting with /landing-assets/ goes to Cloudflare Pages
-		if (url.pathname.startsWith('/landing-assets/')) {
+		if (isAsset) {
+			// Fetch the asset from Cloudflare Pages
 			const assetResp = await fetch(`${PAGES_URL}${url.pathname}`);
 			const newResp = new Response(assetResp.body, assetResp);
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
