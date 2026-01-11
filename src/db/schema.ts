@@ -86,6 +86,7 @@ export const affiliateInvoiceReasonEnum = pgEnum("affiliate_invoice_reason", [
   "one_time",
   "refund",
   "manual_adjustment",
+  "placeholder_from_charge",
 ])
 export const providerEnum = pgEnum("provider", ["credentials", "google"])
 export const user = pgTable(
