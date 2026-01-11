@@ -50,9 +50,10 @@ export async function POST(req: NextRequest) {
 
       const mode = session.mode
       const isSubscription = mode === "subscription"
-      const customerId = session.customer
-        ? (session.customer as string)
-        : generateStripeCustomerId()
+      const availableId =
+        ((session.customer as string) ?? (session.payment_intent as string))
+          ? (session.customer as string)
+          : generateStripeCustomerId()
       const subscriptionId = isSubscription
         ? (session.subscription as string)
         : null
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
       const placeholder = await db.query.affiliateInvoice.findFirst({
         where: (table, { eq, and, or }) =>
           and(
-            eq(table.customerId, customerId),
+            eq(table.customerId, availableId),
             or(
               eq(table.reason, "placeholder_from_charge"),
               eq(table.reason, "placeholder_from_subscription")
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
         await db.insert(affiliateInvoice).values({
           paymentProvider: "stripe",
           subscriptionId,
-          customerId,
+          customerId: availableId,
           amount: amount.toString(),
           currency: "USD",
           rawAmount,
@@ -269,11 +270,12 @@ export async function POST(req: NextRequest) {
     }
     case "charge.succeeded": {
       const charge = event.data.object as Stripe.Charge
-      const customerId = charge.customer as string
+      const availableId =
+        (charge.customer as string) ?? (charge.payment_intent as string)
       const chargeId = charge.id
       const existingInvoice = await db.query.affiliateInvoice.findFirst({
         where: (table, { eq, and, isNull }) =>
-          and(eq(table.customerId, customerId), isNull(table.transactionId)),
+          and(eq(table.customerId, availableId), isNull(table.transactionId)),
         orderBy: (table, { desc }) => [desc(table.createdAt)],
       })
 
@@ -286,7 +288,7 @@ export async function POST(req: NextRequest) {
         await db.insert(affiliateInvoice).values({
           paymentProvider: "stripe",
           transactionId: chargeId,
-          customerId,
+          customerId: availableId,
           amount: "0.00",
           currency: "USD",
           commission: "0.00",
