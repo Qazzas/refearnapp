@@ -38,13 +38,16 @@ export async function POST(req: NextRequest) {
       const metadata = session.metadata || {}
       const refDataRaw = metadata.refearnapp_affiliate_code
       if (!refDataRaw) break
+
       const { code, commissionType, commissionValue } = JSON.parse(refDataRaw)
       const affiliateLinkRecord = await getAffiliateLinkRecord(code)
       if (!affiliateLinkRecord) break
+
       const organizationRecord = await getOrganizationById(
         affiliateLinkRecord.organizationId
       )
       if (!organizationRecord) break
+
       const mode = session.mode
       const isSubscription = mode === "subscription"
       const customerId = session.customer
@@ -53,41 +56,52 @@ export async function POST(req: NextRequest) {
       const subscriptionId = isSubscription
         ? (session.subscription as string)
         : null
+
       const rawAmount = safeFormatAmount(session.amount_total)
       const rawCurrency = session.currency ?? "usd"
       const decimals = getCurrencyDecimals(session.currency ?? "usd")
+
       const { amount } = await convertToUSD(
         parseFloat(rawAmount),
         rawCurrency,
         decimals
       )
+
       let commission = 0
       if (commissionType === "percentage") {
         commission = (parseFloat(amount) * parseFloat(commissionValue)) / 100
       } else if (commissionType === "fixed") {
         commission = parseFloat(commissionValue)
       }
-      if (subscriptionId) {
-        const subscriptionExpirationRecord =
-          await getSubscriptionExpiration(subscriptionId)
-        if (!subscriptionExpirationRecord) {
-          const expirationDate = calculateExpirationDate(
-            new Date(),
-            organizationRecord.commissionDurationValue,
-            organizationRecord.commissionDurationUnit
-          )
 
-          await db.insert(subscriptionExpiration).values({
+      // 1. CHECK FOR PLACEHOLDER
+      const placeholder = await db.query.affiliateInvoice.findFirst({
+        where: (table, { eq, and }) =>
+          and(
+            eq(table.customerId, customerId),
+            eq(table.reason, "placeholder_from_charge")
+          ),
+      })
+
+      // 2. EITHER UPDATE OR INSERT (ONLY ONCE)
+      if (placeholder) {
+        await db
+          .update(affiliateInvoice)
+          .set({
             subscriptionId,
-            expirationDate,
+            amount: amount.toString(),
+            currency: "USD",
+            rawAmount,
+            rawCurrency,
+            commission: commission.toString(),
+            unpaidAmount: commission.toFixed(2),
+            affiliateLinkId: affiliateLinkRecord.id,
+            reason: isSubscription ? "subscription_create" : "one_time",
+            updatedAt: new Date(),
           })
-
-          console.log(
-            "✅ Created subscription expiration record:",
-            subscriptionId
-          )
-        }
-
+          .where(eq(affiliateInvoice.id, placeholder.id))
+        console.log("✅ Updated placeholder:", placeholder.id)
+      } else {
         await db.insert(affiliateInvoice).values({
           paymentProvider: "stripe",
           subscriptionId,
@@ -100,33 +114,27 @@ export async function POST(req: NextRequest) {
           paidAmount: "0.00",
           unpaidAmount: commission.toFixed(2),
           affiliateLinkId: affiliateLinkRecord.id,
-          reason: "subscription_create",
+          reason: isSubscription ? "subscription_create" : "one_time",
         })
+        console.log("✅ Created fresh invoice.")
+      }
 
-        console.log(
-          "✅ checkout.session.completed — inserted new subscription:",
-          subscriptionId
-        )
-      } else {
-        await db.insert(affiliateInvoice).values({
-          paymentProvider: "stripe",
-          subscriptionId: null,
-          customerId,
-          amount: amount.toString(),
-          currency: "USD",
-          rawAmount,
-          rawCurrency,
-          commission: commission.toString(),
-          paidAmount: "0.00",
-          unpaidAmount: commission.toFixed(2),
-          affiliateLinkId: affiliateLinkRecord.id,
-          reason: "one_time",
-        })
-
-        console.log(
-          "✅ checkout.session.completed — inserted one-time payment:",
-          customerId
-        )
+      // 3. SEPARATE LOGIC FOR EXPIRATION (ONLY)
+      if (subscriptionId) {
+        const subscriptionExpirationRecord =
+          await getSubscriptionExpiration(subscriptionId)
+        if (!subscriptionExpirationRecord) {
+          const expirationDate = calculateExpirationDate(
+            new Date(),
+            organizationRecord.commissionDurationValue,
+            organizationRecord.commissionDurationUnit
+          )
+          await db.insert(subscriptionExpiration).values({
+            subscriptionId,
+            expirationDate,
+          })
+          console.log("✅ Created subscription expiration record")
+        }
       }
 
       break
@@ -240,7 +248,7 @@ export async function POST(req: NextRequest) {
         }
 
         const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-          where: (link, { eq }) => eq(link.id, invoiceRecord.affiliateLinkId),
+          where: (link, { eq }) => eq(link.id, invoiceRecord.affiliateLinkId!),
         })
 
         if (!affiliateLinkRecord) {
@@ -292,39 +300,29 @@ export async function POST(req: NextRequest) {
       const charge = event.data.object as Stripe.Charge
       const customerId = charge.customer as string
       const chargeId = charge.id
-      const maxRetries = 5
-      for (let i = 0; i <= maxRetries; i++) {
-        const latestPendingInvoice = await db.query.affiliateInvoice.findFirst({
-          where: (table, { eq, and, isNull }) =>
-            and(eq(table.customerId, customerId), isNull(table.transactionId)),
-          orderBy: (table, { desc }) => [desc(table.createdAt)],
+      const existingInvoice = await db.query.affiliateInvoice.findFirst({
+        where: (table, { eq, and, isNull }) =>
+          and(eq(table.customerId, customerId), isNull(table.transactionId)),
+        orderBy: (table, { desc }) => [desc(table.createdAt)],
+      })
+
+      if (existingInvoice) {
+        await db
+          .update(affiliateInvoice)
+          .set({ transactionId: chargeId, updatedAt: new Date() })
+          .where(eq(affiliateInvoice.id, existingInvoice.id))
+      } else {
+        await db.insert(affiliateInvoice).values({
+          paymentProvider: "stripe",
+          transactionId: chargeId,
+          customerId,
+          amount: "0.00",
+          currency: "USD",
+          commission: "0.00",
+          paidAmount: "0.00",
+          unpaidAmount: "0.00",
+          reason: "placeholder_from_charge",
         })
-
-        if (latestPendingInvoice) {
-          await db
-            .update(affiliateInvoice)
-            .set({
-              transactionId: chargeId,
-              updatedAt: new Date(),
-            })
-            .where(eq(affiliateInvoice.id, latestPendingInvoice.id))
-
-          console.log(
-            `✅ Success: Linked Stripe Charge ${chargeId} to Invoice ${latestPendingInvoice.id}`
-          )
-          break
-        }
-
-        if (i < maxRetries) {
-          console.log(
-            `⏳ Retry ${i + 1}/${maxRetries}: Waiting for invoice record...`
-          )
-          await new Promise((res) => setTimeout(res, 2000))
-        } else {
-          console.warn(
-            `❌ Failed: No pending invoice found for customer ${customerId} after retries.`
-          )
-        }
       }
       break
     }

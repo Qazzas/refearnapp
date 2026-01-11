@@ -525,9 +525,10 @@ export const affiliateInvoice = pgTable(
     paidAmount: numeric("paid_amount", { precision: 10, scale: 2 })
       .default("0")
       .notNull(),
-    affiliateLinkId: text("affiliate_link_id")
-      .notNull()
-      .references(() => affiliateLink.id, { onDelete: "cascade" }),
+    affiliateLinkId: text("affiliate_link_id").references(
+      () => affiliateLink.id,
+      { onDelete: "cascade" }
+    ),
     unpaidAmount: numeric("unpaid_amount", { precision: 10, scale: 2 })
       .default("0")
       .notNull(),

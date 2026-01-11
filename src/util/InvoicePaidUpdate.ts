@@ -10,7 +10,7 @@ export const invoicePaidUpdate = async (
   currency: string,
   customerId: string,
   subscriptionId: string,
-  affiliateLinkId: string,
+  affiliateLinkId: string | null,
   commissionType: string,
   commissionValue: string
 ) => {
