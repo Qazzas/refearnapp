@@ -4,6 +4,7 @@ import { getCurrencyDecimals } from "@/util/CurrencyDecimal"
 import { convertToUSD } from "@/util/CurrencyConvert"
 import { affiliateInvoice } from "@/db/schema"
 import { db } from "@/db/drizzle"
+import { eq } from "drizzle-orm"
 
 export const invoicePaidUpdate = async (
   total: string,
@@ -12,7 +13,8 @@ export const invoicePaidUpdate = async (
   subscriptionId: string,
   affiliateLinkId: string | null,
   commissionType: string,
-  commissionValue: string
+  commissionValue: string,
+  placeholderId?: string | null
 ) => {
   const rawAmount = safeFormatAmount(total)
   const decimals = getCurrencyDecimals(currency ?? "usd")
@@ -30,16 +32,33 @@ export const invoicePaidUpdate = async (
     addedCommission =
       parseFloat(invoiceAmount) < 0 ? 0 : parseFloat(commissionValue)
   }
-  await db.insert(affiliateInvoice).values({
-    paymentProvider: "stripe",
-    subscriptionId,
-    customerId,
+  // Data to be either inserted or updated
+  const invoiceData = {
     amount: invoiceAmount.toString(),
-    currency: "USD",
+    currency: "USD" as const,
     commission: addedCommission.toString(),
-    paidAmount: "0.00",
     unpaidAmount: addedCommission.toFixed(2),
-    affiliateLinkId,
-    reason: "subscription_update",
-  })
+    reason: "subscription_update" as const,
+    updatedAt: new Date(),
+  }
+
+  if (placeholderId) {
+    await db
+      .update(affiliateInvoice)
+      .set(invoiceData)
+      .where(eq(affiliateInvoice.id, placeholderId))
+
+    console.log(`✅ Merged invoice data into placeholder: ${placeholderId}`)
+  } else {
+    await db.insert(affiliateInvoice).values({
+      ...invoiceData,
+      paymentProvider: "stripe",
+      subscriptionId,
+      customerId,
+      paidAmount: "0.00",
+      affiliateLinkId,
+    })
+
+    console.log("✅ Inserted fresh invoice record for subscription cycle.")
+  }
 }

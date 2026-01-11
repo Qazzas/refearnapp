@@ -11,8 +11,8 @@ import { safeFormatAmount } from "@/util/SafeParse"
 import { invoicePaidUpdate } from "@/util/InvoicePaidUpdate"
 import { getAffiliateLinkRecord } from "@/services/getAffiliateLinkRecord"
 import { getOrganizationById } from "@/services/getOrganizationById"
-import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
 import { handleSubscriptionExpiration } from "@/lib/server/handleSubscriptionExpiration"
+import { checkSubscriptionExpired } from "@/util/CheckSubscriptionExpired"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
 })
@@ -196,52 +196,47 @@ export async function POST(req: NextRequest) {
     case "invoice.paid": {
       const invoice = event.data.object as Stripe.Invoice
       const invoiceCreatedDate = new Date(invoice.created * 1000)
-      const subscriptionId = invoice.parent?.subscription_details?.subscription
+      const subscriptionId = invoice.parent?.subscription_details
+        ?.subscription as string
       const customerId = invoice.customer as string
-      if (!subscriptionId || typeof subscriptionId !== "string") {
+      const reason = invoice.billing_reason
+
+      if (!subscriptionId) {
         console.warn("❌ No valid subscriptionId found.")
         return
       }
-      const reason = invoice.billing_reason
+
       if (reason === "subscription_update" || reason === "subscription_cycle") {
-        const invoiceRecord = await db.query.affiliateInvoice.findFirst({
+        const isExpired = await checkSubscriptionExpired(
+          subscriptionId,
+          invoiceCreatedDate
+        )
+        if (isExpired) {
+          console.warn("❌ Subscription expired — skipping:", subscriptionId)
+          break
+        }
+        const latestInvoice = await db.query.affiliateInvoice.findFirst({
           where: (table, { eq }) => eq(table.subscriptionId, subscriptionId),
+          orderBy: (table, { desc }) => [desc(table.createdAt)],
         })
 
-        if (!invoiceRecord) {
-          console.warn(
-            "❌ No affiliate invoice found for subscription:",
-            subscriptionId
-          )
+        if (!latestInvoice || !latestInvoice.affiliateLinkId) {
+          console.warn("❌ No affiliate record found to link this payment to.")
           return
         }
-
         const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-          where: (link, { eq }) => eq(link.id, invoiceRecord.affiliateLinkId!),
+          where: (link, { eq }) => eq(link.id, latestInvoice.affiliateLinkId!),
         })
-
-        if (!affiliateLinkRecord) {
-          console.warn("❌ No affiliate link found for invoice:", invoice.id)
-          return
-        }
+        if (!affiliateLinkRecord) break
 
         const organizationRecord = await getOrganizationById(
           affiliateLinkRecord.organizationId
         )
         if (!organizationRecord) break
-
-        const subscriptionExpirationRecord =
-          await getSubscriptionExpiration(subscriptionId)
-        if (
-          subscriptionExpirationRecord &&
-          invoiceCreatedDate > subscriptionExpirationRecord.expirationDate
-        ) {
-          console.warn(
-            "❌ Subscription expired — skipping update:",
-            subscriptionId
-          )
-          break
-        }
+        const placeholderId =
+          latestInvoice.reason === "placeholder_from_charge"
+            ? latestInvoice.id
+            : null
 
         const total = String(invoice.total_excluding_tax ?? 0)
         const currency = invoice.currency
@@ -252,17 +247,14 @@ export async function POST(req: NextRequest) {
           currency,
           customerId,
           subscriptionId,
-          invoiceRecord.affiliateLinkId,
+          latestInvoice.affiliateLinkId,
           commissionType,
-          commissionValue
+          commissionValue,
+          placeholderId
         )
 
-        console.log(
-          `✅ Updated subscription (${reason}) — amount & commission:`,
-          subscriptionId
-        )
+        console.log(`✅ Handled ${reason} for sub: ${subscriptionId}`)
       }
-
       break
     }
     case "charge.succeeded": {
