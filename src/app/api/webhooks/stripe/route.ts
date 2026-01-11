@@ -51,9 +51,7 @@ export async function POST(req: NextRequest) {
       const mode = session.mode
       const isSubscription = mode === "subscription"
       const availableId =
-        ((session.customer as string) ?? (session.payment_intent as string))
-          ? (session.customer as string)
-          : generateStripeCustomerId()
+        (session.customer as string) ?? (session.payment_intent as string)
       const subscriptionId = isSubscription
         ? (session.subscription as string)
         : null
