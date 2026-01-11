@@ -193,7 +193,7 @@ export default {
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
-			body: request.body,
+			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
 
