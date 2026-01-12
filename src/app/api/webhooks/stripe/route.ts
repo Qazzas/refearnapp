@@ -166,14 +166,11 @@ export async function POST(req: NextRequest) {
         // 2. QUERY A: Find the historical record with valid data
         // We look for the specific subscriptionId and exclude the empty placeholders
         const historicalRecord = await db.query.affiliateInvoice.findFirst({
-          where: (table, { eq, and, notInArray }) =>
+          where: (table, { eq, and, ne }) =>
             and(
               eq(table.subscriptionId, subscriptionId),
               eq(table.customerId, customerId),
-              notInArray(table.reason, [
-                "placeholder_from_charge",
-                "placeholder_from_subscription",
-              ])
+              ne(table.reason, "placeholder_from_charge")
             ),
         })
 
