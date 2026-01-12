@@ -1,19 +1,21 @@
 import { db } from "@/db/drizzle"
 import { affiliateInvoice } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
+// ✅ params must be treated as a Promise in Next.js 15
 export async function GET(
-  request: Request,
-  { params }: { params: { transactionId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ transactionId: string }> }
 ) {
-  // 1. Check for a Secret Header to prevent public access
+  // 1. Await the params to get the transactionId
+  const { transactionId } = await params
+
+  // 2. Check for the Secret Header
   const authHeader = request.headers.get("x-refearn-debug-secret")
   if (authHeader !== process.env.DEBUG_SECRET) {
     return new Response("Unauthorized", { status: 401 })
   }
-
-  const { transactionId } = params
 
   try {
     const invoice = await db.query.affiliateInvoice.findFirst({
@@ -24,7 +26,6 @@ export async function GET(
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 })
     }
 
-    // Return the specific fields your script needs
     return NextResponse.json({
       id: invoice.transactionId,
       customer_id: invoice.customerId,
@@ -33,6 +34,7 @@ export async function GET(
       currency: invoice.rawCurrency,
     })
   } catch (error) {
+    console.error("Debug API Error:", error)
     return NextResponse.json({ error: "Database error" }, { status: 500 })
   }
 }
