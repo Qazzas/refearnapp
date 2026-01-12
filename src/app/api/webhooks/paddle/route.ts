@@ -55,25 +55,30 @@ export async function POST(request: NextRequest) {
         )
       secret = orgPaddleAccount.webhookPublicKey
     } else {
-      // ⚙️ Fallback path: use subscriptionId → affiliateInvoice chain
       const subscriptionId = payload.data?.subscription_id
-      if (!subscriptionId) {
+      const transactionId = payload.data?.transaction_id
+
+      if (!subscriptionId && !transactionId) {
         return NextResponse.json(
-          { error: "Missing both custom data and subscriptionId" },
+          { error: "Missing both custom data and relevant IDs" },
           { status: 400 }
         )
       }
-
       const existingInvoice = await db.query.affiliateInvoice.findFirst({
-        where: eq(affiliateInvoice.subscriptionId, subscriptionId),
+        where: (table, { eq, or }) =>
+          or(
+            subscriptionId
+              ? eq(table.subscriptionId, subscriptionId)
+              : undefined,
+            transactionId ? eq(table.transactionId, transactionId) : undefined
+          ),
       })
-      if (!existingInvoice) {
+      if (!existingInvoice || !existingInvoice.affiliateLinkId) {
         return NextResponse.json(
-          { error: "Affiliate invoice not found for subscription" },
+          { error: "Cannot determine affiliate link from payload" },
           { status: 400 }
         )
       }
-
       const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
         where: (link, { eq }) => eq(link.id, existingInvoice.affiliateLinkId!),
       })
