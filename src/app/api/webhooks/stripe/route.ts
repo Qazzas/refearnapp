@@ -72,21 +72,72 @@ export async function POST(req: NextRequest) {
         commission = parseFloat(commissionValue)
       }
 
-      await db.insert(affiliateInvoice).values({
-        paymentProvider: "stripe",
-        subscriptionId,
-        customerId: availableId,
-        amount: amount.toString(),
-        currency: "USD",
-        rawAmount,
-        rawCurrency,
-        commission: commission.toString(),
-        paidAmount: "0.00",
-        unpaidAmount: commission.toFixed(2),
-        affiliateLinkId: affiliateLinkRecord.id,
-        reason: isSubscription ? "subscription_create" : "one_time",
+      // 1. CHECK FOR PLACEHOLDER
+      const placeholder = await db.query.affiliateInvoice.findFirst({
+        where: (table, { eq, and, or }) =>
+          and(
+            eq(table.customerId, availableId),
+            or(eq(table.reason, "placeholder_from_charge"))
+          ),
+        orderBy: (table, { desc }) => [desc(table.createdAt)],
       })
-      console.log("✅ Created fresh invoice.")
+
+      // 2. EITHER UPDATE OR INSERT (ONLY ONCE)
+      if (placeholder) {
+        await db
+          .update(affiliateInvoice)
+          .set({
+            subscriptionId,
+            amount: amount.toString(),
+            currency: "USD",
+            rawAmount,
+            rawCurrency,
+            commission: commission.toString(),
+            unpaidAmount: commission.toFixed(2),
+            affiliateLinkId: affiliateLinkRecord.id,
+            reason: isSubscription ? "subscription_create" : "one_time",
+            updatedAt: new Date(),
+          })
+          .where(eq(affiliateInvoice.id, placeholder.id))
+        console.log("✅ Updated placeholder:", placeholder.id)
+      } else {
+        await db.insert(affiliateInvoice).values({
+          paymentProvider: "stripe",
+          subscriptionId,
+          customerId: availableId,
+          amount: amount.toString(),
+          currency: "USD",
+          rawAmount,
+          rawCurrency,
+          commission: commission.toString(),
+          paidAmount: "0.00",
+          unpaidAmount: commission.toFixed(2),
+          affiliateLinkId: affiliateLinkRecord.id,
+          reason: isSubscription ? "subscription_create" : "one_time",
+        })
+        console.log("✅ Created fresh invoice.")
+      }
+
+      // 3. SEPARATE LOGIC FOR EXPIRATION (ONLY)
+      if (subscriptionId) {
+        const stripeAccountRecord =
+          await db.query.organizationStripeAccount.findFirst({
+            where: (table, { eq }) => eq(table.orgId, organizationRecord.id),
+          })
+        const stripeAccountId = stripeAccountRecord?.stripeAccountId
+        const sub = await stripe.subscriptions.retrieve(subscriptionId, {
+          stripeAccount: stripeAccountId,
+        })
+        let trialDays = 0
+        if (sub.trial_end && sub.trial_start) {
+          trialDays = Math.round((sub.trial_end - sub.trial_start) / 86400)
+        }
+        await handleSubscriptionExpiration(
+          subscriptionId,
+          organizationRecord,
+          trialDays
+        )
+      }
 
       break
     }
