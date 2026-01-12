@@ -17,13 +17,15 @@ export const invoicePaidUpdate = async (
   placeholderId?: string | null
 ) => {
   const rawAmount = safeFormatAmount(total)
-  const decimals = getCurrencyDecimals(currency ?? "usd")
+  const rawCurrency = currency ?? "usd"
+  const decimals = getCurrencyDecimals(rawCurrency)
 
   const { amount: invoiceAmount } = await convertToUSD(
     parseFloat(rawAmount),
-    currency ?? "usd",
+    rawCurrency,
     decimals
   )
+
   let addedCommission = 0
   if (commissionType === "percentage") {
     addedCommission =
@@ -32,31 +34,36 @@ export const invoicePaidUpdate = async (
     addedCommission =
       parseFloat(invoiceAmount) < 0 ? 0 : parseFloat(commissionValue)
   }
-  // Data to be either inserted or updated
+
+  // Define the shared data for both Update and Insert
   const invoiceData = {
     amount: invoiceAmount.toString(),
     currency: "USD" as const,
+    rawAmount,
+    rawCurrency,
     commission: addedCommission.toString(),
     unpaidAmount: addedCommission.toFixed(2),
     reason: "subscription_update" as const,
     updatedAt: new Date(),
+    subscriptionId,
+    affiliateLinkId,
   }
 
   if (placeholderId) {
+    // UPDATING THE PLACEHOLDER
     await db
       .update(affiliateInvoice)
-      .set(invoiceData)
+      .set(invoiceData) // Now includes subId, linkId, and rawAmount
       .where(eq(affiliateInvoice.id, placeholderId))
 
-    console.log(`✅ Merged invoice data into placeholder: ${placeholderId}`)
+    console.log(`✅ Merged full data into placeholder: ${placeholderId}`)
   } else {
+    // INSERTING FRESH RECORD
     await db.insert(affiliateInvoice).values({
       ...invoiceData,
-      paymentProvider: "stripe",
-      subscriptionId,
+      paymentProvider: "stripe" as const,
       customerId,
       paidAmount: "0.00",
-      affiliateLinkId,
     })
 
     console.log("✅ Inserted fresh invoice record for subscription cycle.")
