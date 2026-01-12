@@ -8,37 +8,35 @@ export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
-		const PAGES_URL = 'https://refearnapp-landing.pages.dev';
+		const PAGES_URL = 'https://refearnapp-landing-astro.pages.dev';
 		const VERCEL_ORIGIN = 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = 'www.refearnapp.com';
-		if (url.pathname === '/') {
-			const resp = await fetch(PAGES_URL);
-			return new Response(resp.body, resp);
-		}
-		const marketingAssets = [
-			'/refearnapp.svg',
-			'/opengraph-update.png',
-			'/brand.js',
-			'/faq.js',
-			'/feature.js',
-			'/footer.js',
-			'/header.js',
-			'/hero.js',
-			'/how-it-works.js',
-			'/pricing.js',
-			'/style.css',
-			'/testimonials.js',
-			'/output.css',
-			'/favicon-96x96.png',
+
+		// 1. SPECIFIC PUBLIC ASSETS (Strict Whitelist)
+		// These are the files you manually put in /public
+		const publicAssets = [
 			'/apple-touch-icon.png',
 			'/favicon.ico',
+			'/favicon.svg',
+			'/favicon-96x96.png',
+			'/opengraph-update.png',
+			'/refearnapp.svg',
+			'/robots.txt',
+			'/sitemap-index.xml',
+			'/sitemap-0.xml',
 		];
-		const isAsset = marketingAssets.some((path) => url.pathname === path);
 
-		if (isAsset) {
-			// Fetch the asset from Cloudflare Pages
-			const assetResp = await fetch(`${PAGES_URL}${url.pathname}`);
-			const newResp = new Response(assetResp.body, assetResp);
+		// 2. CHECK IF ROUTE BELONGS TO ASTRO
+		const isHome = url.pathname === '/';
+		const isExplicitAsset = publicAssets.includes(url.pathname);
+
+		// Astro compiled files (JS/CSS) always live here.
+		// Your Vercel app likely doesn't use this specific folder name.
+		const isCompiledAsset = url.pathname.startsWith('/_astro/');
+
+		if (isHome || isExplicitAsset || isCompiledAsset) {
+			const resp = await fetch(`${PAGES_URL}${url.pathname}${url.search}`);
+			const newResp = new Response(resp.body, resp);
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
 		}
