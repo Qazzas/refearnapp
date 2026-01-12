@@ -230,57 +230,59 @@ export async function POST(request: NextRequest) {
       case "subscription.created": {
         const sub = payload.data
         const isTrial = sub.status === "trialing"
-        if (!isTrial) {
-          console.log(
-            "Subscription created but not trialing — skipping expiration update"
-          )
-          break
-        }
+
+        if (!isTrial) break
+
         const subscriptionId = sub.id
         const customData = sub.custom_data || {}
         const refDataRaw = customData.refearnapp_affiliate_code
         if (!refDataRaw) break
 
-        const { code } = JSON.parse(refDataRaw)
+        // Extract organization settings from the custom data
+        const { code, commissionDurationValue, commissionDurationUnit } =
+          JSON.parse(refDataRaw)
+
         const affiliateLinkRecord = await getAffiliateLinkRecord(code)
         if (!affiliateLinkRecord) break
-        const organizationRecord = await getOrganizationById(
-          affiliateLinkRecord.organizationId
+
+        // Calculate the Trial Length
+        const trialItem = sub.items?.[0]?.price?.trial_period
+        const trialDays = calculateTrialDays(
+          trialItem?.interval,
+          trialItem?.frequency || 0
         )
-        if (!organizationRecord) break
+
+        // ✅ CORRECT LOGIC:
+        // Expiration = Sign-up Date + Trial Days + Commission Duration
+        // OR simply Sign-up Date + Commission Duration (depending on your policy)
+
+        // If you want the 90-day window to start AFTER the 60-day trial:
+        const baseDate = addDays(new Date(), trialDays)
+        const expirationDate = calculateExpirationDate(
+          baseDate,
+          commissionDurationValue,
+          commissionDurationUnit
+        )
 
         const existingExpiration =
           await getSubscriptionExpiration(subscriptionId)
-        let expirationDate: Date
+
         if (existingExpiration) {
-          const trialPeriod = sub.items?.[0]?.price?.trial_period
-          const interval = trialPeriod?.interval
-          const frequency = Number(trialPeriod?.frequency || 0)
-          const trialDays = calculateTrialDays(interval, frequency)
-
-          expirationDate = addDays(new Date(), trialDays)
-
           await db
             .update(subscriptionExpiration)
             .set({ expirationDate })
             .where(eq(subscriptionExpiration.subscriptionId, subscriptionId))
         } else {
-          expirationDate = calculateExpirationDate(
-            new Date(),
-            organizationRecord.commissionDurationValue,
-            organizationRecord.commissionDurationUnit
-          )
-
           await db.insert(subscriptionExpiration).values({
             subscriptionId,
             expirationDate,
           })
         }
 
-        console.log("✅ Updated subscription expiration for:", {
-          subscriptionId,
-          expirationDate: expirationDate.toISOString(),
-        })
+        console.log(
+          "✅ Correctly set expiration to:",
+          expirationDate.toISOString()
+        )
         break
       }
       case "adjustment.updated": {
