@@ -1,7 +1,7 @@
 name: Database Operations
 
 on:
-  # 1. Automatic: Run migrations on every push to main to keep schema in sync
+  # 1. Automatic: Run migrations on push to main
   push:
     branches: [main]
     paths:
@@ -35,19 +35,20 @@ jobs:
       - name: Install Dependencies
         run: bun install
 
-      # Always run migrations first to ensure the table structures match the code
+      # Always run migrations first.
+      # Logic: If manual, use the 'target' input. If auto-push, default to 'dev'.
       - name: Auto Migrate Schema
         env:
-          DATABASE_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+          SUPABASE_DATABASE_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
         run: bun drizzle-kit migrate
 
       # Only run the Reset/Seed sequence if the user clicked "Run Workflow" manually
       - name: Manual Reset and Seed
         if: github.event_name == 'workflow_dispatch'
         env:
-          DATABASE_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
-          UPSTASH_REDIS_REST_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_REDIS_URL || secrets.DEV_REDIS_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ github.event.inputs.target == 'prod' && secrets.PROD_REDIS_TOKEN || secrets.DEV_REDIS_TOKEN }}
+          SUPABASE_DATABASE_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+          UPSTASH_REDIS_REST_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_REDIS_URL || secrets.DEV_REDIS_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_REDIS_TOKEN || secrets.DEV_REDIS_TOKEN }}
           MODE: ${{ github.event.inputs.target }}
         run: |
           echo "🚀 Starting Reset and Seed sequence for ${{ github.event.inputs.target }}..."
