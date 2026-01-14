@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "build:tracker-dev": "NODE_ENV=development rollup -c",
-    "build:tracker-prod": "NODE_ENV=production rollup -c",
+    "build:tracker-dev": "cross-env NODE_ENV=development rollup -c",
+    "build:tracker-prod": "cross-env NODE_ENV=production rollup -c",
     "start": "next start",
     "lint": "next lint",
     "db:reset": "bun src/db/reset.ts npx drizzle-kit generate && npx drizzle-kit migrate && bun src/db/currencySeed.ts && bun src/db/seeds/seedFun1.ts",
@@ -119,6 +119,7 @@
     "@typescript-eslint/parser": "^8.46.3",
     "autoprefixer": "^10.4.21",
     "baseline-browser-mapping": "^2.8.32",
+    "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.6",
     "eslint": "^9.39.1",
     "eslint-config-next": "15.2.4",
