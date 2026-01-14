@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - 'src/db/schema.ts'
-      - 'drizzle/**'
+      - 'migrations/**'
 
   # 2. Manual: Trigger Reset/Seed from the GitHub Actions tab
   workflow_dispatch:
