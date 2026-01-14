@@ -111,6 +111,7 @@ export const defaultDashboardCustomization = {
     chartPrimaryColor: "",
     chartSecondaryColor: "",
     chartTertiaryColor: "",
+    chartQuaternaryColor: "",
     chartLegendTextColor: "",
     toolTipChartDateColor: "",
     toolTipBackgroundColor: "",

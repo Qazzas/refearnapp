@@ -19,6 +19,7 @@ export const ChartCustomizationOptions = ({
       chartPrimaryColor,
       chartSecondaryColor,
       chartTertiaryColor,
+      chartQuaternaryColor,
       chartLegendTextColor,
       toolTipChartDateColor,
       toolTipBackgroundColor,
@@ -59,6 +60,11 @@ export const ChartCustomizationOptions = ({
           label: "Tertiary Chart Color",
           value: chartTertiaryColor,
           onChange: throttled.chartTertiaryColor,
+        },
+        quaternaryColor: {
+          label: "Quaternary Chart Color",
+          value: chartQuaternaryColor,
+          onChange: throttled.chartQuaternaryColor,
         },
         legendTextColor: {
           label: "Legend Text Color",

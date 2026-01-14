@@ -4,6 +4,7 @@ export const formatValue = (
   currency?: string
 ) => {
   const monetaryLabels = [
+    "Commission",
     "Total Commission",
     "Unpaid Commission",
     "Paid Commission",

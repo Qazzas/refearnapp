@@ -125,6 +125,7 @@ export function ChartDailyMetrics({
     chartSecondaryColor,
     chartPrimaryColor,
     chartTertiaryColor,
+    chartQuaternaryColor,
     chartHorizontalLineColor,
     chartDateColor,
     chartLoadingColor,
@@ -139,7 +140,7 @@ export function ChartDailyMetrics({
     visits: (affiliate && chartPrimaryColor) || "#60A5FA",
     sales: (affiliate && chartSecondaryColor) || "#A78BFA",
     conversionRate: (affiliate && chartTertiaryColor) || "#5EEAD4",
-    amount: "#F59E0B",
+    amount: (affiliate && chartQuaternaryColor) || "#F59E0B",
   }
   const symbol = formatCurrency(0, currency).replace(/[0.,\s]/g, "")
   const chartConfig: ChartConfig = {

@@ -1,4 +1,3 @@
-import { AffiliateLinkWithStats } from "@/lib/types/affiliateLinkWithStats"
 import { AffiliatePaymentRow } from "@/lib/types/affiliatePaymentRow"
 import { DummyAffiliateLink } from "@/lib/types/DummyAffiliateLink"
 
@@ -15,6 +14,10 @@ export const dummyAffiliateLinksRaw: DummyAffiliateLink[] = [
       { createdAt: new Date("2025-08-01"), count: 1 },
       { createdAt: new Date("2025-08-05"), count: 3 },
     ],
+    commissions: [
+      { createdAt: new Date("2025-08-01"), amount: 25.5 },
+      { createdAt: new Date("2025-08-05"), amount: 75.0 },
+    ],
   },
   {
     id: "link2",
@@ -25,21 +28,9 @@ export const dummyAffiliateLinksRaw: DummyAffiliateLink[] = [
       { createdAt: new Date("2025-08-03"), count: 2 },
     ],
     sales: [{ createdAt: new Date("2025-08-02"), count: 1 }],
+    commissions: [{ createdAt: new Date("2025-08-02"), amount: 15.0 }],
   },
 ]
-export const dummyAffiliateLinks: AffiliateLinkWithStats[] =
-  dummyAffiliateLinksRaw.map((link) => {
-    const totalClicks = link.clicks.reduce((sum, c) => sum + c.count, 0)
-    const totalSales = link.sales.reduce((sum, s) => sum + s.count, 0)
-    return {
-      id: link.id,
-      fullUrl: link.fullUrl,
-      createdAt: link.createdAt,
-      clicks: totalClicks,
-      sales: totalSales,
-      conversionRate: parseFloat(((totalSales / totalClicks) * 100).toFixed(2)),
-    }
-  })
 export const dummyAffiliatePayments: AffiliatePaymentRow[] = [
   {
     month: "2025-06",

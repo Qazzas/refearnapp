@@ -26,20 +26,24 @@ export async function getAffiliateLinksWithStatsAction(
     WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time') 
     THEN ${affiliateInvoice.id} END
 )`.mapWith(Number),
+      commission: sql<number>`COALESCE(
+        SUM(
+          CASE WHEN ${affiliateInvoice.refundedAt} IS NULL
+      THEN ${affiliateInvoice.commission}
+      ELSE 0 END
+      ), 0)`.mapWith(Number),
 
-      conversionRate: sql<number>`CASE
-  WHEN COUNT(DISTINCT ${affiliateClick.id}) = 0 THEN 0
-      ELSE ROUND(
-      (
-      COUNT(DISTINCT CASE
-      WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time')
-      THEN ${affiliateInvoice.id} END
-      )::numeric
-      / COUNT(DISTINCT ${affiliateClick.id})::numeric
-      ) * 100,
-      2
-      )
-      END`.mapWith(Number),
+      conversionRate: sql<number>`
+        COALESCE(
+    ROUND(
+      (COUNT(DISTINCT CASE 
+        WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time')
+        THEN ${affiliateInvoice.id} END)::numeric
+        / NULLIF(COUNT(DISTINCT ${affiliateClick.id}), 0)::numeric) * 100,
+        2
+        ),
+        0
+        )`.mapWith(Number),
       fullUrl: sql<string>`
   COALESCE(
     MIN('https://' || ${organization.websiteUrl} || '?' || ${organization.referralParam} || '=' || ${affiliateLink.id}),

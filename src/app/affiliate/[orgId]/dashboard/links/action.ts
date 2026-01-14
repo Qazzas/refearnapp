@@ -8,6 +8,8 @@ import { createFullUrl } from "@/lib/server/createFullUrl"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { handleAction } from "@/lib/handleAction"
+import { getOrgCurrencyAffiliate } from "@/lib/server/getOrgCurrencyAffiliate"
+import { ExchangeRate } from "@/util/ExchangeRate"
 
 export const createAffiliateLink = async (
   orgId: string
@@ -33,7 +35,13 @@ export const getAffiliateLinksWithStats = async (
 ): Promise<ActionResult<AffiliateLinkWithStats[]>> => {
   return handleAction("getAffiliateLinksWithStats", async () => {
     const decoded = await getAffiliateOrganization(orgId)
+    const currency = await getOrgCurrencyAffiliate(orgId)
+    const rate = await ExchangeRate(currency)
     const rows = await getAffiliateLinksWithStatsAction(decoded, year, month)
-    return { ok: true, data: rows }
+    const AffiliateLinkStats = rows.map((item) => ({
+      ...item,
+      commission: item.commission * rate,
+    }))
+    return { ok: true, data: AffiliateLinkStats }
   })
 }

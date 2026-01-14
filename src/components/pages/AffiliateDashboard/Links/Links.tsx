@@ -24,7 +24,7 @@ import { YearSelectCustomizationOptions } from "@/components/ui-custom/Customiza
 import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 import { useAppQuery } from "@/hooks/useAppQuery"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
-import { LinksColumns } from "@/components/pages/AffiliateDashboard/Links/LinksColumns"
+import { useLinksColumns } from "@/components/pages/AffiliateDashboard/Links/LinksColumns"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
 import { dummyAffiliateLinksRaw } from "@/lib/types/previewData"
 import { useAtomValue } from "jotai"
@@ -36,6 +36,7 @@ import { useAppMutation } from "@/hooks/useAppMutation"
 import { TableView } from "@/components/ui-custom/TableView"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
 import { useQueryClient } from "@tanstack/react-query"
+import { getOrgAction } from "@/lib/server/getOrg"
 
 interface AffiliateLinkProps {
   orgId: string
@@ -76,6 +77,13 @@ export default function Links({
 
     return () => clearTimeout(timer)
   }, [filters, isPreview])
+  const { data: orgData } = useAppQuery(
+    ["organization-settings", orgId],
+    getOrgAction,
+    [orgId],
+    { enabled: !!orgId }
+  )
+  const displayCurrency = orgData?.currency || "USD"
   const {
     data: searchData,
     error: searchError,
@@ -94,9 +102,9 @@ export default function Links({
     if (!dummyAffiliateLinksRaw) return []
 
     return dummyAffiliateLinksRaw.map((link) => {
-      // filter clicks by year/month
-      const filteredClicks = link.clicks.filter((c) => {
-        const d = new Date(c.createdAt)
+      // Helper function to check date matches
+      const dateMatches = (dateStr: Date) => {
+        const d = new Date(dateStr)
         const matchesYear = filters.year
           ? d.getFullYear() === filters.year
           : true
@@ -104,23 +112,26 @@ export default function Links({
           ? d.getMonth() + 1 === filters.month
           : true
         return matchesYear && matchesMonth
-      })
+      }
 
-      // filter sales by year/month
-      const filteredSales = link.sales.filter((s) => {
-        const d = new Date(s.createdAt)
-        const matchesYear = filters.year
-          ? d.getFullYear() === filters.year
-          : true
-        const matchesMonth = filters.month
-          ? d.getMonth() + 1 === filters.month
-          : true
-        return matchesYear && matchesMonth
-      })
+      const filteredClicks = link.clicks.filter((c) => dateMatches(c.createdAt))
+      const filteredSales = link.sales.filter((s) => dateMatches(s.createdAt))
+
+      // NEW: filter commissions by year/month
+      const filteredCommissions = link.commissions.filter((com) =>
+        dateMatches(com.createdAt)
+      )
 
       // aggregate totals
       const totalClicks = filteredClicks.reduce((sum, c) => sum + c.count, 0)
       const totalSales = filteredSales.reduce((sum, s) => sum + s.count, 0)
+
+      // NEW: aggregate total commission
+      const totalCommission = filteredCommissions.reduce(
+        (sum, com) => sum + com.amount,
+        0
+      )
+
       const conversionRate =
         totalClicks > 0
           ? parseFloat(((totalSales / totalClicks) * 100).toFixed(2))
@@ -133,9 +144,10 @@ export default function Links({
         clicks: totalClicks,
         sales: totalSales,
         conversionRate,
+        commission: totalCommission,
       } satisfies AffiliateLinkWithStats
     })
-  }, [isPreview, filters, previewSimulation])
+  }, [isPreview, filters, previewSimulation, searchData])
 
   const mutation = useAppMutation(createAffiliateLink, {
     affiliate,
@@ -164,7 +176,7 @@ export default function Links({
       mutation.mutate(orgId)
     }
   }
-  const columns = LinksColumns(affiliate)
+  const columns = useLinksColumns(affiliate, displayCurrency)
   const table = useReactTable({
     data: isPreview ? (filteredPreviewData ?? []) : (searchData ?? []),
     columns,
@@ -200,7 +212,22 @@ export default function Links({
                 color: (affiliate && dashboardHeaderDescColor) || undefined,
               }}
             >
-              Track your referral links and their performance
+              {orgData ? (
+                <>
+                  Share your links and earn{" "}
+                  <strong>
+                    {orgData.commissionType === "percentage"
+                      ? `${orgData.commissionValue}%`
+                      : new Intl.NumberFormat("en-US", {
+                          style: "currency",
+                          currency: displayCurrency,
+                        }).format(Number(orgData.commissionValue))}
+                  </strong>{" "}
+                  commission on every sale!
+                </>
+              ) : (
+                "Track your referral links and their performance"
+              )}
             </p>
             {isPreview && (
               <DashboardThemeCustomizationOptions

@@ -5,4 +5,5 @@ export type AffiliateLinkWithStats = {
   sales: number
   createdAt: Date
   conversionRate: number
+  commission: number
 }
