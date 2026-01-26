@@ -15,7 +15,10 @@ export async function getUserPlan(): Promise<PlanInfo> {
 
   const [userSub, userPurchase] = await Promise.all([
     db.query.subscription.findFirst({ where: eq(subscription.userId, userId) }),
-    db.query.purchase.findFirst({ where: eq(purchase.userId, userId) }),
+    db.query.purchase.findFirst({
+      where: eq(purchase.userId, userId),
+      orderBy: (purchase, { desc }) => [desc(purchase.tier)],
+    }),
   ])
 
   // ✅ Check subscription first

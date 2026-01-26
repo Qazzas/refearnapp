@@ -16,7 +16,6 @@ export async function assignLifetimePurchase(userId: string, txnId: string) {
   if (!userId || !txnId) return
 
   try {
-    // 2. Explicitly type the result to avoid Stripe interference
     const transaction: PaddleTransaction = await paddle.transactions.get(txnId)
 
     if (transaction.status !== "completed") {
@@ -24,34 +23,34 @@ export async function assignLifetimePurchase(userId: string, txnId: string) {
       return
     }
 
-    // 3. Paddle stores totals in transaction.details.totals
-    // We safely parse the string total
+    // 💰 totalPaid remains as cents (e.g., 19900 or 29900)
     const totalPaid = parseFloat(transaction.details?.totals?.total || "0")
 
     let tier: "PRO" | "ULTIMATE" = "PRO"
 
-    // Logic: 299 is Ultimate, 199 is Pro
-    if (totalPaid >= 299) {
+    // ✅ Match logic to cent values
+    if (totalPaid >= 29900) {
       tier = "ULTIMATE"
-    } else if (totalPaid >= 199) {
+    } else if (totalPaid >= 19900) {
       tier = "PRO"
     } else {
       console.error("Payment amount invalid:", totalPaid)
       return
     }
 
-    // 4. Save to DB (Redis removed)
     await db.insert(purchase).values({
       id: txnId,
       userId,
       tier,
-      price: totalPaid.toString(),
+      price: totalPaid.toString(), // Saves "19900" or "29900"
       currency: transaction.currencyCode || "USD",
       priceId: transaction.items[0]?.price?.id || "manual",
       isActive: true,
     })
 
-    console.log(`Successfully assigned ${tier} to ${userId}`)
+    console.log(
+      `Successfully assigned ${tier} to ${userId} (Cents: ${totalPaid})`
+    )
   } catch (error) {
     console.error("Paddle Transaction Error:", error)
   }

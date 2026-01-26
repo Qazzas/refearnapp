@@ -44,7 +44,7 @@ async function devSetUserPlan({
         plan: plan === "ULTIMATE" ? "ULTIMATE" : "PRO",
         billingInterval: "MONTHLY",
         currency: "USD",
-        price: plan === "ULTIMATE" ? "2000" : "1000",
+        price: plan === "ULTIMATE" ? "4000" : "2500",
         expiresAt,
       })
     }
@@ -55,7 +55,7 @@ async function devSetUserPlan({
       await db.insert(purchase).values({
         userId,
         tier: plan as "PRO" | "ULTIMATE",
-        price: plan === "PRO" ? "85" : "125",
+        price: plan === "PRO" ? "19900" : "29900",
         currency: "USD",
       })
     }

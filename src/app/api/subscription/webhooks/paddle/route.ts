@@ -55,6 +55,7 @@ export async function POST(req: Request) {
         priceDesc.includes("ULTIMATE-SUBSCRIPTION") ||
         priceDesc.includes("ULTIMATE-SUBSCRIPTION-YEAR") ||
         priceDesc.includes("ULTIMATE-ONE-TIME-UPGRADE") ||
+        priceDesc.includes("ULTIMATE-ONE-TIME") ||
         priceDesc === "ULTIMATE" // 125 one-time
       ) {
         planType = "ULTIMATE"
@@ -78,7 +79,7 @@ export async function POST(req: Request) {
 
         if (isUpgrade) {
           console.log("🔼 One-time upgrade: PRO → ULTIMATE")
-          await db.delete(purchase).where(eq(purchase.userId, decodedOrg.id))
+          // await db.delete(purchase).where(eq(purchase.userId, decodedOrg.id))
         }
         const existingSub = await db.query.subscription.findFirst({
           where: eq(subscription.userId, decodedOrg.id),
@@ -91,6 +92,7 @@ export async function POST(req: Request) {
             )
 
             await db.insert(purchase).values({
+              id: data.id,
               userId: decodedOrg.id,
               tier: planType,
               price: priceAmount.toString(),
@@ -109,6 +111,7 @@ export async function POST(req: Request) {
         }
         // 💾 Insert one-time
         await db.insert(purchase).values({
+          id: data.id,
           userId: decodedOrg.id,
           tier: planType,
           price: priceAmount.toString(),
@@ -327,24 +330,32 @@ export async function POST(req: Request) {
           )
 
           await db.delete(purchase).where(eq(purchase.id, transactionId))
-
-          await db
-            .update(subscription)
-            .set({
-              plan: "FREE",
-              price: null,
-              expiresAt: new Date(),
-              updatedAt: new Date(),
-            })
-            .where(eq(subscription.userId, userId))
-
-          if (userOrg) {
-            await syncOrgDataToRedisLinks(userOrg.id, {
-              ownerId: userId,
-              planType: "FREE",
-              paymentType: "SUBSCRIPTION",
-              expiresAt: new Date().toISOString(),
-            })
+          const remainingPurchase = await db.query.purchase.findFirst({
+            where: eq(purchase.userId, userId),
+            orderBy: (p, { desc }) => [desc(p.tier)],
+          })
+          if (remainingPurchase) {
+            console.log(
+              `🔄 User has another purchase (${remainingPurchase.id}). Activating it.`
+            )
+          } else {
+            await db
+              .update(subscription)
+              .set({
+                plan: "FREE",
+                price: null,
+                expiresAt: new Date(),
+                updatedAt: new Date(),
+              })
+              .where(eq(subscription.userId, userId))
+            if (userOrg) {
+              await syncOrgDataToRedisLinks(userOrg.id, {
+                ownerId: userId,
+                planType: "FREE",
+                paymentType: "SUBSCRIPTION",
+                expiresAt: new Date().toISOString(),
+              })
+            }
           }
         } else {
           console.log(

@@ -276,7 +276,7 @@ export const purchase_seed = [
     id: "pur_ultimate_lifetime",
     userId: "29022934-eb52-49af-aca4-b6ed553c89dd",
     tier: "ULTIMATE" as const,
-    price: "499.00",
+    price: "29900",
     currency: "USD",
     priceId: "ultimate_lifetime",
     isActive: true,
