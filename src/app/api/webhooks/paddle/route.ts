@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
     // Get the raw body as text (important for signature verification)
     const rawBody = await request.text()
     const signatureHeader = request.headers.get("paddle-signature")
-    console.log("Received Paddle webhook with body:", signatureHeader)
+    const settingId = request.headers.get("paddle-notification-setting-id")
+    console.log("Received Paddle webhook with setting ID:", settingId)
     if (!signatureHeader) {
       return NextResponse.json(
         { error: "Missing Paddle-Signature header" },
