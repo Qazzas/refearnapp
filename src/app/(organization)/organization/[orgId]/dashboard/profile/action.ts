@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache"
 import { getUserAuthCapabilities } from "@/lib/server/getUserAuthCapabilities"
 import { getCurrentUser } from "@/lib/server/getCurrentUser"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const getUserData = async (): Promise<
   ActionResult<SafeUserWithCapabilities>
@@ -23,11 +24,11 @@ export const getUserData = async (): Promise<
     })
 
     if (!userData) {
-      throw {
+      throw new AppError({
         status: 404,
         error: "User not found",
         toast: "Your account could not be found.",
-      }
+      })
     }
 
     return {
@@ -46,7 +47,7 @@ export async function updateUserProfile(
 ): Promise<MutationData> {
   return handleAction("updateUserProfile", async () => {
     const { id } = await getCurrentUser()
-    if (!id) throw { status: 401, toast: "Unauthorized" }
+    if (!id) throw new AppError({ status: 401, toast: "Unauthorized" })
     if (!data.name) return { ok: true }
 
     await db.update(user).set({ name: data.name }).where(eq(user.id, id))
@@ -60,23 +61,23 @@ export async function validateCurrentOrganizationPassword(
 ): Promise<MutationData> {
   return handleAction("validating current Organization Password", async () => {
     const { id } = await getCurrentUser()
-    if (!id) throw { status: 401, toast: "Unauthorized" }
+    if (!id) throw new AppError({ status: 401, toast: "Unauthorized" })
 
     // Get account by userId
     const record = await db.query.account.findFirst({
       where: eq(account.userId, id),
     })
     if (!record || !record.password) {
-      throw { status: 404, toast: "Account not found" }
+      throw new AppError({ status: 404, toast: "Account not found" })
     }
 
     const isMatch = await bcrypt.compare(currentPassword, record.password)
     if (!isMatch) {
-      throw {
+      throw new AppError({
         status: 403,
         toast: "Incorrect current password",
         data: currentPassword,
-      }
+      })
     }
 
     return { ok: true, toast: "Validated Password" }
@@ -89,7 +90,10 @@ export async function updateUserPassword(
     const { userId, canChangePassword } = await getUserAuthCapabilities()
 
     if (!canChangePassword) {
-      throw { status: 403, toast: "This account cannot change password" }
+      throw new AppError({
+        status: 403,
+        toast: "This account cannot change password",
+      })
     }
 
     const hashed = await bcrypt.hash(newPassword, 10)
@@ -101,7 +105,7 @@ export async function updateUserPassword(
       .returning()
 
     if (!result.length) {
-      throw { status: 404, toast: "Account not found" }
+      throw new AppError({ status: 404, toast: "Account not found" })
     }
 
     return { ok: true, toast: "Successfully Updated Password" }

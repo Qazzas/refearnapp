@@ -6,6 +6,7 @@ import { affiliateAccount } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { decodedType } from "@/lib/types/decodedType"
 import { returnError } from "@/lib/errorHandler"
+import { AppError } from "@/lib/exceptions"
 
 export const updateAffiliatePasswordAction = async (
   decoded: decodedType,
@@ -25,10 +26,10 @@ export const updateAffiliatePasswordAction = async (
     .returning()
 
   if (!result.length) {
-    throw {
+    throw new AppError({
       status: 404,
       error: "Affiliate account not found",
       toast: "Could not update password, account missing",
-    }
+    })
   }
 }

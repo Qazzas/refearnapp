@@ -14,109 +14,44 @@ import { getOrganizationById } from "@/services/getOrganizationById"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
 import { getPaddleAccount } from "@/lib/server/getPaddleAccount"
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { orgId: string } }
+) {
   try {
-    // Get the raw body as text (important for signature verification)
+    const { orgId } = params
     const rawBody = await request.text()
     const signatureHeader = request.headers.get("paddle-signature")
+
     if (!signatureHeader) {
-      return NextResponse.json(
-        { error: "Missing Paddle-Signature header" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Missing Signature" }, { status: 400 })
     }
 
+    // 1. Get the secret directly using the orgId from the URL
+    const orgPaddleAccount = await getPaddleAccount(orgId)
+    if (!orgPaddleAccount) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 })
+    }
+
+    const secret = orgPaddleAccount.webhookPublicKey
+
+    // 2. Verify Signature
     const [tsPart, h1Part] = signatureHeader.split(";")
     const timestamp = tsPart.split("=")[1]
     const receivedSignature = h1Part.split("=")[1]
-    const payload = JSON.parse(rawBody)
-    const customData = payload.data?.custom_data || {}
-    let refDataRaw = customData.refearnapp_affiliate_code
-    let secret: string | null = null
 
-    if (refDataRaw) {
-      // ✅ Normal path with custom data
-      const { code } = JSON.parse(refDataRaw)
-      const affiliateLinkRecord = await getAffiliateLinkRecord(code)
-      if (!affiliateLinkRecord)
-        return NextResponse.json(
-          { error: "Invalid affiliate code" },
-          { status: 400 }
-        )
-
-      const orgPaddleAccount = await getPaddleAccount(
-        affiliateLinkRecord.organizationId
-      )
-      if (!orgPaddleAccount)
-        return NextResponse.json(
-          { error: "Missing Paddle account" },
-          { status: 400 }
-        )
-      secret = orgPaddleAccount.webhookPublicKey
-    } else {
-      const subscriptionId = payload.data?.subscription_id
-      const transactionId = payload.data?.transaction_id
-
-      if (!subscriptionId && !transactionId) {
-        return NextResponse.json(
-          { error: "Missing both custom data and relevant IDs" },
-          { status: 400 }
-        )
-      }
-      const existingInvoice = await db.query.affiliateInvoice.findFirst({
-        where: (table, { eq, or }) =>
-          or(
-            subscriptionId
-              ? eq(table.subscriptionId, subscriptionId)
-              : undefined,
-            transactionId ? eq(table.transactionId, transactionId) : undefined
-          ),
-      })
-      if (!existingInvoice || !existingInvoice.affiliateLinkId) {
-        return NextResponse.json(
-          { error: "Cannot determine affiliate link from payload" },
-          { status: 400 }
-        )
-      }
-      const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-        where: (link, { eq }) => eq(link.id, existingInvoice.affiliateLinkId!),
-      })
-      if (!affiliateLinkRecord)
-        return NextResponse.json(
-          { error: "Affiliate link not found" },
-          { status: 400 }
-        )
-
-      const orgPaddleAccount = await getPaddleAccount(
-        affiliateLinkRecord.organizationId
-      )
-      if (!orgPaddleAccount)
-        return NextResponse.json(
-          { error: "Missing Paddle account" },
-          { status: 400 }
-        )
-      secret = orgPaddleAccount.webhookPublicKey
-    }
-
-    if (!secret) {
-      return NextResponse.json(
-        { error: "Missing webhook secret" },
-        { status: 500 }
-      )
-    }
     const signedPayload = `${timestamp}:${rawBody}`
     const computedSignature = crypto
       .createHmac("sha256", secret)
       .update(signedPayload)
       .digest("hex")
+
     if (computedSignature !== receivedSignature) {
-      console.error("Invalid signature", {
-        computed: computedSignature,
-        received: receivedSignature,
-        payload: signedPayload,
-      })
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
     }
+
+    // 3. Parse payload only AFTER verification
+    const payload = JSON.parse(rawBody)
 
     switch (payload.event_type) {
       case "transaction.completed": {

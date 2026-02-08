@@ -19,6 +19,7 @@ import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 import { getUserPlan } from "@/lib/server/getUserPlan"
 import { isReservedDomain } from "@/lib/constants/domains"
+import { AppError } from "@/lib/exceptions"
 
 const s3Client = new S3Client({
   region: "auto",
@@ -35,7 +36,7 @@ export const CreateOrganization = async (
   return handleAction("Organization Create", async () => {
     const cookieStore = await cookies()
     const token = cookieStore.get("organizationToken")?.value
-    if (!token) throw { status: 401, error: "Unauthorized" }
+    if (!token) throw new AppError({ status: 401, error: "Unauthorized" })
 
     const decoded = jwt.decode(token) as {
       id: string
@@ -53,19 +54,19 @@ export const CreateOrganization = async (
       })
 
       if (plan.plan === "FREE" && orgCount.length >= 1) {
-        throw {
+        throw new AppError({
           status: 403,
           toast:
             "Free plan allows only one organization. Upgrade to Pro or Ultimate.",
-        }
+        })
       }
 
       if (plan.plan === "PRO" && orgCount.length >= 1) {
-        throw {
+        throw new AppError({
           status: 403,
           toast:
             "Pro plan allows only one organization. Upgrade to Ultimate for more.",
-        }
+        })
       }
     }
 
@@ -76,22 +77,22 @@ export const CreateOrganization = async (
       .replace(/^https?:\/\//, "")
 
     if (isReservedDomain(normalizedDomain)) {
-      throw {
+      throw new AppError({
         ok: false,
         toast:
           "This domain is reserved for system use. Please choose a different subdomain.",
-      }
+      })
     }
     // 🔍 Check if domain already exists in DB
     const existingDomain = await db.query.websiteDomain.findFirst({
       where: eq(websiteDomain.domainName, normalizedDomain),
     })
     if (existingDomain) {
-      throw {
+      throw new AppError({
         status: 409,
         toast: `Domain name "${normalizedDomain}" already exists. Please choose another one.`,
         data: existingDomain.domainName,
-      }
+      })
     }
     const [newOrg] = await db
       .insert(organization)
@@ -104,7 +105,8 @@ export const CreateOrganization = async (
       })
       .returning()
 
-    if (!newOrg) throw { status: 500, toast: "Failed to create org" }
+    if (!newOrg)
+      throw new AppError({ status: 500, toast: "Failed to create org" })
     await db.insert(websiteDomain).values({
       orgId: newOrg.id,
       domainName: normalizedDomain,
@@ -168,7 +170,7 @@ export async function deleteOrganizationLogo(
   logoUrl: string
 ): Promise<MutationData> {
   return handleAction("Delete Organization Logo", async () => {
-    if (!logoUrl) throw { status: 500, toast: "logo not found" }
+    if (!logoUrl) throw new AppError({ status: 500, toast: "logo not found" })
 
     // 1. Extract the object key from R2 public URL
     const uploadPath = logoUrl.replace(`${process.env.R2_ACCESS_URL}/`, "")
@@ -194,7 +196,7 @@ export async function updateOrganizationLogo({
   value: string | null
 }): Promise<MutationData> {
   return handleAction("Update Organization Logo", async () => {
-    if (!orgId) throw { status: 500, toast: "missing orgId" }
+    if (!orgId) throw new AppError({ status: 500, toast: "missing orgId" })
 
     await db
       .update(organization)

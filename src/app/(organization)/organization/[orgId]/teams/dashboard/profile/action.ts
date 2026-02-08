@@ -11,6 +11,7 @@ import { handleAction } from "@/lib/handleAction"
 import { getTeamAuthCapabilities } from "@/lib/server/getTeamAuthCapabilities"
 import { getCurrentTeam } from "@/lib/server/getCurrentTeam"
 import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+import { AppError } from "@/lib/exceptions"
 
 export const getTeamData = async (
   orgId: string
@@ -25,11 +26,11 @@ export const getTeamData = async (
     })
 
     if (!teamData) {
-      throw {
+      throw new AppError({
         status: 404,
         error: "User not found",
         toast: "Your account could not be found.",
-      }
+      })
     }
 
     return {
@@ -49,7 +50,7 @@ export async function updateTeamProfile(
   return handleAction("update Team Profile", async () => {
     await getTeamAuthAction(orgId)
     const { id } = await getCurrentTeam(orgId)
-    if (!id) throw { status: 401, toast: "Unauthorized" }
+    if (!id) throw new AppError({ status: 401, toast: "Unauthorized" })
     if (!data.name) return { ok: true }
 
     await db.update(team).set({ name: data.name }).where(eq(team.id, id))
@@ -65,23 +66,23 @@ export async function validateCurrentTeamPassword(
   return handleAction("validating current Team Password", async () => {
     await getTeamAuthAction(orgId)
     const { id } = await getCurrentTeam(orgId)
-    if (!id) throw { status: 401, toast: "Unauthorized" }
+    if (!id) throw new AppError({ status: 401, toast: "Unauthorized" })
 
     // Get account by userId
     const record = await db.query.teamAccount.findFirst({
       where: eq(teamAccount.teamId, id),
     })
     if (!record || !record.password) {
-      throw { status: 404, toast: "Account not found" }
+      throw new AppError({ status: 404, toast: "Account not found" })
     }
 
     const isMatch = await bcrypt.compare(currentPassword, record.password)
     if (!isMatch) {
-      throw {
+      throw new AppError({
         status: 403,
         toast: "Incorrect current password",
         data: currentPassword,
-      }
+      })
     }
 
     return { ok: true, toast: "Validated Password" }
@@ -96,7 +97,10 @@ export async function updateTeamPassword(
     const { userId, canChangePassword } = await getTeamAuthCapabilities(orgId)
 
     if (!canChangePassword) {
-      throw { status: 403, toast: "This account cannot change password" }
+      throw new AppError({
+        status: 403,
+        toast: "This account cannot change password",
+      })
     }
 
     const hashed = await bcrypt.hash(newPassword, 10)
@@ -108,7 +112,7 @@ export async function updateTeamPassword(
       .returning()
 
     if (!result.length) {
-      throw { status: 404, toast: "Account not found" }
+      throw new AppError({ status: 404, toast: "Account not found" })
     }
 
     return { ok: true, toast: "Successfully Updated Password" }

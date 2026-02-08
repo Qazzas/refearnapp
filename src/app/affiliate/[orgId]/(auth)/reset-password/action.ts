@@ -11,6 +11,7 @@ import { buildAffiliateUrl } from "@/util/Url"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const resetAffiliatePasswordServer = async ({
   affiliateId,
@@ -37,10 +38,10 @@ export const resetAffiliatePasswordServer = async ({
       .returning()
 
     if (!updatedAccount) {
-      throw {
+      throw new AppError({
         status: 500,
         toast: "Affiliate credentials account not found",
-      }
+      })
     }
 
     // 🔑 Fetch affiliate to normalize email & session payload
@@ -50,10 +51,10 @@ export const resetAffiliatePasswordServer = async ({
     })
 
     if (!existingAffiliate) {
-      throw {
+      throw new AppError({
         status: 500,
         toast: "Affiliate not found",
-      }
+      })
     }
 
     const sessionPayload = {

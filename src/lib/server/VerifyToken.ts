@@ -2,6 +2,7 @@
 import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
 import { returnError } from "@/lib/errorHandler"
+import { AppError } from "@/lib/exceptions"
 
 export const verifyToken = async () => {
   try {
@@ -9,19 +10,19 @@ export const verifyToken = async () => {
     const tokenCookie = cookieStore.get("token")
     const token = tokenCookie?.value
     if (!token) {
-      throw {
+      throw new AppError({
         status: 401, // Unauthorized
         error: "Authentication token missing",
         toast: "Please log in to continue.",
-      }
+      })
     }
     const verified = jwt.verify(token, process.env.secret as string)
     if (!verified) {
-      throw {
+      throw new AppError({
         status: 401, // Unauthorized
         error: "Authentication token expired",
         toast: "Your session has expired. Please log in again.",
-      }
+      })
     }
     return token
   } catch (error: any) {

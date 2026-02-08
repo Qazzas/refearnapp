@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const resetTeamPasswordServer = async ({
   teamId,
@@ -35,10 +36,10 @@ export const resetTeamPasswordServer = async ({
       .returning()
 
     if (!updatedTeamAccount) {
-      throw {
+      throw new AppError({
         status: 500,
         toast: "Affiliate credentials account not found",
-      }
+      })
     }
 
     // 🔑 Fetch affiliate to normalize email & session payload
@@ -48,10 +49,10 @@ export const resetTeamPasswordServer = async ({
     })
 
     if (!existingTeam) {
-      throw {
+      throw new AppError({
         status: 500,
         toast: "Affiliate not found",
-      }
+      })
     }
 
     const sessionPayload = {

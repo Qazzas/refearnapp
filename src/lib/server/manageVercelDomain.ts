@@ -1,4 +1,6 @@
 "use server"
+import { AppError } from "@/lib/exceptions"
+
 export async function addDomainToVercel(domain: string) {
   const res = await fetch(
     `https://api.vercel.com/v9/projects/${process.env.VERCEL_PROJECT_ID}/domains`,
@@ -15,10 +17,10 @@ export async function addDomainToVercel(domain: string) {
   const data = (await res.json()) as any
 
   if (!res.ok) {
-    throw {
+    throw new AppError({
       status: res.status,
       toast: data.error?.message ?? "Failed to add domain to Vercel",
-    }
+    })
   }
 
   return data
@@ -37,10 +39,10 @@ export async function verifyDomainOnVercel(domain: string) {
   const data = (await res.json()) as any
 
   if (!res.ok) {
-    throw {
+    throw new AppError({
       status: res.status,
       toast: data.error?.message ?? "Failed to verify domain",
-    }
+    })
   }
 
   return data
@@ -58,10 +60,10 @@ export async function deleteDomainFromVercel(domain: string) {
 
   if (!res.ok) {
     const data = (await res.json()) as any
-    throw {
+    throw new AppError({
       status: res.status,
       toast: data?.error?.message ?? "Failed to delete domain from Vercel",
-    }
+    })
   }
 }
 export async function getVercelDomainConfig(domain: string) {
@@ -76,7 +78,10 @@ export async function getVercelDomainConfig(domain: string) {
   )
 
   if (!res.ok) {
-    throw { ok: false, toast: "Failed to fetch domain config from Vercel" }
+    throw new AppError({
+      ok: false,
+      toast: "Failed to fetch domain config from Vercel",
+    })
   }
 
   return await res.json()

@@ -8,6 +8,7 @@ import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { customAlphabet } from "nanoid"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 type CreateUserPayload = {
   name: string
@@ -26,7 +27,7 @@ export const SignupServer = async ({
 }: CreateUserPayload & { transactionId?: string }): Promise<MutationData> => {
   return handleAction("Signup Server", async () => {
     if (!email || !password || !name) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Missing required fields.",
         toast: "Please fill in all required fields.",
@@ -35,7 +36,7 @@ export const SignupServer = async ({
           password: !password ? "Password is required" : "",
           name: !name ? "Name is required" : "",
         },
-      }
+      })
     }
 
     const normalizedEmail = email.trim().toLowerCase()
@@ -53,13 +54,13 @@ export const SignupServer = async ({
       })
 
       if (existingAcc) {
-        throw {
+        throw new AppError({
           status: 409,
           error: "User already exists.",
           toast: "This email is already registered",
           data: existingUser.email,
           fields: { email: "Email already in use" },
-        }
+        })
       }
 
       // Create new credentials account for existing user
@@ -109,11 +110,11 @@ export const SignupServer = async ({
       .returning()
 
     if (!newUser) {
-      throw {
+      throw new AppError({
         status: 500,
         error: "User creation failed.",
         toast: "Something went wrong while creating user.",
-      }
+      })
     }
 
     await db.insert(account).values({

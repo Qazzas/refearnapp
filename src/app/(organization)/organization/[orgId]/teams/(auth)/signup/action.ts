@@ -8,6 +8,7 @@ import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { customAlphabet } from "nanoid"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 type CreateAffiliatePayload = {
   name: string
@@ -27,11 +28,11 @@ export const SignupTeamServer = async ({
 }: CreateAffiliatePayload): Promise<MutationData> => {
   return handleAction("Signup Team Server", async () => {
     if (!email || !password || !name || !organizationId) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Missing required fields.",
         toast: "Please fill in all required fields.",
-      }
+      })
     }
     const normalizedEmail = email.trim().toLowerCase()
     const existingTeam = await db.query.team.findFirst({
@@ -49,14 +50,14 @@ export const SignupTeamServer = async ({
       })
 
       if (existingAcc) {
-        throw {
+        throw new AppError({
           status: 409,
           error: "Team already exists.",
           toast:
             "This email is already registered with credentials under this organization.",
           data: existingTeam.email,
           fields: { email: "Email already in use" },
-        }
+        })
       }
 
       // Add new credentials account under existing affiliate
@@ -99,11 +100,11 @@ export const SignupTeamServer = async ({
       .returning()
 
     if (!newTeam) {
-      throw {
+      throw new AppError({
         status: 500,
         error: "team creation failed.",
         toast: "Something went wrong while creating team",
-      }
+      })
     }
 
     await db.insert(teamAccount).values({

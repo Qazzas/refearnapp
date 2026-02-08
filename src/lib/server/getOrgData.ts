@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import { db } from "@/db/drizzle"
 import { ActionResult } from "@/lib/types/response"
 import { OrgData } from "@/lib/types/organization"
+import { AppError } from "@/lib/exceptions"
 
 export const getOrgData = async (
   orgId: string,
@@ -13,20 +14,20 @@ export const getOrgData = async (
   const token = cookieStore.get(tokenKey)?.value
 
   if (!token) {
-    throw {
+    throw new AppError({
       status: 401,
       error: "Unauthorized",
       toast: "You must be logged in.",
-    }
+    })
   }
 
   const decoded = jwt.decode(token) as { id: string }
   if (!decoded?.id) {
-    throw {
+    throw new AppError({
       status: 400,
       error: "Invalid token",
       toast: "Session invalid or expired.",
-    }
+    })
   }
 
   // Fetch organization data
@@ -35,11 +36,11 @@ export const getOrgData = async (
   })
 
   if (!org) {
-    throw {
+    throw new AppError({
       status: 404,
       error: "Organization not found",
       toast: "The requested organization does not exist.",
-    }
+    })
   }
   return {
     ok: true,

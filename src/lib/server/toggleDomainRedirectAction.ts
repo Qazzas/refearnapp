@@ -2,6 +2,7 @@
 import { and, eq } from "drizzle-orm"
 import { websiteDomain } from "@/db/schema"
 import { db } from "@/db/drizzle"
+import { AppError } from "@/lib/exceptions"
 export async function toggleDomainRedirectAction({
   orgId,
   domainId,
@@ -15,7 +16,7 @@ export async function toggleDomainRedirectAction({
     where: and(eq(websiteDomain.id, domainId), eq(websiteDomain.orgId, orgId)),
   })
   if (!domain?.isActive || domain.isPrimary) {
-    throw { ok: false, toast: "Invalid redirect target" }
+    throw new AppError({ ok: false, toast: "Invalid redirect target" })
   }
   await db
     .update(websiteDomain)

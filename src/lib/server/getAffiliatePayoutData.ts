@@ -6,6 +6,7 @@ import { OrderBy, OrderDir } from "@/lib/types/orderTypes"
 import { PayoutResult } from "@/lib/types/payoutResult"
 import { ActionResult } from "@/lib/types/response"
 import { OrgAuthResult } from "@/lib/types/orgAuth"
+import { AppError } from "@/lib/exceptions"
 
 export async function getAffiliatePayoutData(
   mode: "TABLE" | "EXPORT" = "TABLE",
@@ -37,10 +38,10 @@ export async function getAffiliatePayoutData(
     )
 
     if (validRows.length === 0) {
-      throw {
+      throw new AppError({
         status: 400,
         toast: "No unpaid commissions with PayPal email found",
-      }
+      })
     }
 
     return {

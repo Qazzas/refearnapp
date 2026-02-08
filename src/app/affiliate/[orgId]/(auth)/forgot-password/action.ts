@@ -7,6 +7,7 @@ import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const ForgotPasswordAffiliateServer = async ({
   email,
@@ -17,11 +18,11 @@ export const ForgotPasswordAffiliateServer = async ({
 }): Promise<MutationData> => {
   return handleAction("Forgot Password Affiliate Server", async () => {
     if (!email || !organizationId) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Email and organization are required.",
         toast: "Please enter your email.",
-      }
+      })
     }
 
     const existingAffiliate = await db.query.affiliate.findFirst({

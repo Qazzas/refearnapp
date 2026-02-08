@@ -2,6 +2,7 @@
 import { handleAction } from "@/lib/handleAction"
 import type { MutationData } from "@/lib/types/response"
 import { updatePlan } from "@/lib/server/updatePlan"
+import { AppError } from "@/lib/exceptions"
 
 export async function updateSubscriptionAction({
   subscriptionId,
@@ -17,7 +18,8 @@ export async function updateSubscriptionAction({
   modeType: "SUB_TO_SUB" | "SUB_TO_ONE_TIME"
 }): Promise<MutationData> {
   return handleAction("updateSubscriptionAction", async () => {
-    if (!subscriptionId) throw { status: 400, toast: "Invalid subscription" }
+    if (!subscriptionId)
+      throw new AppError({ status: 400, toast: "Invalid subscription" })
 
     await updatePlan({
       subscriptionId,

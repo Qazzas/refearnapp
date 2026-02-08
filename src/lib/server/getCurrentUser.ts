@@ -2,15 +2,17 @@
 import "server-only"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
+import { AppError } from "@/lib/exceptions"
 
 export async function getCurrentUser() {
   const cookieStore = await cookies()
   const token = cookieStore.get("organizationToken")?.value
-  if (!token) throw { status: 401, toast: "Unauthorized" }
+  if (!token) throw new AppError({ status: 401, toast: "Unauthorized" })
   const payload = jwt.verify(token, process.env.SECRET_KEY as string) as {
     id?: string
   }
-  if (!payload?.id) throw { status: 400, toast: "Invalid session" }
+  if (!payload?.id)
+    throw new AppError({ status: 400, toast: "Invalid session" })
 
   return { id: payload.id }
 }

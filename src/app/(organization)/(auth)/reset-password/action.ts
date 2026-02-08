@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const resetOrganizationPasswordServer = async ({
   userId,
@@ -30,10 +31,10 @@ export const resetOrganizationPasswordServer = async ({
       .returning()
 
     if (!updatedAccount) {
-      throw {
+      throw new AppError({
         status: 500,
         toast: "Organization credentials account not found",
-      }
+      })
     }
 
     // 🔑 Fetch organization to normalize email & session payload
@@ -42,10 +43,10 @@ export const resetOrganizationPasswordServer = async ({
     })
 
     if (!existingUser) {
-      throw {
+      throw new AppError({
         status: 500,
         toast: "Organization not found",
-      }
+      })
     }
 
     // Find organizations owned by this user

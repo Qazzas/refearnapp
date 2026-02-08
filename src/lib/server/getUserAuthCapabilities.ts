@@ -4,10 +4,11 @@ import { eq } from "drizzle-orm"
 import { getCurrentUser } from "@/lib/server/getCurrentUser"
 import { account } from "@/db/schema"
 import { db } from "@/db/drizzle"
+import { AppError } from "@/lib/exceptions"
 
 export async function getUserAuthCapabilities() {
   const { id } = await getCurrentUser()
-  if (!id) throw { status: 401, toast: "Unauthorized" }
+  if (!id) throw new AppError({ status: 401, toast: "Unauthorized" })
   const accounts = await db.query.account.findMany({
     where: eq(account.userId, id),
   })

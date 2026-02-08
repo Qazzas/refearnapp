@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const LoginServer = async ({
   email,
@@ -18,7 +19,7 @@ export const LoginServer = async ({
 }): Promise<MutationData> => {
   return handleAction("Login Server", async () => {
     if (!email || !password) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Email and password are required.",
         toast: "Please enter your login credentials.",
@@ -26,7 +27,7 @@ export const LoginServer = async ({
           email: !email ? "Email is required" : "",
           password: !password ? "Password is required" : "",
         },
-      }
+      })
     }
 
     // Find the user by email
@@ -35,12 +36,12 @@ export const LoginServer = async ({
     })
 
     if (!existingUser) {
-      throw {
+      throw new AppError({
         status: 404,
         error: "User not found.",
         toast: "Invalid credentials. Please check your email and password.",
         fields: { email: "User not found" },
-      }
+      })
     }
 
     // Find the user account with provider = 'credentials'
@@ -50,22 +51,22 @@ export const LoginServer = async ({
     })
 
     if (!userAcc || !userAcc.password) {
-      throw {
+      throw new AppError({
         status: 401,
         error: "User account not found.",
         toast: "Invalid credentials. No password found for this user.",
-      }
+      })
     }
 
     const validPassword = await bcrypt.compare(password, userAcc.password)
 
     if (!validPassword) {
-      throw {
+      throw new AppError({
         status: 401,
         error: "Invalid password.",
         toast: "Invalid credentials. Please check your password.",
         fields: { password: "Invalid password" },
-      }
+      })
     }
 
     // Get organizations owned by this user

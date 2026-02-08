@@ -10,6 +10,7 @@ import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 type CreateAffiliatePayload = {
   name: string
@@ -29,11 +30,11 @@ export const SignupAffiliateServer = async ({
 }: CreateAffiliatePayload): Promise<MutationData> => {
   return handleAction("Signup Affiliate Server", async () => {
     if (!email || !password || !name || !organizationId) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Missing required fields.",
         toast: "Please fill in all required fields.",
-      }
+      })
     }
     const normalizedEmail = email.trim().toLowerCase()
     const existingAffiliate = await db.query.affiliate.findFirst({
@@ -54,14 +55,14 @@ export const SignupAffiliateServer = async ({
       })
 
       if (existingAcc) {
-        throw {
+        throw new AppError({
           status: 409,
           error: "Affiliate already exists.",
           toast:
             "This email is already registered with credentials under this organization.",
           data: existingAffiliate.email,
           fields: { email: "Email already in use" },
-        }
+        })
       }
 
       // Add new credentials account under existing affiliate
@@ -113,11 +114,11 @@ export const SignupAffiliateServer = async ({
       .returning()
 
     if (!newAffiliate) {
-      throw {
+      throw new AppError({
         status: 500,
         error: "Affiliate creation failed.",
         toast: "Something went wrong while creating affiliate.",
-      }
+      })
     }
 
     await db.insert(affiliateAccount).values({

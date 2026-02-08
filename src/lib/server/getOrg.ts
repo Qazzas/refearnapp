@@ -7,6 +7,7 @@ import { handleAction } from "@/lib/handleAction"
 import { getAffiliateOrganization } from "@/lib/server/GetAffiliateOrganization"
 import { getAffiliateLinksWithStatsAction } from "@/lib/server/getAffiliateLinksWithStats"
 import { ActionResult } from "@/lib/types/response"
+import { AppError } from "@/lib/exceptions"
 
 export const getOrg = async (orgId: string): Promise<Organization> => {
   const org = await db.query.organization.findFirst({
@@ -14,11 +15,11 @@ export const getOrg = async (orgId: string): Promise<Organization> => {
   })
 
   if (!org) {
-    throw {
+    throw new AppError({
       status: 500,
       error: "failed to organization data",
       toast: "failed to fetch organization data",
-    }
+    })
   }
 
   return org

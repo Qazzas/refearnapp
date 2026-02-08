@@ -7,6 +7,7 @@ import { team } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { handleAction } from "@/lib/handleAction"
 import { ActionResult } from "@/lib/types/response"
+import { AppError } from "@/lib/exceptions"
 
 export const verifyAndDeleteTeamSessionAction = async (
   orgId: string
@@ -17,7 +18,7 @@ export const verifyAndDeleteTeamSessionAction = async (
     const token = cookieStore.get(cookieName)?.value
 
     if (!token) {
-      throw { status: 401, toast: "No session token found" }
+      throw new AppError({ status: 401, toast: "No session token found" })
     }
 
     const { id: teamId } = jwt.decode(token) as { id: string }
@@ -34,12 +35,15 @@ export const verifyAndDeleteTeamSessionAction = async (
 
     if (!teamData) {
       cookieStore.delete(cookieName)
-      throw { status: 404, toast: "Team not found or unauthorized" }
+      throw new AppError({
+        status: 404,
+        toast: "Team not found or unauthorized",
+      })
     }
 
     if (!teamData.isActive) {
       cookieStore.delete(cookieName)
-      throw { status: 403, toast: "Team deactivated by owner" }
+      throw new AppError({ status: 403, toast: "Team deactivated by owner" })
     }
 
     // ✅ match ResponseData<T>

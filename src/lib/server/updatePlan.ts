@@ -4,6 +4,7 @@ import { Paddle } from "@paddle/paddle-node-sdk"
 import { db } from "@/db/drizzle"
 import { subscription } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { AppError } from "@/lib/exceptions"
 
 const paddle = new Paddle(paddleConfig.server.apiToken, {
   environment: paddleConfig.env,
@@ -43,7 +44,7 @@ export async function updatePlan({
     })
   }
 
-  throw { status: 400, message: "Invalid modeType" }
+  throw new AppError({ status: 400, toast: "Invalid modeType" })
 }
 
 /* -------------------------------------------------------------------------- */
@@ -64,10 +65,10 @@ async function handleSubscriptionToSubscription({
   const priceId = paddleConfig.priceIds.SUBSCRIPTION[targetCycle][targetPlan]
 
   if (!priceId) {
-    throw {
+    throw new AppError({
       status: 400,
       toast: `Missing priceId for ${targetPlan} ${targetCycle}`,
-    }
+    })
   }
 
   const prorationBillingMode =
@@ -99,7 +100,10 @@ export async function handleCancelSubscription({
 }) {
   const priceId = paddleConfig.priceIds.PURCHASE[targetPlan]
   if (!priceId) {
-    throw { status: 400, toast: `Missing one-time price for ${targetPlan}` }
+    throw new AppError({
+      status: 400,
+      toast: `Missing one-time price for ${targetPlan}`,
+    })
   }
 
   // 1️⃣ Load subscription
@@ -107,7 +111,7 @@ export async function handleCancelSubscription({
     where: eq(subscription.id, subscriptionId),
   })
   if (!sub) {
-    throw { status: 400, toast: "Subscription not found" }
+    throw new AppError({ status: 400, toast: "Subscription not found" })
   }
   const effectiveFrom =
     mode === "PRORATE" ? "immediately" : "next_billing_period"

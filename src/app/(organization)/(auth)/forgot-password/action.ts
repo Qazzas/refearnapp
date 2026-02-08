@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const ForgotPasswordServer = async ({
   email,
@@ -13,12 +14,12 @@ export const ForgotPasswordServer = async ({
 }): Promise<MutationData> => {
   return handleAction("Forgot Password Server", async () => {
     if (!email) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Email is required.",
         toast: "Please enter your email.",
         fields: { email: "Email is required" },
-      }
+      })
     }
 
     const existingUser = await db.query.user.findFirst({

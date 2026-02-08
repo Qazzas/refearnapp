@@ -13,6 +13,7 @@ import {
   DashboardCustomization,
   defaultDashboardCustomization,
 } from "@/customization/Dashboard/defaultDashboardCustomization"
+import { AppError } from "@/lib/exceptions"
 
 export async function saveOrganizationCustomization(
   orgId: string,
@@ -25,7 +26,7 @@ export async function saveOrganizationCustomization(
     (!data.auth || Object.keys(data.auth).length === 0) &&
     (!data.dashboard || Object.keys(data.dashboard).length === 0)
   ) {
-    throw { status: 400, toast: "No customization data provided" }
+    throw new AppError({ status: 400, toast: "No customization data provided" })
   }
 
   // ---- AUTH ----

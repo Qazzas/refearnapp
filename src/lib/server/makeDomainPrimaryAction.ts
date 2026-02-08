@@ -2,6 +2,7 @@
 import { and, eq } from "drizzle-orm"
 import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
+import { AppError } from "@/lib/exceptions"
 export async function makeDomainPrimaryAction({
   orgId,
   domainId,
@@ -14,7 +15,7 @@ export async function makeDomainPrimaryAction({
   })
 
   if (!domain || !domain.isActive) {
-    throw { ok: false, toast: "Domain must be active" }
+    throw new AppError({ ok: false, toast: "Domain must be active" })
   }
 
   await db.transaction(async (tx) => {

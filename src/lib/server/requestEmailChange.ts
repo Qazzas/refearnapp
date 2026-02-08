@@ -11,6 +11,7 @@ import { getOrganizationContext } from "@/lib/server/getOrganizationContext"
 import { getTeamContext } from "@/lib/server/getTeamContext"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
+import { AppError } from "@/lib/exceptions"
 
 type BaseResponse = { ok: boolean; message?: string; redirectUrl?: string }
 
@@ -28,7 +29,8 @@ export async function requestEmailChange({
   isAffiliate?: boolean
 }): Promise<BaseResponse> {
   try {
-    if (!newEmail) throw { status: 400, toast: "New email required" }
+    if (!newEmail)
+      throw new AppError({ status: 400, toast: "New email required" })
 
     // 🧠 Step 1: check for existing record
     if (isAffiliate && orgId) {
@@ -39,31 +41,31 @@ export async function requestEmailChange({
         ),
       })
       if (existingAffiliate)
-        throw {
+        throw new AppError({
           status: 400,
           toast: "Email already in use in this organization",
           data: existingAffiliate.email,
-        }
+        })
     } else if (isTeam) {
       const existingTeam = await db.query.team.findFirst({
         where: eq(team.email, newEmail),
       })
       if (existingTeam)
-        throw {
+        throw new AppError({
           status: 400,
           toast: "Email already in use",
           data: existingTeam.email,
-        }
+        })
     } else {
       const existingUser = await db.query.user.findFirst({
         where: eq(user.email, newEmail),
       })
       if (existingUser)
-        throw {
+        throw new AppError({
           status: 400,
           toast: "Email already in use",
           data: existingUser.email,
-        }
+        })
     }
 
     // 🧠 Step 2: generate token & verify URL based on context

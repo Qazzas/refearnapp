@@ -14,6 +14,7 @@ import { getAffiliateAuthCapabilities } from "@/lib/server/getAffiliateAuthCapab
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 
 export const getAffiliateData = async (
   orgId: string
@@ -81,7 +82,10 @@ export async function updateAffiliatePassword(
     const decoded = await getAffiliateOrganization(orgId)
     const { canChangePassword } = await getAffiliateAuthCapabilities(orgId)
     if (!canChangePassword) {
-      throw { status: 403, toast: "This account cannot change password" }
+      throw new AppError({
+        status: 403,
+        toast: "This account cannot change password",
+      })
     }
     await updateAffiliatePasswordAction(decoded, newPassword)
 

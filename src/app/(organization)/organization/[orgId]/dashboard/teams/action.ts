@@ -9,6 +9,7 @@ import { getUserPlan } from "@/lib/server/getUserPlan"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { TeamRow } from "@/lib/types/teamsRow"
+import { AppError } from "@/lib/exceptions"
 
 export const inviteTeamMember = async ({
   email,
@@ -24,7 +25,7 @@ export const inviteTeamMember = async ({
   return handleAction("Invite Team Member", async () => {
     await getOrgAuth(orgId)
     if (!email || !title || !description || !orgId) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Missing required fields.",
         toast: "Please fill in all required fields.",
@@ -34,7 +35,7 @@ export const inviteTeamMember = async ({
           description: !description ? "Description is required" : "",
           orgId: !orgId ? "Organization is required" : "",
         },
-      }
+      })
     }
     // 🟢 Enforce plan-based restrictions
     const plan = await getUserPlan()
@@ -45,17 +46,17 @@ export const inviteTeamMember = async ({
     })
 
     if (plan.plan === "FREE") {
-      throw {
+      throw new AppError({
         status: 403,
         toast: "Free plan users cannot invite team members.",
-      }
+      })
     }
 
     if (plan.plan === "PRO" && teamCount.length >= 3) {
-      throw {
+      throw new AppError({
         status: 403,
         toast: "Pro plan allows up to 3 team members. Upgrade for more.",
-      }
+      })
     }
 
     // Check if this email is already invited
@@ -64,12 +65,12 @@ export const inviteTeamMember = async ({
     })
 
     if (existingTeamMember) {
-      throw {
+      throw new AppError({
         status: 409,
         error: "This email is already a team member.",
         toast: "This user is already part of your team.",
         fields: { email: "Already a team member" },
-      }
+      })
     }
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
     const [invite] = await db
@@ -148,10 +149,10 @@ export async function toggleTeamStatus({
     const plan = await getUserPlan()
 
     if (plan.plan === "FREE") {
-      throw {
+      throw new AppError({
         status: 403,
         toast: "Free plan users cannot toggle team status",
-      }
+      })
     }
     await db
       .update(team)
@@ -176,10 +177,10 @@ export async function deleteTeamMember({
     const plan = await getUserPlan()
 
     if (plan.plan === "FREE") {
-      throw {
+      throw new AppError({
         status: 403,
         toast: "Free plan users cannot delete teams.",
-      }
+      })
     }
     await db
       .delete(team)

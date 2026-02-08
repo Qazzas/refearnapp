@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm"
 import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
 import { deleteDomainFromVercel } from "@/lib/server/manageVercelDomain"
+import { AppError } from "@/lib/exceptions"
 
 export async function deleteDomainAction({
   orgId,
@@ -26,11 +27,11 @@ export async function deleteDomainAction({
     .where(and(eq(websiteDomain.id, domainId), eq(websiteDomain.orgId, orgId)))
     .limit(1)
   if (!domain) {
-    throw { ok: false, toast: "Domain not found" }
+    throw new AppError({ ok: false, toast: "Domain not found" })
   }
 
   if (domain.isPrimary) {
-    throw { ok: false, toast: "Primary domain cannot be deleted" }
+    throw new AppError({ ok: false, toast: "Primary domain cannot be deleted" })
   }
   if (domain.type !== "DEFAULT") {
     await deleteDomainFromVercel(domain.domainName)

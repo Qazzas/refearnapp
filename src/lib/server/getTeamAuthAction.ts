@@ -5,10 +5,11 @@ import { db } from "@/db/drizzle"
 import { team, organization } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { OrgAuthResult } from "@/lib/types/orgAuth"
+import { AppError } from "@/lib/exceptions"
 export async function getTeamAuthAction(orgId: string): Promise<OrgAuthResult> {
   const cookieStore = await cookies()
   const token = cookieStore.get(`teamToken-${orgId}`)?.value
-  if (!token) throw { status: 401, toast: "Unauthorized" }
+  if (!token) throw new AppError({ status: 401, toast: "Unauthorized" })
 
   const { id: teamId } = jwt.decode(token) as { id: string }
 
@@ -26,11 +27,11 @@ export async function getTeamAuthAction(orgId: string): Promise<OrgAuthResult> {
     .then((r) => r[0])
 
   if (!teamData) {
-    throw { status: 404, toast: "Team not found or unauthorized" }
+    throw new AppError({ status: 404, toast: "Team not found or unauthorized" })
   }
 
   if (!teamData.isActive) {
-    throw { status: 403, toast: "Team deactivated by owner" }
+    throw new AppError({ status: 403, toast: "Team deactivated by owner" })
   }
 
   // 🔹 Fetch minimal org info for downstream context
@@ -45,7 +46,7 @@ export async function getTeamAuthAction(orgId: string): Promise<OrgAuthResult> {
     .where(eq(organization.id, orgId))
     .then((r) => r[0])
 
-  if (!org) throw { status: 404, toast: "Organization not found" }
+  if (!org) throw new AppError({ status: 404, toast: "Organization not found" })
 
   return {
     ...org,

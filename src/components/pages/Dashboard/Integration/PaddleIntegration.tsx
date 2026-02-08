@@ -10,8 +10,6 @@ import { Card } from "@/components/ui/card"
 import { PaddleImageProvider } from "@/provider/PaddleImageProvider"
 import { PaddleImageDialog } from "@/components/ui-custom/PaddleImageDialog"
 
-const WEBHOOK_URL = "https://origin.refearnapp.com/api/webhooks/paddle"
-
 export default function PaddleIntegration({
   orgId,
   isTeam = false,
@@ -20,7 +18,7 @@ export default function PaddleIntegration({
   isTeam?: boolean
 }) {
   const [copied, setCopied] = useState(false)
-
+  const WEBHOOK_URL = `https://origin.refearnapp.com/api/webhooks/paddle/${orgId}`
   const handleCopy = () => {
     navigator.clipboard
       .writeText(WEBHOOK_URL)

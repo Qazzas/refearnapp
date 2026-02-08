@@ -3,12 +3,13 @@
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import { returnError } from "@/lib/errorHandler"
+import { AppError } from "@/lib/exceptions"
 
 export async function switchOrganization(newOrgId: string) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get("organizationToken")?.value
-    if (!token) throw { status: 401, error: "Unauthorized" }
+    if (!token) throw new AppError({ status: 401, error: "Unauthorized" })
 
     const decoded = jwt.decode(token) as {
       id: string
@@ -22,7 +23,10 @@ export async function switchOrganization(newOrgId: string) {
     }
 
     if (!decoded.orgIds?.includes(newOrgId)) {
-      throw { status: 403, error: "You don’t belong to this organization" }
+      throw new AppError({
+        status: 403,
+        error: "You don’t belong to this organization",
+      })
     }
 
     const { exp, iat, ...rest } = decoded

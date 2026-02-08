@@ -7,6 +7,7 @@ import {
   getVercelDomainConfig,
   verifyDomainOnVercel,
 } from "@/lib/server/manageVercelDomain"
+import { AppError } from "@/lib/exceptions"
 
 export async function verifyDomainDnsAction({
   orgId,
@@ -24,7 +25,7 @@ export async function verifyDomainDnsAction({
     .limit(1)
 
   if (!domain) {
-    throw { ok: false, toast: "Domain not found" }
+    throw new AppError({ ok: false, toast: "Domain not found" })
   }
 
   const verifyData = (await verifyDomainOnVercel(domain.domainName)) as any
@@ -43,9 +44,9 @@ export async function verifyDomainDnsAction({
     .where(and(eq(websiteDomain.id, domainId), eq(websiteDomain.orgId, orgId)))
 
   if (!isFullyActive) {
-    throw {
+    throw new AppError({
       ok: false,
       toast: "DNS records not yet detected. This can take up to 48 hours.",
-    }
+    })
   }
 }

@@ -8,6 +8,7 @@ import { buildAffiliateUrl } from "@/util/Url"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 export const LoginAffiliateServer = async ({
   email,
   password,
@@ -21,11 +22,11 @@ export const LoginAffiliateServer = async ({
 }): Promise<MutationData> => {
   return handleAction("Login Affiliate Server", async () => {
     if (!email || !password || !organizationId) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Email, password, and organization ID are required.",
         toast: "Please enter your login credentials.",
-      }
+      })
     }
 
     // Find the affiliate by organization and email
@@ -35,13 +36,13 @@ export const LoginAffiliateServer = async ({
     })
 
     if (!existingAffiliate) {
-      throw {
+      throw new AppError({
         status: 404,
         error: "Affiliate not found.",
         toast:
           "Invalid credentials. Please check your email, password, and organization.",
         fields: { email: "Affiliate not found in this organization" },
-      }
+      })
     }
 
     // Find the affiliate account with provider = 'credentials'
@@ -54,22 +55,22 @@ export const LoginAffiliateServer = async ({
     })
 
     if (!affiliateAcc || !affiliateAcc.password) {
-      throw {
+      throw new AppError({
         status: 401,
         error: "Affiliate account not found.",
         toast: "Invalid credentials. No password found for this affiliate.",
-      }
+      })
     }
 
     const validPassword = await bcrypt.compare(password, affiliateAcc.password)
 
     if (!validPassword) {
-      throw {
+      throw new AppError({
         status: 401,
         error: "Invalid password.",
         toast: "Invalid credentials. Please check your password.",
         fields: { password: "Invalid password" },
-      }
+      })
     }
 
     const token = jwt.sign(

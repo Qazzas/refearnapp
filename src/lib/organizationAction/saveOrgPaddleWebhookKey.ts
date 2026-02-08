@@ -1,6 +1,7 @@
 import { db } from "@/db/drizzle"
 import { organizationPaddleAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { AppError } from "@/lib/exceptions"
 
 export async function saveOrgPaddleWebhookKey({
   orgId,
@@ -10,7 +11,7 @@ export async function saveOrgPaddleWebhookKey({
   webhookPublicKey: string
 }) {
   if (!orgId || !webhookPublicKey) {
-    throw { status: 400, toast: "Missing orgId or webhookPublicKey" }
+    throw new AppError({ status: 400, toast: "Missing orgId or webhookPublicKey" })
   }
 
   // 🧩 Ensure webhook key is globally unique
@@ -21,7 +22,10 @@ export async function saveOrgPaddleWebhookKey({
     .limit(1)
 
   if (existingKey.length > 0) {
-    throw { status: 409, toast: "This webhook key is already registered" }
+    throw new AppError({
+      status: 409,
+      toast: "This webhook key is already registered",
+    })
   }
 
   // 🔍 Check if org already has a record

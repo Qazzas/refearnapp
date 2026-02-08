@@ -8,6 +8,7 @@ import { buildAffiliateUrl } from "@/util/Url"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { AppError } from "@/lib/exceptions"
 export const LoginTeamServer = async ({
   email,
   password,
@@ -21,11 +22,11 @@ export const LoginTeamServer = async ({
 }): Promise<MutationData> => {
   return handleAction("Login Team Server", async () => {
     if (!email || !password || !organizationId) {
-      throw {
+      throw new AppError({
         status: 400,
         error: "Email, password, and organization ID are required.",
         toast: "Please enter your login credentials.",
-      }
+      })
     }
 
     // Find the affiliate by organization and email
@@ -35,22 +36,22 @@ export const LoginTeamServer = async ({
     })
 
     if (!existingTeam) {
-      throw {
+      throw new AppError({
         status: 404,
         error: "team not found.",
         toast:
           "Invalid credentials. Please check your email, password, and organization.",
         fields: { email: "team not found in this organization" },
-      }
+      })
     }
     if (!existingTeam.isActive) {
-      throw {
+      throw new AppError({
         status: 403,
         error: "Team deactivated.",
         toast:
           "Your team account has been deactivated by the organization owner.",
         fields: { email: "This account is currently deactivated" },
-      }
+      })
     }
 
     // Find the affiliate account with provider = 'credentials'
@@ -60,22 +61,22 @@ export const LoginTeamServer = async ({
     })
 
     if (!teamAcc || !teamAcc.password) {
-      throw {
+      throw new AppError({
         status: 401,
         error: "Affiliate account not found.",
         toast: "Invalid credentials. No password found for this team.",
-      }
+      })
     }
 
     const validPassword = await bcrypt.compare(password, teamAcc.password)
 
     if (!validPassword) {
-      throw {
+      throw new AppError({
         status: 401,
         error: "Invalid password.",
         toast: "Invalid credentials. Please check your password.",
         fields: { password: "Invalid password" },
-      }
+      })
     }
 
     const token = jwt.sign(

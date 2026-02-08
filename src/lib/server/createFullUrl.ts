@@ -4,13 +4,17 @@ import { generateAffiliateCode } from "@/util/idGenerators"
 import { affiliateLink } from "@/db/schema"
 import { redis } from "@/lib/redis"
 import { RedisLinkMetadata } from "@/lib/types/redisLinkMetadata"
+import { AppError } from "@/lib/exceptions"
 
 export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
   const org = await db.query.organization.findFirst({
     where: (o, { eq }) => eq(o.id, decoded.orgId),
   })
   if (!org) {
-    throw { status: 500, toast: "failed to fetch organization data" }
+    throw new AppError({
+      status: 500,
+      toast: "failed to fetch organization data",
+    })
   }
   const [userSub, userPurchase] = await Promise.all([
     db.query.subscription.findFirst({
@@ -25,10 +29,10 @@ export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
   })
 
   if (existingLinks.length >= 10) {
-    throw {
+    throw new AppError({
       status: 400,
       toast: "You have reached the maximum of 10 affiliate links.",
-    }
+    })
   }
   const code = generateAffiliateCode() // e.g., "7hjKpQ"
   const param = org.referralParam
