@@ -1,4 +1,3 @@
-// lib/server/updatePlan.ts
 import { paddleConfig } from "@/util/PaddleConfig"
 import { Paddle } from "@paddle/paddle-node-sdk"
 import { db } from "@/db/drizzle"

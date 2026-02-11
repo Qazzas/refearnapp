@@ -5,7 +5,7 @@ import { invitation } from "@/db/schema"
 export async function getTeamValidation(teamToken?: string) {
   if (!teamToken) return null
 
-  return await db.query.invitation.findFirst({
+  return db.query.invitation.findFirst({
     where: and(
       eq(invitation.token, teamToken),
       eq(invitation.accepted, false),

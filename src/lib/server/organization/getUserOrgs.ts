@@ -1,4 +1,3 @@
-"use server"
 import { db } from "@/db/drizzle"
 import { organization } from "@/db/schema"
 import { eq } from "drizzle-orm"

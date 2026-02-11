@@ -1,5 +1,3 @@
-// app/(organization)/organization/[orgId]/dashboard/action.ts
-
 "use server"
 import { db } from "@/db/drizzle"
 import { organization } from "@/db/schema"

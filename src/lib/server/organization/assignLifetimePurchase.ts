@@ -1,6 +1,5 @@
 import { db } from "@/db/drizzle"
 import { purchase } from "@/db/schema"
-// 1. Alias the types from the Paddle SDK
 import {
   Paddle,
   type Transaction as PaddleTransaction,

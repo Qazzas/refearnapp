@@ -1,4 +1,3 @@
-"use server"
 import { affiliatePayoutMethod } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { decodedType } from "@/lib/types/organization/decodedType"

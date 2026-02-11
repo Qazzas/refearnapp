@@ -1,4 +1,3 @@
-// lib/server/authGuards.ts
 import { redirect } from "next/navigation"
 import {
   getOrganizationAuth,

@@ -3,7 +3,7 @@ import { and, eq, sql } from "drizzle-orm"
 import { affiliateInvoice, affiliateLink } from "@/db/schema"
 
 export async function getUnpaidPayoutAction(orgId: string) {
-  return await db
+  return db
     .select({
       month:
         sql<number>`extract(month from ${affiliateInvoice.createdAt})`.mapWith(

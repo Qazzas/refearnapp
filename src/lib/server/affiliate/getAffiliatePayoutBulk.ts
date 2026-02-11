@@ -1,4 +1,3 @@
-"use server"
 import { getAffiliatesWithStatsAction } from "@/lib/server/affiliate/getAffiliatesWithStats"
 
 export async function getAffiliatePayoutBulkAction(

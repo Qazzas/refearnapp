@@ -1,6 +1,6 @@
 import { db } from "@/db/drizzle"
-import { eq, and } from "drizzle-orm"
-import { affiliate, affiliatePayoutMethod } from "@/db/schema"
+import { eq } from "drizzle-orm"
+import { affiliate } from "@/db/schema"
 import { decodedType } from "@/lib/types/organization/decodedType"
 import { getPayoutEmailMethod } from "@/lib/server/organization/getPayoutEmailMethod"
 import { AppError } from "@/lib/exceptions"

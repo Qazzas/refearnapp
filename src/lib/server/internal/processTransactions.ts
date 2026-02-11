@@ -1,4 +1,3 @@
-// use server
 import { sql, inArray, eq, and, or, isNull } from "drizzle-orm"
 import { db } from "@/db/drizzle"
 import {

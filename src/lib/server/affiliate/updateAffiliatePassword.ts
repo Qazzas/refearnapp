@@ -1,11 +1,8 @@
-"use server"
-
 import * as bcrypt from "bcrypt"
 import { db } from "@/db/drizzle"
 import { affiliateAccount } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { decodedType } from "@/lib/types/organization/decodedType"
-import { returnError } from "@/lib/errorHandler"
 import { AppError } from "@/lib/exceptions"
 
 export const updateAffiliatePasswordAction = async (

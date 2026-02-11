@@ -1,5 +1,3 @@
-"use server"
-
 import { getOrganizationById } from "@/services/getOrganizationById"
 import { db } from "@/db/drizzle"
 import { organizationPaddleAccount } from "@/db/schema"

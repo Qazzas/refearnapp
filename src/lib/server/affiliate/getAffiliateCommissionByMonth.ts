@@ -1,4 +1,3 @@
-"use server"
 import { db } from "@/db/drizzle"
 import { and, eq, isNull, sql } from "drizzle-orm"
 import { affiliateInvoice, affiliateLink } from "@/db/schema"

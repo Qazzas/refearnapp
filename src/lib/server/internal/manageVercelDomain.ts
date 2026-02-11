@@ -1,4 +1,3 @@
-"use server"
 import { AppError } from "@/lib/exceptions"
 
 export async function addDomainToVercel(domain: string) {

@@ -1,4 +1,3 @@
-"use server"
 import { getAffiliatePayoutAction } from "@/lib/server/affiliate/getAffiliatePayout"
 import { AffiliatePayout } from "@/lib/types/affiliate/affiliateStats"
 import { convertedCurrency } from "@/util/ConvertedCurrency"

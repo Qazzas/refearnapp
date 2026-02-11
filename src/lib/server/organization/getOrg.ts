@@ -4,8 +4,6 @@ import { organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { Organization } from "@/lib/types/organization/orgAuth"
 import { handleAction } from "@/lib/handleAction"
-import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
-import { getAffiliateLinksWithStatsAction } from "@/lib/server/affiliate/getAffiliateLinksWithStats"
 import { ActionResult } from "@/lib/types/organization/response"
 import { AppError } from "@/lib/exceptions"
 

@@ -1,4 +1,3 @@
-// lib/affiliateInvoice.ts
 import { db } from "@/db/drizzle"
 import { affiliateInvoice } from "@/db/schema"
 import { and, eq, sql } from "drizzle-orm"

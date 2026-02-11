@@ -1,4 +1,3 @@
-"use server"
 import { and, eq, ilike } from "drizzle-orm"
 import { websiteDomain } from "@/db/schema"
 import { db } from "@/db/drizzle"

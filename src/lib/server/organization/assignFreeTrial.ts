@@ -1,7 +1,5 @@
-"use server"
 import { db } from "@/db/drizzle"
 import { subscription } from "@/db/schema"
-import { redis } from "@/lib/redis"
 
 export async function assignFreeTrialSubscription(userId: string) {
   if (!userId) return

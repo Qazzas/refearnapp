@@ -1,4 +1,3 @@
-"use server"
 import { db } from "@/db/drizzle"
 import { generateAffiliateCode } from "@/util/idGenerators"
 import { affiliateLink } from "@/db/schema"

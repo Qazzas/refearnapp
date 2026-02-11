@@ -1,5 +1,3 @@
-"use server"
-
 import { eq } from "drizzle-orm"
 import { getCurrentUser } from "@/lib/server/organization/getCurrentUser"
 import { account } from "@/db/schema"

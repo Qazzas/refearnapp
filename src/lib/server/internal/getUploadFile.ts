@@ -1,4 +1,3 @@
-// lib/server/getUploadFile.ts
 import { NextResponse } from "next/server"
 import sharp from "sharp"
 
