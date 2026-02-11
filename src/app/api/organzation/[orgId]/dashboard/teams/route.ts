@@ -4,11 +4,6 @@ import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { db } from "@/db/drizzle"
 import { team } from "@/db/schema"
 import { and, eq, ilike } from "drizzle-orm"
-import { withQuery } from "@/lib/api/utils"
-export const GET_ORG_TEAM_MEMBERS_PATH = (
-  orgId: string,
-  query: { offset?: number; email?: string }
-) => withQuery(`/api/organization/${orgId}/dashboard/teams`, query)
 export const GET = handleRoute("Get Team Members", async (req, { params }) => {
   const { orgId } = await params
   const { searchParams } = new URL(req.url)

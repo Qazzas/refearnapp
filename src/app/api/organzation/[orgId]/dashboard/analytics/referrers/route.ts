@@ -3,16 +3,6 @@ import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { getOrgAffiliateLinks } from "@/lib/server/affiliate/GetOrgAffiliateLinks"
 import { getReferrerStats } from "@/lib/server/analytics/getReferrerStats"
 import { handleRoute } from "@/lib/handleRoute"
-import { withQuery } from "@/lib/api/utils"
-export const GET_ORG_REFERRERS_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(`/api/organization/${orgId}/dashboard/analytics/referrers`, {
-    year,
-    month,
-  })
 export const GET = handleRoute("Get Org Referrers", async (req, { params }) => {
   const { orgId } = await params
   const { searchParams } = new URL(req.url)

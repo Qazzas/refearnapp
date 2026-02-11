@@ -2,8 +2,6 @@ import { NextResponse } from "next/server"
 import { handleRoute } from "@/lib/handleRoute"
 import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
 import { getPayoutEmailMethod } from "@/lib/server/organization/getPayoutEmailMethod"
-export const GET_AFFILIATE_PAYMENT_METHOD_PATH = (orgId: string) =>
-  `/api/affiliate/${orgId}/dashboard/profile/payment-method`
 export const GET = handleRoute(
   "Get Affiliate Payment Method",
   async (_, { params }) => {

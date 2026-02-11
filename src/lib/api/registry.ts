@@ -1,10 +1,3 @@
-// Named imports are much safer for deep type inference
-import { GET_AFFILIATE_KPI_PATH } from "@/app/api/affiliate/[orgId]/dashboard/analytics/kpi/route"
-
-import { GET_AFFILIATE_REFERRERS_PATH } from "@/app/api/affiliate/[orgId]/dashboard/analytics/referrers/route"
-
-import { GET_AFFILIATE_TIME_SERIES_PATH } from "@/app/api/affiliate/[orgId]/dashboard/analytics/time-series/route"
-import { GET_ACTIVE_DOMAIN_PATH } from "@/app/api/organzation/[orgId]/domain/active/route"
 import { ActionResult } from "@/lib/types/organization/response"
 import { WebsiteDomain } from "@/lib/types/internal/database"
 import {
@@ -19,42 +12,48 @@ import {
   AffiliateReferrerStat,
   OrganizationReferrerStat,
 } from "@/lib/types/affiliate/affiliateReferrerStat"
-import { GET_AFFILIATE_LINKS_PATH } from "@/app/api/affiliate/[orgId]/dashboard/links/route"
-import { AffiliateLinkWithStats } from "@/lib/types/affiliate/affiliateLinkWithStats"
-import { GET_AFFILIATE_PAYMENT } from "@/app/api/affiliate/[orgId]/dashboard/payment/route"
-import { AffiliatePaymentRow } from "@/lib/types/affiliate/affiliatePaymentRow"
-import { GET_AFFILIATE_PAYMENT_METHOD_PATH } from "@/app/api/affiliate/[orgId]/dashboard/profile/payment-method/route"
-import { GET_ORG_AFFILIATES_STATS_PATH } from "@/app/api/organzation/[orgId]/dashboard/affiliates/route"
 import {
   AffiliatePayout,
   AffiliateStats,
 } from "@/lib/types/affiliate/affiliateStats"
-import { GET_ORG_KPI_PATH } from "@/app/api/organzation/[orgId]/dashboard/analytics/kpi/route"
-import { GET_ORG_REFERRERS_PATH } from "@/app/api/organzation/[orgId]/dashboard/analytics/referrers/route"
-import { GET_ORG_TIME_SERIES_PATH } from "@/app/api/organzation/[orgId]/dashboard/analytics/time-series/route"
-import { GET_ORG_CUSTOMIZATION_ALL_PATH } from "@/app/api/organzation/[orgId]/dashboard/customization/all/route"
-import { GET_ORG_CUSTOMIZATION_AUTH_PATH } from "@/app/api/organzation/[orgId]/dashboard/customization/auth/route"
-import { GET_ORG_CUSTOMIZATION_DASHBOARD_PATH } from "@/app/api/organzation/[orgId]/dashboard/customization/dashboard/route"
 import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
-import { GET_ORG_WEBHOOK_KEY_PATH } from "@/app/api/organzation/[orgId]/dashboard/integration/webhook-key/route"
-import { GET_ORG_DOMAIN_MANAGE_PATH } from "@/app/api/organzation/[orgId]/dashboard/manage-domains/route"
-import { GET_ORG_TEAM_MEMBERS_PATH } from "@/app/api/organzation/[orgId]/dashboard/teams/route"
+import {
+  GET_ACTIVE_DOMAIN_PATH,
+  GET_AFFILIATE_KPI_PATH,
+  GET_AFFILIATE_LINKS_PATH,
+  GET_AFFILIATE_PAYMENT,
+  GET_AFFILIATE_PAYMENT_METHOD_PATH,
+  GET_AFFILIATE_REFERRERS_PATH,
+  GET_AFFILIATE_TIME_SERIES_PATH,
+  GET_ORG_AFFILIATES_STATS_PATH,
+  GET_ORG_CUSTOMIZATION_ALL_PATH,
+  GET_ORG_CUSTOMIZATION_AUTH_PATH,
+  GET_ORG_CUSTOMIZATION_DASHBOARD_PATH,
+  GET_ORG_DOMAIN_MANAGE_PATH,
+  GET_ORG_KPI_PATH,
+  GET_ORG_PAYOUTS_BULK_PATH,
+  GET_ORG_PAYOUTS_PATH,
+  GET_ORG_PAYOUTS_UNPAID_PATH,
+  GET_ORG_REFERRERS_PATH,
+  GET_ORG_TEAM_MEMBERS_PATH,
+  GET_ORG_TIME_SERIES_PATH,
+  GET_ORG_WEBHOOK_KEY_PATH,
+  GET_TEAM_AFFILIATES_STATS_PATH,
+  GET_TEAM_DOMAIN_MANAGE_PATH,
+  GET_TEAM_PAYOUTS_BULK_PATH,
+  GET_TEAM_PAYOUTS_PATH,
+  GET_TEAM_PAYOUTS_UNPAID_PATH,
+  GET_TEAM_REFERRERS_PATH,
+  GET_TEAM_TIME_SERIES_PATH,
+  GET_TEAM_WEBHOOK_KEY_PATH,
+} from "@/lib/api/paths"
+import { AffiliateLinkWithStats } from "@/lib/types/affiliate/affiliateLinkWithStats"
+import { AffiliatePaymentRow } from "@/lib/types/affiliate/affiliatePaymentRow"
 import { DomainRow } from "@/lib/types/organization/domainRow"
-import { TeamRow } from "@/lib/types/internal/teamsRow"
-import { GET_ORG_PAYOUTS_BULK_PATH } from "@/app/api/organzation/[orgId]/dashboard/payout/affiliateBulkPayout/route"
-import { GET_ORG_PAYOUTS_PATH } from "@/app/api/organzation/[orgId]/dashboard/payout/affiliatePayout/route"
-import { GET_ORG_PAYOUTS_UNPAID_PATH } from "@/app/api/organzation/[orgId]/dashboard/payout/unpaid-months/route"
 import { PayoutResult } from "@/lib/types/organization/payoutResult"
 import { UnpaidMonth } from "@/lib/types/organization/unpaidMonth"
-import { GET_TEAM_REFERRERS_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/analytics/referrers/route"
-import { GET_TEAM_TIME_SERIES_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/analytics/time-series/route"
-import { GET_TEAM_PAYOUTS_BULK_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/payout/affiliateBulkPayout/route"
-import { GET_TEAM_PAYOUTS_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/payout/affiliatePayout/route"
-import { GET_TEAM_PAYOUTS_UNPAID_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/payout/unpaid-months/route"
-import { GET_TEAM_WEBHOOK_KEY_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/integration/webhook-key/route"
-import { GET_TEAM_AFFILIATES_STATS_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/affiliates/route"
-import { GET_TEAM_DOMAIN_MANAGE_PATH } from "@/app/api/organzation/[orgId]/teams/dashboard/manage-domains/route"
+import { TeamRow } from "@/lib/types/internal/teamsRow"
 
 export const API_CONFIG = {
   affiliate: {

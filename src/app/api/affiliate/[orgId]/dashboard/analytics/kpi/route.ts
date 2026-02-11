@@ -4,13 +4,6 @@ import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrg
 import { getAffiliateKpiStatsAction } from "@/lib/server/affiliate/getAffiliateKpiStats"
 import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { ExchangeRate } from "@/util/ExchangeRate"
-import { withQuery } from "@/lib/api/utils"
-export const GET_AFFILIATE_KPI_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(`/api/affiliate/${orgId}/dashboard/analytics/kpi`, { year, month })
 export const GET = handleRoute(
   "Get Affiliate KPI Stats",
   async (req, { params }) => {

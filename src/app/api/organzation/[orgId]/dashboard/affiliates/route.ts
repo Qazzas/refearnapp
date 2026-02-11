@@ -5,18 +5,7 @@ import { convertedCurrency } from "@/util/ConvertedCurrency"
 import { handleRoute } from "@/lib/handleRoute"
 import { AffiliateBasePayout } from "@/lib/types/affiliate/affiliateStats"
 import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
-import { withQuery } from "@/lib/api/utils"
-export const GET_ORG_AFFILIATES_STATS_PATH = (
-  orgId: string,
-  query: {
-    year?: number
-    month?: number
-    orderBy?: OrderBy
-    orderDir?: OrderDir
-    offset?: number
-    email?: string
-  }
-) => withQuery(`/api/organization/${orgId}/dashboard/affiliates`, query)
+
 export const GET = handleRoute(
   "Get Organization Affiliates Stats",
   async (req, { params }) => {

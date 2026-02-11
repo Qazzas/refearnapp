@@ -3,16 +3,7 @@ import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { getOrganizationKpiStatsAction } from "@/lib/server/internal/getOrganizationKpiStats"
 import { ExchangeRate } from "@/util/ExchangeRate"
 import { handleRoute } from "@/lib/handleRoute"
-import { withQuery } from "@/lib/api/utils"
-export const GET_ORG_KPI_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(`/api/organization/${orgId}/dashboard/analytics/kpi`, {
-    year,
-    month,
-  })
+
 export const GET = handleRoute("Get Org KPI", async (req, { params }) => {
   const { orgId } = await params
   const { searchParams } = new URL(req.url)

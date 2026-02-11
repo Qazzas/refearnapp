@@ -3,16 +3,7 @@ import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { getOrgAffiliateLinks } from "@/lib/server/affiliate/GetOrgAffiliateLinks"
 import { getReferrerStats } from "@/lib/server/analytics/getReferrerStats"
 import { handleRoute } from "@/lib/handleRoute"
-import { withQuery } from "@/lib/api/utils"
-export const GET_TEAM_REFERRERS_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(`/api/organization/${orgId}/teams/dashboard/analytics/referrers`, {
-    year,
-    month,
-  })
+
 export const GET = handleRoute(
   "Get Team Referrers",
   async (req, { params }) => {

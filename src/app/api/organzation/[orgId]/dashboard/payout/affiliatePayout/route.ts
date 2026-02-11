@@ -3,23 +3,6 @@ import { handleRoute } from "@/lib/handleRoute"
 import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { getAffiliatePayoutData } from "@/lib/server/affiliate/getAffiliatePayoutData"
 import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
-import { withQuery } from "@/lib/api/utils"
-export const GET_ORG_PAYOUTS_PATH = (
-  orgId: string,
-  query: {
-    year?: number
-    month?: number
-    mode?: "TABLE" | "EXPORT"
-    offset?: number
-    email?: string
-    orderBy?: OrderBy
-    orderDir?: OrderDir
-  }
-) =>
-  withQuery(
-    `/api/organization/${orgId}/dashboard/payout/affiliatePayout`,
-    query
-  )
 export const GET = handleRoute(
   "Get Affiliate Payouts",
   async (req, { params }) => {

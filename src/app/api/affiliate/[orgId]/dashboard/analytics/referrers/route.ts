@@ -3,16 +3,6 @@ import { handleRoute } from "@/lib/handleRoute"
 import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
 import { getAffiliateLinks } from "@/lib/server/affiliate/getAffiliateLinks"
 import { getReferrerStats } from "@/lib/server/analytics/getReferrerStats"
-import { withQuery } from "@/lib/api/utils"
-export const GET_AFFILIATE_REFERRERS_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(`/api/affiliate/${orgId}/dashboard/analytics/referrers`, {
-    year,
-    month,
-  })
 export const GET = handleRoute(
   "Get Affiliate Referrers",
   async (req, { params }) => {

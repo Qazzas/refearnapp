@@ -5,10 +5,6 @@ import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 
-// 1. Export the Path function (No query params needed here)
-export const GET_ACTIVE_DOMAIN_PATH = (orgId: string) =>
-  `/api/organization/${orgId}/domain/active` as const
-
 export const GET = handleRoute("Get Active Domain", async (_, { params }) => {
   const { orgId } = await params
   await getOrgAuth(orgId)

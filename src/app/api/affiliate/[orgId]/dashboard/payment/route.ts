@@ -4,9 +4,6 @@ import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrg
 import { getAffiliateCommissionByMonthAction } from "@/lib/server/affiliate/getAffiliateCommissionByMonth"
 import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { ExchangeRate } from "@/util/ExchangeRate"
-import { withQuery } from "@/lib/api/utils"
-export const GET_AFFILIATE_PAYMENT = (orgId: string, year?: number) =>
-  withQuery(`/api/affiliate/${orgId}/dashboard/payment`, { year })
 export const GET = handleRoute(
   "Get Affiliate Monthly Commissions",
   async (req, { params }) => {

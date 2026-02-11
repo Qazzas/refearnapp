@@ -4,16 +4,7 @@ import { getTimeSeriesData } from "@/lib/server/analytics/getTimeSeriesData"
 import { ExchangeRate } from "@/util/ExchangeRate"
 import { handleRoute } from "@/lib/handleRoute"
 import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
-import { withQuery } from "@/lib/api/utils"
-export const GET_TEAM_TIME_SERIES_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(
-    `/api/organization/${orgId}/teams/dashboard/analytics/time-series`,
-    { year, month }
-  )
+
 export const GET = handleRoute(
   "Get Team Time Series",
   async (req, { params }) => {

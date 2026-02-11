@@ -3,16 +3,6 @@ import { getOrganizationKpiStatsAction } from "@/lib/server/internal/getOrganiza
 import { ExchangeRate } from "@/util/ExchangeRate"
 import { handleRoute } from "@/lib/handleRoute"
 import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
-import { withQuery } from "@/lib/api/utils"
-export const GET_TEAM_KPI_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(`/api/organization/${orgId}/teams/dashboard/analytics/kpi`, {
-    year,
-    month,
-  })
 export const GET = handleRoute("Get Team KPI", async (req, { params }) => {
   const { orgId } = await params
   const { searchParams } = new URL(req.url)

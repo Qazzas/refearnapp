@@ -3,22 +3,6 @@ import { handleRoute } from "@/lib/handleRoute"
 import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { getAffiliatePayoutBulkData } from "@/lib/server/affiliate/getAffiliatePayoutBulkData"
 import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
-import { withQuery } from "@/lib/api/utils"
-export const GET_TEAM_PAYOUTS_BULK_PATH = (
-  orgId: string,
-  query: {
-    months: { month: number; year: number }[]
-    mode?: "TABLE" | "EXPORT"
-    offset?: number
-    email?: string
-    orderBy?: OrderBy
-    orderDir?: OrderDir
-  }
-) =>
-  withQuery(
-    `/api/organization/${orgId}/teams/dashboard/payout/affiliateBulkPayout`,
-    query
-  )
 export const GET = handleRoute(
   "Get Team Affiliate Bulk Payouts",
   async (req, { params }) => {

@@ -3,11 +3,9 @@ import { handleRoute } from "@/lib/handleRoute"
 import { db } from "@/db/drizzle"
 import { organizationDashboardCustomization } from "@/db/schema"
 import { eq } from "drizzle-orm"
-export const GET_ORG_CUSTOMIZATION_DASHBOARD_PATH = (orgId: string) =>
-  `/api/organization/${orgId}/dashboard/customization/dashboard`
 export const GET = handleRoute(
   "Get Dashboard Customization",
-  async (req, { params }) => {
+  async (_, { params }) => {
     const { orgId } = await params
 
     const [dashboardRow] = await db

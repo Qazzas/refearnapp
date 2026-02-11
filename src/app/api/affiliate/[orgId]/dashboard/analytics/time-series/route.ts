@@ -5,16 +5,6 @@ import { getOrgCurrencyAffiliate } from "@/lib/server/internal/getOrgCurrencyAff
 import { getAffiliateLinks } from "@/lib/server/affiliate/getAffiliateLinks"
 import { getTimeSeriesData } from "@/lib/server/analytics/getTimeSeriesData"
 import { ExchangeRate } from "@/util/ExchangeRate"
-import { withQuery } from "@/lib/api/utils"
-export const GET_AFFILIATE_TIME_SERIES_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) =>
-  withQuery(`/api/affiliate/${orgId}/dashboard/analytics/time-series`, {
-    year,
-    month,
-  })
 export const GET = handleRoute(
   "Get Affiliate Time Series",
   async (req, { params }) => {

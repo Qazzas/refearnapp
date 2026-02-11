@@ -4,12 +4,6 @@ import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrg
 import { getAffiliateLinksWithStatsAction } from "@/lib/server/affiliate/getAffiliateLinksWithStats"
 import { getOrgCurrencyAffiliate } from "@/lib/server/internal/getOrgCurrencyAffiliate"
 import { ExchangeRate } from "@/util/ExchangeRate"
-import { withQuery } from "@/lib/api/utils"
-export const GET_AFFILIATE_LINKS_PATH = (
-  orgId: string,
-  year?: number,
-  month?: number
-) => withQuery(`/api/affiliate/${orgId}/dashboard/links`, { year, month })
 export const GET = handleRoute(
   "Get Affiliate Links with Stats",
   async (req, { params }) => {

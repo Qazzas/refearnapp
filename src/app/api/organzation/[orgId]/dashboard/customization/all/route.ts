@@ -6,8 +6,6 @@ import {
   organizationDashboardCustomization,
 } from "@/db/schema"
 import { eq } from "drizzle-orm"
-export const GET_ORG_CUSTOMIZATION_ALL_PATH = (orgId: string) =>
-  `/api/organization/${orgId}/dashboard/customization/all`
 export const GET = handleRoute(
   "Get All Customizations",
   async (_, { params }) => {

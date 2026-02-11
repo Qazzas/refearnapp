@@ -2,11 +2,6 @@ import { NextResponse } from "next/server"
 import { handleRoute } from "@/lib/handleRoute"
 import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { getDomainsAction } from "@/lib/server/internal/getDomainsAction"
-import { withQuery } from "@/lib/api/utils"
-export const GET_ORG_DOMAIN_MANAGE_PATH = (
-  orgId: string,
-  query: { offset?: number; domain?: string }
-) => withQuery(`/api/organization/${orgId}/dashboard/manage-domains`, query)
 export const GET = handleRoute(
   "Get Organization Domains",
   async (req, { params }) => {

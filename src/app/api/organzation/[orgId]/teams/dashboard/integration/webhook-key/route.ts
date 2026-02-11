@@ -2,8 +2,6 @@ import { NextResponse } from "next/server"
 import { handleRoute } from "@/lib/handleRoute"
 import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { getWebhookKey } from "@/lib/organizationAction/getWebhookKey"
-export const GET_TEAM_WEBHOOK_KEY_PATH = (orgId: string) =>
-  `/api/organization/${orgId}/teams/dashboard/integration/webhook-key`
 export const GET = handleRoute(
   "Get Team Org Webhook Key",
   async (_, { params }) => {
