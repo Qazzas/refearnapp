@@ -5,8 +5,7 @@ import { getAffiliatePayoutBulkData } from "@/lib/server/affiliate/getAffiliateP
 import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
 export const GET = handleRoute(
   "Get Affiliate Bulk Payouts",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     const mode = (searchParams.get("mode") as "TABLE" | "EXPORT") || "TABLE"

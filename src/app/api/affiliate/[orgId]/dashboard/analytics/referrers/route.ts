@@ -5,8 +5,7 @@ import { getAffiliateLinks } from "@/lib/server/affiliate/getAffiliateLinks"
 import { getReferrerStats } from "@/lib/server/analytics/getReferrerStats"
 export const GET = handleRoute(
   "Get Affiliate Referrers",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     const year = searchParams.get("year")

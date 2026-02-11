@@ -8,9 +8,7 @@ import {
 import { eq } from "drizzle-orm"
 export const GET = handleRoute(
   "Get All Customizations",
-  async (_, { params }) => {
-    const { orgId } = await params
-
+  async (_, { orgId }: { orgId: string }) => {
     const [authRow, dashboardRow] = await Promise.all([
       db
         .select({ auth: organizationAuthCustomization.auth })

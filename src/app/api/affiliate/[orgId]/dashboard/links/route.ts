@@ -6,8 +6,7 @@ import { getOrgCurrencyAffiliate } from "@/lib/server/internal/getOrgCurrencyAff
 import { ExchangeRate } from "@/util/ExchangeRate"
 export const GET = handleRoute(
   "Get Affiliate Links with Stats",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     // 1. Extract Date Filters

@@ -132,6 +132,8 @@ export const GET_ORG_TEAM_MEMBERS_PATH = (
 ) => withQuery(`/api/organization/${orgId}/dashboard/teams`, query)
 export const GET_ACTIVE_DOMAIN_PATH = (orgId: string) =>
   `/api/organization/${orgId}/domain/active`
+export const GET_ORG_CURRENCY_PATH = (orgId: string) =>
+  `/api/organization/${orgId}/currency`
 
 // =============================================================================
 // 👥 TEAM (STAFF) DASHBOARD PATHS

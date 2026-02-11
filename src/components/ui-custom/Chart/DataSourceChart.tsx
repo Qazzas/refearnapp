@@ -23,8 +23,6 @@ import {
   AffiliateReferrerStat,
   OrganizationReferrerStat,
 } from "@/lib/types/affiliate/affiliateReferrerStat"
-import { getAffiliateReferrers } from "@/app/affiliate/[orgId]/dashboard/action"
-import { getOrganizationReferrer } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
 import { dummySourceData } from "@/lib/types/analytics/dummySourceData"
@@ -35,11 +33,11 @@ import {
 } from "@/store/DashboardCustomizationAtom"
 import { useAppQuery } from "@/hooks/useAppQuery"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
-import { getTeamOrganizationReferrer } from "@/app/(organization)/organization/[orgId]/teams/dashboard/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { cn } from "@/lib/utils"
 import { getResponsiveCardHeight } from "@/util/GetResponsiveSelectWidth"
 import { useUltraSmall } from "@/hooks/useUltraSmall"
+import { api } from "@/lib/apiClient"
 
 const chartConfig: ChartConfig = {
   visitors: { label: "Visitors" },
@@ -91,21 +89,28 @@ export default function SocialTrafficPieChart({
     isPending: affiliatePending,
   } = useAppQuery(
     ["affiliate-source", orgId, filters.year, filters.month],
-    getAffiliateReferrers,
-    [orgId, filters.year, filters.month],
+    (id, y, m) => api.affiliate.dashboard.analytics.referrers([id, y, m]),
+    [orgId, filters.year, filters.month] as const,
     {
       enabled: !!(affiliate && orgId && !isPreview),
     }
   )
-  const fetchFn = isTeam ? getTeamOrganizationReferrer : getOrganizationReferrer
   const {
     data: organizationData,
     error: organizationError,
     isPending: organizationPending,
   } = useAppQuery(
-    ["organization-source", orgId, filters.year, filters.month],
-    fetchFn,
-    [orgId, filters.year, filters.month],
+    [
+      isTeam ? "team-source" : "organization-source",
+      orgId,
+      filters.year,
+      filters.month,
+    ],
+    (id, y, m) =>
+      isTeam
+        ? api.organization.teams.dashboard.analytics.referrers([id, y, m])
+        : api.organization.dashboard.analytics.referrers([id, y, m]),
+    [orgId, filters.year, filters.month] as const,
     {
       enabled: !!(!affiliate && orgId && !isPreview),
     }

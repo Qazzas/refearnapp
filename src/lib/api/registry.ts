@@ -27,6 +27,7 @@ import {
   GET_AFFILIATE_REFERRERS_PATH,
   GET_AFFILIATE_TIME_SERIES_PATH,
   GET_ORG_AFFILIATES_STATS_PATH,
+  GET_ORG_CURRENCY_PATH,
   GET_ORG_CUSTOMIZATION_ALL_PATH,
   GET_ORG_CUSTOMIZATION_AUTH_PATH,
   GET_ORG_CUSTOMIZATION_DASHBOARD_PATH,
@@ -94,6 +95,10 @@ export const API_CONFIG = {
         path: GET_ACTIVE_DOMAIN_PATH,
         response: {} as ActionResult<WebsiteDomain | null>,
       },
+    },
+    currency: {
+      path: GET_ORG_CURRENCY_PATH,
+      response: {} as ActionResult<string>,
     },
     dashboard: {
       affiliates: {

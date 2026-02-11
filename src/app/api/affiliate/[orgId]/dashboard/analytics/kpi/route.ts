@@ -6,8 +6,7 @@ import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { ExchangeRate } from "@/util/ExchangeRate"
 export const GET = handleRoute(
   "Get Affiliate KPI Stats",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     const year = searchParams.get("year")

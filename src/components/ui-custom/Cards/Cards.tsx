@@ -17,8 +17,6 @@ import {
   OrganizationKpiStats,
 } from "@/lib/types/affiliate/affiliateKpiStats"
 import { mapAffiliateStats, mapOrganizationStats } from "@/util/mapStats"
-import { getAffiliateKpiStats } from "@/app/affiliate/[orgId]/dashboard/action"
-import { getOrganizationKpiStats } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
 import { formatValue } from "@/util/FormatValue"
@@ -34,9 +32,8 @@ import {
 } from "@/store/DashboardCustomizationAtom"
 import { useAppQuery } from "@/hooks/useAppQuery"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
-import { getTeamOrganizationKpiStats } from "@/app/(organization)/organization/[orgId]/teams/dashboard/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
-import { getOrganizationCurrency } from "@/lib/server/organization/getOrganizationCurrency"
+import { api } from "@/lib/apiClient"
 
 interface CardsProps {
   orgId: string
@@ -82,13 +79,13 @@ const Cards = ({
     isPending: affiliateSearchPending,
   } = useAppQuery(
     ["affiliate-card", orgId, filters.year, filters.month],
-    getAffiliateKpiStats,
-    [orgId, filters.year, filters.month],
+    (id, year, month) =>
+      api.affiliate.dashboard.analytics.kpi([id, year, month]),
+    [orgId, filters.year, filters.month] as const,
     {
       enabled: !!(affiliate && orgId && !isPreview),
     }
   )
-  const fetchFn = isTeam ? getTeamOrganizationKpiStats : getOrganizationKpiStats
   const {
     data: organizationSearchData,
     error: organizationError,
@@ -100,8 +97,11 @@ const Cards = ({
       filters.year,
       filters.month,
     ],
-    fetchFn,
-    [orgId, filters.year, filters.month],
+    (id, year, month) =>
+      isTeam
+        ? api.organization.teams.dashboard.analytics.kpi([id, year, month])
+        : api.organization.dashboard.analytics.kpi([id, year, month]),
+    [orgId, filters.year, filters.month] as const,
     {
       enabled: !!(!affiliate && orgId && !isPreview),
     }
@@ -129,8 +129,8 @@ const Cards = ({
   }, [isPreview])
   const { data: currency = "USD" } = useAppQuery(
     ["org-currency", orgId],
-    getOrganizationCurrency,
-    [orgId],
+    (id) => api.organization.currency([id]),
+    [orgId] as const,
     { enabled: !!orgId }
   )
   const displayCurrency = React.useMemo(() => {

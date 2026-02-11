@@ -4,9 +4,7 @@ import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { getUnpaidPayoutAction } from "@/lib/server/organization/getUnpaidPayout"
 export const GET = handleRoute(
   "Get Team Unpaid Months",
-  async (_, { params }) => {
-    const { orgId } = await params
-
+  async (_, { orgId }: { orgId: string }) => {
     await getTeamAuthAction(orgId)
     const rows = await getUnpaidPayoutAction(orgId)
 

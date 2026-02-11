@@ -5,9 +5,7 @@ import { organizationAuthCustomization } from "@/db/schema"
 import { eq } from "drizzle-orm"
 export const GET = handleRoute(
   "Get Auth Customization",
-  async (_, { params }) => {
-    const { orgId } = await params
-
+  async (_, { orgId }: { orgId: string }) => {
     const [authRow] = await db
       .select({ auth: organizationAuthCustomization.auth })
       .from(organizationAuthCustomization)

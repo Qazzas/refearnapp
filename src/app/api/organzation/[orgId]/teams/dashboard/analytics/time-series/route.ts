@@ -7,8 +7,7 @@ import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 
 export const GET = handleRoute(
   "Get Team Time Series",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     const year = searchParams.get("year")

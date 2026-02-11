@@ -7,8 +7,9 @@ import { handleRoute } from "@/lib/handleRoute"
 
 export const GET = handleRoute(
   "Get Org Time Series",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
+    // 🔍 DEBUG LOG
+    console.log(`🚀 ROUTE HIT: Get Org KPI for OrgID: ${orgId}`)
     const { searchParams } = new URL(req.url)
 
     const year = searchParams.get("year")

@@ -5,8 +5,7 @@ import { getDomainsAction } from "@/lib/server/internal/getDomainsAction"
 
 export const GET = handleRoute(
   "Get Team Organization Domains",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     // 1. Extract Query Parameters

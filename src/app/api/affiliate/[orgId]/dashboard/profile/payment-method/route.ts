@@ -4,9 +4,7 @@ import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrg
 import { getPayoutEmailMethod } from "@/lib/server/organization/getPayoutEmailMethod"
 export const GET = handleRoute(
   "Get Affiliate Payment Method",
-  async (_, { params }) => {
-    const { orgId } = await params
-
+  async (_, { orgId }: { orgId: string }) => {
     // 🔐 Affiliate Auth
     const decoded = await getAffiliateOrganization(orgId)
 

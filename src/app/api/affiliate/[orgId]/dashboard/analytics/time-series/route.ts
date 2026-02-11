@@ -7,8 +7,7 @@ import { getTimeSeriesData } from "@/lib/server/analytics/getTimeSeriesData"
 import { ExchangeRate } from "@/util/ExchangeRate"
 export const GET = handleRoute(
   "Get Affiliate Time Series",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     const year = searchParams.get("year")

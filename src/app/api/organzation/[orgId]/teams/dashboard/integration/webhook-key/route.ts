@@ -4,9 +4,7 @@ import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { getWebhookKey } from "@/lib/organizationAction/getWebhookKey"
 export const GET = handleRoute(
   "Get Team Org Webhook Key",
-  async (_, { params }) => {
-    const { orgId } = await params
-
+  async (_, { orgId }: { orgId: string }) => {
     // 🔐 Team Authorization - Verify the staff member belongs to this org
     await getTeamAuthAction(orgId)
 

@@ -27,8 +27,6 @@ import MonthSelect from "@/components/ui-custom/MonthSelect"
 import { DashboardThemeCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardThemeCustomizationOptions"
 import { Separator } from "@/components/ui/separator"
 import { ChartCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/ChartCustomizationOptions"
-import { getAffiliateKpiTimeSeries } from "@/app/affiliate/[orgId]/dashboard/action"
-import { getOrganizationKpiTimeSeries } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
 import { dummyChartData } from "@/lib/types/analytics/dummyChartData"
@@ -39,12 +37,11 @@ import {
 } from "@/store/DashboardCustomizationAtom"
 import { useAppQuery } from "@/hooks/useAppQuery"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
-import { getTeamOrganizationKpiTimeSeries } from "@/app/(organization)/organization/[orgId]/teams/dashboard/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { cn } from "@/lib/utils"
 import { getResponsiveCardHeight } from "@/util/GetResponsiveSelectWidth"
-import { getOrganizationCurrency } from "@/lib/server/organization/getOrganizationCurrency"
 import { formatCurrency } from "@/util/Formatter"
+import { api } from "@/lib/apiClient"
 
 interface ChartDailyMetricsProps {
   orgId: string
@@ -72,29 +69,34 @@ export function ChartDailyMetrics({
     isPending: affiliateSearchPending,
   } = useAppQuery(
     ["affiliate-kpi-time-series", orgId, filters.year, filters.month],
-    getAffiliateKpiTimeSeries,
-    [orgId, filters.year, filters.month],
+    (id, y, m) => api.affiliate.dashboard.analytics.timeSeries([id, y, m]),
+    [orgId, filters.year, filters.month] as const,
     {
       enabled: !!(affiliate && orgId && !isPreview),
     }
   )
   const { data: currency = "USD" } = useAppQuery(
     ["org-currency", orgId],
-    getOrganizationCurrency,
-    [orgId],
+    (id) => api.organization.currency([id]),
+    [orgId] as const,
     { enabled: !!orgId }
   )
-  const fetchFn = isTeam
-    ? getTeamOrganizationKpiTimeSeries
-    : getOrganizationKpiTimeSeries
   const {
     data: organizationSearchData,
     error: organizationSearchError,
     isPending: organizationSearchPending,
   } = useAppQuery(
-    ["organization-kpi-time-series", orgId, filters.year, filters.month],
-    fetchFn,
-    [orgId, filters.year, filters.month],
+    [
+      isTeam ? "team-time-series" : "organization-time-series",
+      orgId,
+      filters.year,
+      filters.month,
+    ],
+    (id, y, m) =>
+      isTeam
+        ? api.organization.teams.dashboard.analytics.timeSeries([id, y, m])
+        : api.organization.dashboard.analytics.timeSeries([id, y, m]),
+    [orgId, filters.year, filters.month] as const,
     {
       enabled: !!(!affiliate && orgId && !isPreview),
     }

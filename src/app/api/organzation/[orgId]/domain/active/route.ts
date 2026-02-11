@@ -5,20 +5,22 @@ import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 
-export const GET = handleRoute("Get Active Domain", async (_, { params }) => {
-  const { orgId } = await params
-  await getOrgAuth(orgId)
+export const GET = handleRoute(
+  "Get Active Domain",
+  async (_, { orgId }: { orgId: string }) => {
+    await getOrgAuth(orgId)
 
-  const domain = await db.query.websiteDomain.findFirst({
-    where: and(
-      eq(websiteDomain.orgId, orgId),
-      eq(websiteDomain.isActive, true),
-      eq(websiteDomain.isPrimary, true)
-    ),
-  })
+    const domain = await db.query.websiteDomain.findFirst({
+      where: and(
+        eq(websiteDomain.orgId, orgId),
+        eq(websiteDomain.isActive, true),
+        eq(websiteDomain.isPrimary, true)
+      ),
+    })
 
-  return NextResponse.json({
-    ok: true,
-    data: domain || null,
-  })
-})
+    return NextResponse.json({
+      ok: true,
+      data: domain || null,
+    })
+  }
+)

@@ -8,8 +8,7 @@ import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
 
 export const GET = handleRoute(
   "Get Organization Affiliates Stats",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     // 1. Extract Query Parameters

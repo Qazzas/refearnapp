@@ -4,8 +4,7 @@ import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { getDomainsAction } from "@/lib/server/internal/getDomainsAction"
 export const GET = handleRoute(
   "Get Organization Domains",
-  async (req, { params }) => {
-    const { orgId } = await params
+  async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
 
     // 1. Extract Query Parameters
