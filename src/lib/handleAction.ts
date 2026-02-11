@@ -1,5 +1,5 @@
 import { returnError } from "@/lib/errorHandler"
-import { MutationData, ActionResult } from "@/lib/types/response"
+import { MutationData, ActionResult } from "@/lib/types/organization/response"
 
 /**
  * Generic wrapper for async server actions.

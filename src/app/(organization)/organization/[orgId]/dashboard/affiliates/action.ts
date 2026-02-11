@@ -1,10 +1,13 @@
 "use server"
 
-import { ActionResult } from "@/lib/types/response"
-import { AffiliateBasePayout, AffiliateStats } from "@/lib/types/affiliateStats"
-import { getOrgAuth } from "@/lib/server/GetOrgAuth"
-import { getAffiliatesWithStatsAction } from "@/lib/server/getAffiliatesWithStats"
-import { OrderBy, OrderDir } from "@/lib/types/orderTypes"
+import { ActionResult } from "@/lib/types/organization/response"
+import {
+  AffiliateBasePayout,
+  AffiliateStats,
+} from "@/lib/types/affiliate/affiliateStats"
+import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
+import { getAffiliatesWithStatsAction } from "@/lib/server/affiliate/getAffiliatesWithStats"
+import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
 import { convertedCurrency } from "@/util/ConvertedCurrency"
 import { handleAction } from "@/lib/handleAction"
 

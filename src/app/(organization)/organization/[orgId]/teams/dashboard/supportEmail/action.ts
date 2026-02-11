@@ -1,9 +1,9 @@
 "use server"
 import { handleAction } from "@/lib/handleAction"
-import { MutationData } from "@/lib/types/response"
-import { SupportMessageInput } from "@/lib/types/supportMessageInput"
-import { sendSupportMessageAction } from "@/lib/server/sendSupportMessageAction"
-import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+import { MutationData } from "@/lib/types/organization/response"
+import { SupportMessageInput } from "@/lib/types/internal/supportMessageInput"
+import { sendSupportMessageAction } from "@/lib/server/internal/sendSupportMessageAction"
+import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 
 export async function sendTeamSupportMessage({
   type,

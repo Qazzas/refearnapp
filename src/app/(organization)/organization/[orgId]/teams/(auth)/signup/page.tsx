@@ -1,9 +1,9 @@
 import React from "react"
 import Signup from "@/components/pages/Signup"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import InvalidToken from "@/components/pages/InvalidToken"
-import { getTeamValidation } from "@/lib/server/getTeamValidation"
+import { getTeamValidation } from "@/lib/server/team/getTeamValidation"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 type TeamSignupProps = OrgIdProps & {

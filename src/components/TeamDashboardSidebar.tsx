@@ -26,7 +26,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { OrganizationData, TeamData } from "@/lib/types/profileTypes"
+import {
+  OrganizationData,
+  TeamData,
+} from "@/lib/types/organization/profileTypes"
 import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 

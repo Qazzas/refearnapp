@@ -1,8 +1,8 @@
 import React from "react"
 import ResetPassword from "@/components/pages/Reset-password"
 import InvalidToken from "@/components/pages/InvalidToken"
-import { validateResetToken } from "@/lib/server/validateResetToken"
-import { redirectIfAuthed } from "@/lib/server/authGuards"
+import { validateResetToken } from "@/lib/server/auth/validateResetToken"
+import { redirectIfAuthed } from "@/lib/server/auth/authGuards"
 import type { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 

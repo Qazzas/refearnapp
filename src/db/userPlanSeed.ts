@@ -2,7 +2,7 @@ import prompts from "prompts"
 import { db } from "@/db/drizzle"
 import { subscription, purchase, organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { syncOrgDataToRedisLinks } from "@/lib/server/syncOrgDataToRedisLinks"
+import { syncOrgDataToRedisLinks } from "@/lib/server/organization/syncOrgDataToRedisLinks"
 
 const DEV_USER_ID = "29022934-eb52-49af-aca4-b6ed553c89dd"
 

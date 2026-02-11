@@ -13,8 +13,8 @@ import {
   team,
 } from "@/db/schema"
 import { buildAffiliateUrl } from "@/util/Url"
-import { assignFreeTrialSubscription } from "@/lib/server/assignFreeTrial"
-import { assignLifetimePurchase } from "@/lib/server/assignLifetimePurchase"
+import { assignFreeTrialSubscription } from "@/lib/server/organization/assignFreeTrial"
+import { assignLifetimePurchase } from "@/lib/server/organization/assignLifetimePurchase"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions" // Assuming you have this for custom errors
 

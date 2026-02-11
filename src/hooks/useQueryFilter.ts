@@ -1,6 +1,6 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState, useMemo } from "react"
-import { OrderBy } from "@/lib/types/orderTypes"
+import { OrderBy } from "@/lib/types/analytics/orderTypes"
 
 type OrderDir = "asc" | "desc"
 

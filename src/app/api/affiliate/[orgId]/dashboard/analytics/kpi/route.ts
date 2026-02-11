@@ -1,0 +1,52 @@
+import { NextResponse } from "next/server"
+import { handleRoute } from "@/lib/handleRoute"
+import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
+import { getAffiliateKpiStatsAction } from "@/lib/server/affiliate/getAffiliateKpiStats"
+import { getOrganization } from "@/lib/server/organization/getOrganization"
+import { ExchangeRate } from "@/util/ExchangeRate"
+import { withQuery } from "@/lib/api/utils"
+export const GET_AFFILIATE_KPI_PATH = (
+  orgId: string,
+  year?: number,
+  month?: number
+) =>
+  withQuery(`/api/affiliate/${orgId}/dashboard/analytics/kpi`, { year, month })
+export const GET = handleRoute(
+  "Get Affiliate KPI Stats",
+  async (req, { params }) => {
+    const { orgId } = await params
+    const { searchParams } = new URL(req.url)
+
+    const year = searchParams.get("year")
+      ? Number(searchParams.get("year"))
+      : undefined
+    const month = searchParams.get("month")
+      ? Number(searchParams.get("month"))
+      : undefined
+
+    // 🔐 Affiliate Auth
+    const decoded = await getAffiliateOrganization(orgId)
+
+    const [row] = await getAffiliateKpiStatsAction(
+      decoded.orgId,
+      decoded.id,
+      year,
+      month
+    )
+
+    const org = await getOrganization(decoded.orgId)
+    const rate = await ExchangeRate(org.currency)
+
+    const data = {
+      totalLinks: row?.totalLinks ?? 0,
+      totalVisitors: row?.totalVisitors ?? 0,
+      totalSales: row?.sales ?? 0,
+      totalCommission: (row?.commission ?? 0) * rate,
+      totalCommissionPaid: (row?.paid ?? 0) * rate,
+      totalCommissionUnpaid: (row?.unpaid ?? 0) * rate,
+      currency: org.currency,
+    }
+
+    return NextResponse.json({ ok: true, data: [data] })
+  }
+)

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { useAppQuery } from "@/hooks/useAppQuery"
-import { verifyAndDeleteTeamSessionAction } from "@/lib/server/verifyAndDeleteTeamSessionAction"
+import { verifyAndDeleteTeamSessionAction } from "@/lib/server/team/verifyAndDeleteTeamSessionAction"
 
 export function useVerifyTeamSession(orgId?: string, isTeam?: boolean) {
   const router = useRouter()

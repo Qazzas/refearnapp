@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle } from "lucide-react"
-import type { PlanInfo } from "@/lib/types/planInfo"
+import type { PlanInfo } from "@/lib/types/organization/planInfo"
 
 interface SubscriptionStatusBannerProps {
   plan: PlanInfo

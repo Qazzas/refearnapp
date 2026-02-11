@@ -1,7 +1,7 @@
 // app/(organization)/verify-login/page.tsx
 import InvalidToken from "@/components/pages/InvalidToken"
 import VerifyClient from "@/components/pages/VerifyClient"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { Metadata } from "next"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { buildMetadata } from "@/util/BuildMetadata"

@@ -4,45 +4,15 @@ import { db } from "@/db/drizzle"
 import { team, teamAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import * as bcrypt from "bcrypt"
-import { ActionResult, MutationData } from "@/lib/types/response"
-import { SafeTeamWithCapabilities } from "@/lib/types/authUser"
+import { ActionResult, MutationData } from "@/lib/types/organization/response"
+import { SafeTeamWithCapabilities } from "@/lib/types/organization/authUser"
 import { revalidatePath } from "next/cache"
 import { handleAction } from "@/lib/handleAction"
-import { getTeamAuthCapabilities } from "@/lib/server/getTeamAuthCapabilities"
-import { getCurrentTeam } from "@/lib/server/getCurrentTeam"
-import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+import { getTeamAuthCapabilities } from "@/lib/server/team/getTeamAuthCapabilities"
+import { getCurrentTeam } from "@/lib/server/team/getCurrentTeam"
+import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { AppError } from "@/lib/exceptions"
 
-export const getTeamData = async (
-  orgId: string
-): Promise<ActionResult<SafeTeamWithCapabilities>> => {
-  return handleAction("get Team Data", async () => {
-    await getTeamAuthAction(orgId)
-    const { userId, canChangePassword, canChangeEmail } =
-      await getTeamAuthCapabilities(orgId)
-
-    const teamData = await db.query.team.findFirst({
-      where: eq(team.id, userId),
-    })
-
-    if (!teamData) {
-      throw new AppError({
-        status: 404,
-        error: "User not found",
-        toast: "Your account could not be found.",
-      })
-    }
-
-    return {
-      ok: true,
-      data: {
-        ...teamData,
-        canChangeEmail,
-        canChangePassword,
-      },
-    }
-  })
-}
 export async function updateTeamProfile(
   orgId: string,
   data: { name?: string }

@@ -11,7 +11,7 @@ import deepEqual from "fast-deep-equal"
 import { useForm } from "react-hook-form"
 import { Form } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { MutationData } from "@/lib/types/response"
+import { MutationData } from "@/lib/types/organization/response"
 import {
   BadgeDollarSign,
   Building2,
@@ -33,7 +33,7 @@ import React, { useMemo } from "react"
 import { InputField, TextareaField } from "@/components/Auth/FormFields"
 import { SelectField } from "@/components/ui-custom/SelectFields"
 import { LogoUpload } from "@/components/ui-custom/LogoUpload"
-import { OrgData } from "@/lib/types/organization"
+import { OrgData } from "@/lib/types/organization/organization"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { updateTeamOrgSettings } from "@/app/(organization)/organization/[orgId]/teams/dashboard/settings/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"

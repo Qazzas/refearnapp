@@ -2,13 +2,13 @@ import React from "react"
 import ResetPassword from "@/components/pages/Reset-password"
 import InvalidToken from "@/components/pages/InvalidToken"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { validateResetToken } from "@/lib/server/validateResetToken"
-import { redirectIfAffiliateAuthed } from "@/lib/server/authGuards"
+import { validateResetToken } from "@/lib/server/auth/validateResetToken"
+import { redirectIfAffiliateAuthed } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
-import { getOrganization } from "@/lib/server/getOrganization"
-import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { getOrganization } from "@/lib/server/organization/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 
 type Props = {
   searchParams: Promise<{ affiliateToken?: string }>

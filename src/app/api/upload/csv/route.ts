@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
-import { parsePaypalCSV } from "@/lib/server/parsePaypalCSV"
+import { parsePaypalCSV } from "@/lib/server/internal/parsePaypalCSV"
 import util from "util"
 import {
   processTransactions,
   Transaction,
-} from "@/lib/server/processTransactions"
-import { getUploadFile } from "@/lib/server/getUploadFile"
+} from "@/lib/server/internal/processTransactions"
+import { getUploadFile } from "@/lib/server/internal/getUploadFile"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
 

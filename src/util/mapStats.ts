@@ -1,7 +1,7 @@
 import {
   AffiliateKpiStats,
   OrganizationKpiStats,
-} from "@/lib/types/affiliateKpiStats"
+} from "@/lib/types/affiliate/affiliateKpiStats"
 import {
   DollarSign,
   Link,

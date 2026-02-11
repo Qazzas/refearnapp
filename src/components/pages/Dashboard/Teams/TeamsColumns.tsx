@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Power, PowerOff, Trash2 } from "lucide-react"
-import { TeamRow } from "@/lib/types/teamsRow"
+import { TeamRow } from "@/lib/types/internal/teamsRow"
 
 export const TeamsColumns = ({
   onToggle,

@@ -13,7 +13,7 @@ import {
   MoreHorizontal,
   ShieldCheck,
 } from "lucide-react"
-import { DomainRow } from "@/lib/types/domainRow"
+import { DomainRow } from "@/lib/types/organization/domainRow"
 import {
   Popover,
   PopoverContent,

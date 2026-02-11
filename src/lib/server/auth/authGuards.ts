@@ -1,0 +1,118 @@
+// lib/server/authGuards.ts
+import { redirect } from "next/navigation"
+import {
+  getOrganizationAuth,
+  OrganizationTokenPayload,
+} from "@/lib/server/organization/getOrganizationAuth"
+import {
+  AffiliateTokenPayload,
+  getAffiliateAuth,
+} from "@/lib/server/affiliate/getAffiliateAuth"
+import { getBaseUrl } from "@/lib/server/affiliate/getBaseUrl"
+import { buildAffiliateUrl } from "@/util/Url"
+import { getTeamAuth, TeamTokenPayload } from "@/lib/server/team/getTeamAuth"
+
+export async function requireOrganizationWithOrg(
+  paramsOrgId?: string
+): Promise<OrganizationTokenPayload> {
+  const decoded = await getOrganizationAuth()
+
+  if (!decoded) {
+    redirect("/login")
+  }
+
+  if (!decoded.orgIds || decoded.orgIds.length === 0) {
+    redirect("/create-company")
+  }
+  if (!paramsOrgId && decoded.activeOrgId) {
+    redirect(`/organization/${decoded.activeOrgId}/dashboard/analytics`)
+  }
+  if (paramsOrgId && !decoded.orgIds.includes(paramsOrgId)) {
+    redirect(
+      `/organization/${decoded.activeOrgId ?? decoded.orgIds[0]}/dashboard/analytics`
+    )
+  }
+
+  return decoded
+}
+
+export async function redirectIfAuthed() {
+  const decoded = await getOrganizationAuth()
+
+  if (decoded) {
+    if (decoded.activeOrgId) {
+      redirect(`/organization/${decoded.activeOrgId}/dashboard/analytics`)
+    }
+    if (decoded.orgIds && decoded.orgIds.length > 0) {
+      redirect(`/organization/${decoded.orgIds[0]}/dashboard/analytics`)
+    }
+    redirect("/create-company")
+  }
+
+  return null
+}
+export async function redirectTeamIfAuthed(orgId: string) {
+  const decoded = await getTeamAuth(orgId)
+  if (decoded) {
+    redirect(`/organization/${orgId}/teams/dashboard/analytics`)
+  }
+  return null
+}
+export async function requireTeamWithOrg(
+  orgId: string
+): Promise<TeamTokenPayload> {
+  const decoded = await getTeamAuth(orgId)
+  if (!decoded) {
+    redirect(`/organization/${orgId}/teams/login`)
+  }
+  if (decoded.orgId !== orgId) {
+    redirect(`/organization/${decoded.orgId}/teams/dashboard/analytics`)
+  }
+  return decoded
+}
+
+// 🔹 Affiliate Guards
+export async function requireAffiliateWithOrg(
+  paramsOrgId: string
+): Promise<AffiliateTokenPayload> {
+  const decoded = await getAffiliateAuth(paramsOrgId)
+  const baseUrl = await getBaseUrl()
+  const login = buildAffiliateUrl({
+    path: "login",
+    organizationId: paramsOrgId,
+    baseUrl,
+    partial: true,
+  })
+
+  if (!decoded) {
+    redirect(login)
+  }
+  const dashboard = buildAffiliateUrl({
+    path: "dashboard",
+    organizationId: decoded.orgId,
+    baseUrl,
+    partial: true,
+  })
+  if (paramsOrgId && decoded.orgId !== paramsOrgId) {
+    // Prevent cross-org access
+    redirect(dashboard)
+  }
+
+  return decoded
+}
+
+export async function redirectIfAffiliateAuthed(orgId: string) {
+  const decoded = await getAffiliateAuth(orgId)
+  const baseUrl = await getBaseUrl()
+  const dashboard = buildAffiliateUrl({
+    path: "dashboard",
+    organizationId: orgId,
+    baseUrl,
+    partial: true,
+  })
+  if (decoded) {
+    redirect(dashboard)
+  }
+
+  return null
+}

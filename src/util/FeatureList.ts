@@ -1,4 +1,4 @@
-import { FeatureList } from "@/lib/types/FeatureList"
+import { FeatureList } from "@/lib/types/organization/FeatureList"
 
 export const featuresList: FeatureList[] = [
   { name: "Unlimited affiliates signup", pro: true, ultimate: true },

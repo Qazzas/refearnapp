@@ -15,9 +15,9 @@ import { defaultDashboardCustomization } from "@/customization/Dashboard/default
 import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { eq } from "drizzle-orm"
 import { sanitizeDomain } from "@/util/SanitizeDomain"
-import { MutationData } from "@/lib/types/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
-import { getUserPlan } from "@/lib/server/getUserPlan"
+import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 import { isReservedDomain } from "@/lib/constants/domains"
 import { AppError } from "@/lib/exceptions"
 

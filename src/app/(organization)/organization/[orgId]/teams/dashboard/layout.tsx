@@ -4,9 +4,9 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { requireTeamWithOrg } from "@/lib/server/authGuards"
+import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import React from "react"
 import { getTeamData } from "@/app/(organization)/organization/[orgId]/teams/dashboard/profile/action"
 import TeamDashboardSidebar from "@/components/TeamDashboardSidebar"

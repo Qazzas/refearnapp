@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { AffiliatePaymentRow } from "@/lib/types/affiliatePaymentRow"
+import { AffiliatePaymentRow } from "@/lib/types/affiliate/affiliatePaymentRow"
 import { Badge } from "@/components/ui/badge"
 import React from "react"
 import { useAtomValue } from "jotai"

@@ -1,8 +1,8 @@
 import React from "react"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import PayoutTable from "@/components/pages/Dashboard/Payouts/PayoutTable"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { requireOrganizationWithOrg } from "@/lib/server/authGuards"
+import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export async function generateMetadata({

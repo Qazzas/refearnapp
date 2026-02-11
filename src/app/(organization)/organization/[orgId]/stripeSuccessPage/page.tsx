@@ -1,8 +1,8 @@
 import React from "react"
 import StripeSuccess from "@/components/pages/StripeSuccess"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { requireOrganizationWithOrg } from "@/lib/server/authGuards"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export async function generateMetadata({

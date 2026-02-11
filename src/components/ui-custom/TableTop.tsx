@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { ChevronDown, Settings2 } from "lucide-react"
 import { Table as ReactTable } from "@tanstack/react-table"
-import { OrderDir, OrderBy } from "@/lib/types/orderTypes"
+import { OrderDir, OrderBy } from "@/lib/types/analytics/orderTypes"
 import OrderSelect from "@/components/ui-custom/OrderSelect"
 import { SearchInput } from "@/components/ui-custom/SearchInput"
 import { ReactNode } from "react"

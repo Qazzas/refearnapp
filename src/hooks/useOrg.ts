@@ -1,8 +1,8 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { Organization } from "@/lib/types/orgAuth"
-import { getOrg } from "@/lib/server/getOrg"
+import { Organization } from "@/lib/types/organization/orgAuth"
+import { getOrg } from "@/lib/server/organization/getOrg"
 
 export function useOrg(orgId?: string, affiliate?: boolean) {
   const {

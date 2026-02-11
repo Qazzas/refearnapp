@@ -1,8 +1,8 @@
 import React from "react"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { ChartDailyMetrics } from "@/components/ui-custom/Chart/SalesChart"
-import { requireAffiliateWithOrg } from "@/lib/server/authGuards"
+import { requireAffiliateWithOrg } from "@/lib/server/auth/authGuards"
 
 const chartsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })

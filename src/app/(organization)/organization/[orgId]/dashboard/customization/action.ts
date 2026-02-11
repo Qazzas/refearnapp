@@ -16,8 +16,8 @@ import {
   defaultDashboardCustomization,
 } from "@/customization/Dashboard/defaultDashboardCustomization"
 import { deepMerge } from "@/util/DeepMerge"
-import { getOrgAuth } from "@/lib/server/GetOrgAuth"
-import { MutationData } from "@/lib/types/response"
+import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrganizationCustomization } from "@/lib/organizationAction/saveOrganizationCustomization"
 

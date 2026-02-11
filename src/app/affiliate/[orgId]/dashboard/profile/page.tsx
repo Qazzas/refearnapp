@@ -1,14 +1,14 @@
 import React from "react"
 import Profile from "@/components/pages/Dashboard/Profile/Profile"
-import { OrgIdProps } from "@/lib/types/orgId"
-import { getAffiliateData } from "@/app/affiliate/[orgId]/dashboard/profile/action"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { ErrorCard } from "@/components/ui-custom/ErrorCard"
-import { requireAffiliateWithOrg } from "@/lib/server/authGuards"
+import { requireAffiliateWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
-import { getOrganization } from "@/lib/server/getOrganization"
-import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { getOrganization } from "@/lib/server/organization/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getAffiliateData } from "@/lib/server/affiliate/getAffiliateData"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {

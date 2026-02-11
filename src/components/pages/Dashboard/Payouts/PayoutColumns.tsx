@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { AffiliatePayout } from "@/lib/types/affiliateStats"
+import { AffiliatePayout } from "@/lib/types/affiliate/affiliateStats"
 import { commonAffiliateColumns } from "@/components/ui-custom/CommonColumns"
 
 export const PayoutColumns = (): ColumnDef<AffiliatePayout>[] => {

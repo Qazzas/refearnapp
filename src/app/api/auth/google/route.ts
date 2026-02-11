@@ -1,6 +1,6 @@
 // app/api/auth/google/route.ts
 import { NextResponse } from "next/server"
-import { getBaseUrl } from "@/lib/server/getBaseUrl"
+import { getBaseUrl } from "@/lib/server/affiliate/getBaseUrl"
 import { handleRoute } from "@/lib/handleRoute"
 
 export const GET = handleRoute("Google Auth Redirect", async (req) => {

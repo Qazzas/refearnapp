@@ -3,7 +3,7 @@ import {
   UseQueryResult,
   QueryObserverResult,
 } from "@tanstack/react-query"
-import { ActionResult } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/organization/response"
 type QueryKeyPrimitive = string | number | boolean | null | undefined | object
 interface UseAppQueryOptions {
   enabled?: boolean

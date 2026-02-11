@@ -1,11 +1,11 @@
 import React from "react"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import CheckEmail from "@/components/pages/CheckEmail"
-import { redirectIfAffiliateAuthed } from "@/lib/server/authGuards"
+import { redirectIfAffiliateAuthed } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
-import { getOrganization } from "@/lib/server/getOrganization"
-import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { getOrganization } from "@/lib/server/organization/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
 export async function generateMetadata({
   params,

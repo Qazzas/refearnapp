@@ -22,12 +22,12 @@ import { PieChartCustomizationOptions } from "@/components/ui-custom/Customizati
 import {
   AffiliateReferrerStat,
   OrganizationReferrerStat,
-} from "@/lib/types/affiliateReferrerStat"
+} from "@/lib/types/affiliate/affiliateReferrerStat"
 import { getAffiliateReferrers } from "@/app/affiliate/[orgId]/dashboard/action"
 import { getOrganizationReferrer } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
-import { dummySourceData } from "@/lib/types/dummySourceData"
+import { dummySourceData } from "@/lib/types/analytics/dummySourceData"
 import { useAtomValue } from "jotai"
 import {
   dashboardThemeCustomizationAtom,

@@ -1,10 +1,10 @@
 // actions/getAffiliateCommissionByMonth.ts
 "use server"
-import { getAffiliateOrganization } from "@/lib/server/GetAffiliateOrganization"
-import { AffiliatePaymentRow } from "@/lib/types/affiliatePaymentRow"
-import { ActionResult } from "@/lib/types/response"
-import { getAffiliateCommissionByMonthAction } from "@/lib/server/getAffiliateCommissionByMonth"
-import { getOrganization } from "@/lib/server/getOrganization"
+import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
+import { AffiliatePaymentRow } from "@/lib/types/affiliate/affiliatePaymentRow"
+import { ActionResult } from "@/lib/types/organization/response"
+import { getAffiliateCommissionByMonthAction } from "@/lib/server/affiliate/getAffiliateCommissionByMonth"
+import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { ExchangeRate } from "@/util/ExchangeRate"
 import { handleAction } from "@/lib/handleAction"
 

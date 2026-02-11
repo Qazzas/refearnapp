@@ -7,7 +7,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"
-import { OrderDir, OrderBy } from "@/lib/types/orderTypes"
+import { OrderDir, OrderBy } from "@/lib/types/analytics/orderTypes"
 import { cn } from "@/lib/utils"
 import {
   ArrowDown,

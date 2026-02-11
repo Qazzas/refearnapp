@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-import type { PlanInfo } from "@/lib/types/planInfo"
+import type { PlanInfo } from "@/lib/types/organization/planInfo"
 import { featuresList } from "@/util/FeatureList"
 import { SubscriptionSection } from "@/components/ui-custom/Pricing/SubscriptionSection"
 import { PricingGrid } from "@/components/ui-custom/Pricing/PricingGrid"

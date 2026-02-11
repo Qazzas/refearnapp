@@ -29,7 +29,7 @@ import { TeamsColumns } from "@/components/pages/Dashboard/Teams/TeamsColumns"
 import { TableTop } from "@/components/ui-custom/TableTop"
 import PaginationControls from "@/components/ui-custom/PaginationControls"
 import { useQueryClient } from "@tanstack/react-query"
-import { PlanInfo } from "@/lib/types/planInfo"
+import { PlanInfo } from "@/lib/types/organization/planInfo"
 import { useRouter } from "next/navigation"
 import { handlePlanRedirect } from "@/util/HandlePlanRedirect"
 

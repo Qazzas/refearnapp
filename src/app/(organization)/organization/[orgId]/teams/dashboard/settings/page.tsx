@@ -1,12 +1,12 @@
 import React from "react"
 import Settings from "@/components/pages/Dashboard/Settings/Settings"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { ErrorCard } from "@/components/ui-custom/ErrorCard"
-import { requireTeamWithOrg } from "@/lib/server/authGuards"
-import { orgTeamInfo } from "@/app/(organization)/organization/[orgId]/teams/dashboard/settings/action"
+import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getTeamOrgSettings } from "@/lib/server/team/getTeamOrgSettings"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -22,7 +22,7 @@ export async function generateMetadata({
 const SettingsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireTeamWithOrg(orgId)
-  const orgResponse = await orgTeamInfo(orgId)
+  const orgResponse = await getTeamOrgSettings(orgId)
   if (!orgResponse.ok) {
     return <ErrorCard message={orgResponse.error || "Something went wrong"} />
   }

@@ -1,7 +1,7 @@
 "use server"
 import { handleAction } from "@/lib/handleAction"
-import type { MutationData } from "@/lib/types/response"
-import { updatePlan } from "@/lib/server/updatePlan"
+import type { MutationData } from "@/lib/types/organization/response"
+import { updatePlan } from "@/lib/server/organization/updatePlan"
 import { AppError } from "@/lib/exceptions"
 
 export async function updateSubscriptionAction({

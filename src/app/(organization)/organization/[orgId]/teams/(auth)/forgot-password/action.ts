@@ -3,9 +3,9 @@
 import { db } from "@/db/drizzle"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/verificationEmail"
-import { getBaseUrl } from "@/lib/server/getBaseUrl"
+import { getBaseUrl } from "@/lib/server/affiliate/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
-import { MutationData } from "@/lib/types/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { AppError } from "@/lib/exceptions"
 

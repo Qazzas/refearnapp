@@ -1,6 +1,6 @@
-import { getUserPlan } from "@/lib/server/getUserPlan"
+import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 import PricingClient from "@/components/ui-custom/Pricing/PricingClient"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { Metadata } from "next"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { buildMetadata } from "@/util/BuildMetadata"

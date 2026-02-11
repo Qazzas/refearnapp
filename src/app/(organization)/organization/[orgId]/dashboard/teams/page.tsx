@@ -1,9 +1,9 @@
 import React from "react"
 import Teams from "@/components/pages/Dashboard/Teams/Teams"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { requireOrganizationWithOrg } from "@/lib/server/authGuards"
-import { OrgIdProps } from "@/lib/types/orgId"
-import { getUserPlan } from "@/lib/server/getUserPlan"
+import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
+import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export async function generateMetadata({

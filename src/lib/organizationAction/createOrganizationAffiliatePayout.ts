@@ -1,8 +1,8 @@
 import { db } from "@/db/drizzle"
 import { payoutReference, payoutReferencePeriods } from "@/db/schema"
 import { customAlphabet } from "nanoid"
-import { InsertedRef } from "@/lib/types/insertedRef"
-import { CreatePayoutInput } from "@/lib/types/createPayoutInput"
+import { InsertedRef } from "@/lib/types/organization/insertedRef"
+import { CreatePayoutInput } from "@/lib/types/organization/createPayoutInput"
 const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 const generateRefId = customAlphabet(alphabet, 8)
 export async function createOrganizationAffiliatePayout({

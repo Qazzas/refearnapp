@@ -14,7 +14,7 @@ import {
   createAffiliateLink,
   getAffiliateLinksWithStats,
 } from "@/app/affiliate/[orgId]/dashboard/links/action"
-import { AffiliateLinkWithStats } from "@/lib/types/affiliateLinkWithStats"
+import { AffiliateLinkWithStats } from "@/lib/types/affiliate/affiliateLinkWithStats"
 import MonthSelect from "@/components/ui-custom/MonthSelect"
 import { DashboardThemeCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardThemeCustomizationOptions"
 import { DashboardButtonCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardButtonCustomizationOptions"
@@ -26,7 +26,7 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import { useLinksColumns } from "@/components/pages/AffiliateDashboard/Links/LinksColumns"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
-import { dummyAffiliateLinksRaw } from "@/lib/types/previewData"
+import { dummyAffiliateLinksRaw } from "@/lib/types/organization/previewData"
 import { useAtomValue } from "jotai"
 import {
   dashboardButtonCustomizationAtom,
@@ -36,7 +36,7 @@ import { useAppMutation } from "@/hooks/useAppMutation"
 import { TableView } from "@/components/ui-custom/TableView"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
 import { useQueryClient } from "@tanstack/react-query"
-import { getOrgAction } from "@/lib/server/getOrg"
+import { getOrgAction } from "@/lib/server/organization/getOrg"
 
 interface AffiliateLinkProps {
   orgId: string

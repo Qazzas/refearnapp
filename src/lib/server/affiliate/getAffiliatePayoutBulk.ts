@@ -1,0 +1,34 @@
+"use server"
+import { getAffiliatesWithStatsAction } from "@/lib/server/affiliate/getAffiliatesWithStats"
+
+export async function getAffiliatePayoutBulkAction(
+  orgId: string,
+  months: { month: number; year: number }[],
+  orderBy?:
+    | "conversionRate"
+    | "commission"
+    | "sales"
+    | "visits"
+    | "email"
+    | "commissionPaid"
+    | "commissionUnpaid",
+  orderDir?: "asc" | "desc",
+  limit?: number,
+  offset?: number,
+  email?: string
+) {
+  return await getAffiliatesWithStatsAction(
+    orgId,
+    undefined,
+    undefined,
+    months,
+    {
+      exclude: ["conversionRate"],
+      orderBy,
+      orderDir,
+      limit,
+      offset,
+      email,
+    }
+  )
+}

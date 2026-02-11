@@ -2,9 +2,9 @@ import { db } from "@/db/drizzle"
 import { organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
-import { OrgData } from "@/lib/types/organization"
+import { OrgData } from "@/lib/types/organization/organization"
 import { buildRedisUpdates } from "@/util/BuildRedisUpdates"
-import { syncOrgDataToRedisLinks } from "@/lib/server/syncOrgDataToRedisLinks"
+import { syncOrgDataToRedisLinks } from "@/lib/server/organization/syncOrgDataToRedisLinks"
 
 export async function updateSettings(
   data: Partial<OrgData> & { id: string },

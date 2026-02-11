@@ -3,11 +3,11 @@
 import { db } from "@/db/drizzle"
 import { organizationPaddleAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { MutationData } from "@/lib/types/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrgPaddleWebhookKey } from "@/lib/organizationAction/saveOrgPaddleWebhookKey"
 import { getWebhookKey } from "@/lib/organizationAction/getWebhookKey"
-import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 
 export async function saveTeamPaddleWebhookKey({
   orgId,

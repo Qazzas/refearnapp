@@ -5,7 +5,7 @@ import MonthSelect from "@/components/ui-custom/MonthSelect"
 import {
   getDummyAffiliateStats,
   initialKpiData,
-} from "@/lib/types/dummyKpiData"
+} from "@/lib/types/analytics/dummyKpiData"
 import React, { useEffect, useState } from "react"
 import { DashboardThemeCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardThemeCustomizationOptions"
 import { YearSelectCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/YearSelectCustomizationOptions"
@@ -15,7 +15,7 @@ import { KpiCardCustomizationOptions } from "@/components/ui-custom/Customizatio
 import {
   AffiliateKpiStats,
   OrganizationKpiStats,
-} from "@/lib/types/affiliateKpiStats"
+} from "@/lib/types/affiliate/affiliateKpiStats"
 import { mapAffiliateStats, mapOrganizationStats } from "@/util/mapStats"
 import { getAffiliateKpiStats } from "@/app/affiliate/[orgId]/dashboard/action"
 import { getOrganizationKpiStats } from "@/app/(organization)/organization/[orgId]/dashboard/action"
@@ -36,7 +36,7 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
 import { getTeamOrganizationKpiStats } from "@/app/(organization)/organization/[orgId]/teams/dashboard/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
-import { getOrganizationCurrency } from "@/lib/server/getOrganizationCurrency"
+import { getOrganizationCurrency } from "@/lib/server/organization/getOrganizationCurrency"
 
 interface CardsProps {
   orgId: string

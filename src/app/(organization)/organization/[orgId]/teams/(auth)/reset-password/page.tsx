@@ -1,10 +1,13 @@
 import React from "react"
 import ResetPassword from "@/components/pages/Reset-password"
 import InvalidToken from "@/components/pages/InvalidToken"
-import { validateResetToken } from "@/lib/server/validateResetToken"
-import { redirectIfAuthed, redirectTeamIfAuthed } from "@/lib/server/authGuards"
+import { validateResetToken } from "@/lib/server/auth/validateResetToken"
+import {
+  redirectIfAuthed,
+  redirectTeamIfAuthed,
+} from "@/lib/server/auth/authGuards"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import EmailVerified from "@/components/pages/Email-verified"
-import { getOrganizationAuth } from "@/lib/server/getOrganizationAuth"
+import { getOrganizationAuth } from "@/lib/server/organization/getOrganizationAuth"
 import type { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export const metadata: Metadata = buildMetadata({

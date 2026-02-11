@@ -9,7 +9,7 @@ import {
   SelectGroup,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { UnpaidMonth } from "@/lib/types/unpaidMonth"
+import { UnpaidMonth } from "@/lib/types/organization/unpaidMonth"
 import { Checkbox } from "@/components/ui/checkbox"
 
 interface UnpaidSelectProps {

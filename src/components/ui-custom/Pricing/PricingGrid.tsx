@@ -5,15 +5,15 @@ import {
   BillingType,
   SubscriptionCycle,
 } from "@/components/ui-custom/Pricing/PricingClient"
-import { PlanInfo } from "@/lib/types/planInfo"
-import { FeatureList } from "@/lib/types/FeatureList"
+import { PlanInfo } from "@/lib/types/organization/planInfo"
+import { FeatureList } from "@/lib/types/organization/FeatureList"
 import { PricingCard } from "@/components/ui-custom/Pricing/PricingCard"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
 import usePaddleCheckout from "@/hooks/usePaddleCheckout"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { updateSubscriptionAction } from "@/app/(organization)/organization/[orgId]/dashboard/pricing/action"
 import { Loader2 } from "lucide-react"
-import { PRICING_CONFIG } from "@/lib/types/priceConfig"
+import { PRICING_CONFIG } from "@/lib/types/organization/priceConfig"
 
 export function PricingGrid({
   billingType,

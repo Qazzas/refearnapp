@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { AffiliateData } from "@/lib/types/profileTypes"
+import { AffiliateData } from "@/lib/types/organization/profileTypes"
 import { useAtomValue } from "jotai"
 import { sidebarCustomizationAtom } from "@/store/DashboardCustomizationAtom"
 import { useAffiliatePath } from "@/hooks/useUrl"

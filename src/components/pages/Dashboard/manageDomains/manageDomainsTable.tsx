@@ -42,7 +42,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { DomainCreateForm, domainCreateSchema } from "@/lib/schema/domainSchema"
 import { useForm } from "react-hook-form"
-import { DomainInputType } from "@/lib/types/createDomainType"
+import { DomainInputType } from "@/lib/types/internal/createDomainType"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import {

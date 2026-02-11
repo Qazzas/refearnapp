@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { validateOrg } from "@/util/ValidateOrg"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 
 export async function getValidatedOrgFromParams({ params }: OrgIdProps) {
   const { orgId } = await params

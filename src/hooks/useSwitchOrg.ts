@@ -1,5 +1,5 @@
 import { useAppMutation } from "@/hooks/useAppMutation"
-import { switchOrganization } from "@/lib/server/switchOrganization"
+import { switchOrganization } from "@/lib/server/organization/switchOrganization"
 import { useRouter } from "next/navigation"
 
 export function useSwitchOrg() {

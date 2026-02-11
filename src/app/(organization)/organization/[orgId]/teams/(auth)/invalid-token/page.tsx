@@ -1,7 +1,7 @@
 import InvalidToken from "@/components/pages/InvalidToken"
-import { redirectTeamIfAuthed } from "@/lib/server/authGuards"
+import { redirectTeamIfAuthed } from "@/lib/server/auth/authGuards"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export async function generateMetadata({

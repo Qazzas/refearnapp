@@ -31,7 +31,7 @@ import { getAffiliateKpiTimeSeries } from "@/app/affiliate/[orgId]/dashboard/act
 import { getOrganizationKpiTimeSeries } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
-import { dummyChartData } from "@/lib/types/dummyChartData"
+import { dummyChartData } from "@/lib/types/analytics/dummyChartData"
 import { useAtomValue } from "jotai"
 import {
   chartCustomizationAtom,
@@ -43,7 +43,7 @@ import { getTeamOrganizationKpiTimeSeries } from "@/app/(organization)/organizat
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { cn } from "@/lib/utils"
 import { getResponsiveCardHeight } from "@/util/GetResponsiveSelectWidth"
-import { getOrganizationCurrency } from "@/lib/server/getOrganizationCurrency"
+import { getOrganizationCurrency } from "@/lib/server/organization/getOrganizationCurrency"
 import { formatCurrency } from "@/util/Formatter"
 
 interface ChartDailyMetricsProps {

@@ -4,16 +4,16 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import AffiliateDashboardSidebar from "@/components/AffiliateDashboardSidebar"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { getAffiliateData } from "@/app/affiliate/[orgId]/dashboard/profile/action"
 import { CustomizationProvider } from "@/app/affiliate/[orgId]/dashboard/customizationProvider"
-import { requireAffiliateWithOrg } from "@/lib/server/authGuards"
+import { requireAffiliateWithOrg } from "@/lib/server/auth/authGuards"
 import React from "react"
 import { Metadata } from "next"
-import { getOrganization } from "@/lib/server/getOrganization"
-import { getOrgBaseUrl } from "@/lib/server/getOrgBaseUrl"
+import { getOrganization } from "@/lib/server/organization/getOrganization"
+import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
 
 interface AffiliateDashboardLayoutProps extends OrgIdProps {

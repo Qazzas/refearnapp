@@ -4,43 +4,14 @@ import { db } from "@/db/drizzle"
 import { account, user } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import * as bcrypt from "bcrypt"
-import { ActionResult, MutationData } from "@/lib/types/response"
-import { SafeUserWithCapabilities } from "@/lib/types/authUser"
+import { ActionResult, MutationData } from "@/lib/types/organization/response"
+import { SafeUserWithCapabilities } from "@/lib/types/organization/authUser"
 import { revalidatePath } from "next/cache"
-import { getUserAuthCapabilities } from "@/lib/server/getUserAuthCapabilities"
-import { getCurrentUser } from "@/lib/server/getCurrentUser"
+import { getUserAuthCapabilities } from "@/lib/server/organization/getUserAuthCapabilities"
+import { getCurrentUser } from "@/lib/server/organization/getCurrentUser"
 import { handleAction } from "@/lib/handleAction"
 import { AppError } from "@/lib/exceptions"
 
-export const getUserData = async (): Promise<
-  ActionResult<SafeUserWithCapabilities>
-> => {
-  return handleAction("getUserData", async () => {
-    const { userId, canChangePassword, canChangeEmail } =
-      await getUserAuthCapabilities()
-
-    const userData = await db.query.user.findFirst({
-      where: eq(user.id, userId),
-    })
-
-    if (!userData) {
-      throw new AppError({
-        status: 404,
-        error: "User not found",
-        toast: "Your account could not be found.",
-      })
-    }
-
-    return {
-      ok: true,
-      data: {
-        ...userData,
-        canChangeEmail,
-        canChangePassword,
-      },
-    }
-  })
-}
 export async function updateUserProfile(
   orgId: string,
   data: { name?: string }

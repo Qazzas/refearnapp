@@ -5,7 +5,6 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { useForm } from "react-hook-form"
 
 import {
-  logoutAction,
   updateAffiliatePassword,
   updateAffiliateProfile,
   validateCurrentPassword,
@@ -32,11 +31,11 @@ import ProfileCardHeader from "@/components/pages/Dashboard/Profile/ProfileCardH
 import ProfileCardContent from "@/components/pages/Dashboard/Profile/ProfileCardContent"
 import ProfileCardFooter from "@/components/pages/Dashboard/Profile/ProfileCardFooter"
 import ProfileDialog from "@/components/pages/Dashboard/Profile/ProfileDialog"
-import { ProfileProps } from "@/lib/types/profileTypes"
+import { ProfileProps } from "@/lib/types/organization/profileTypes"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
 import deepEqual from "fast-deep-equal"
 import ProfileEmailDialog from "@/components/ui-custom/ProfileEmailDialog"
-import { requestEmailChange } from "@/lib/server/requestEmailChange"
+import { requestEmailChange } from "@/lib/server/auth/requestEmailChange"
 import { LogoutButton } from "@/components/ui-custom/LogoutButton"
 import { useCachedValidation } from "@/hooks/useCachedValidation"
 import {
@@ -52,6 +51,7 @@ import {
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { openEmailApp } from "@/util/OpenEmailApp"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
+import { logoutAction } from "@/lib/server/auth/logout"
 
 export default function Profile({
   AffiliateData,

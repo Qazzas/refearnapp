@@ -1,5 +1,5 @@
-import { PlanInfo } from "@/lib/types/planInfo"
-import { FeatureList } from "@/lib/types/FeatureList"
+import { PlanInfo } from "@/lib/types/organization/planInfo"
+import { FeatureList } from "@/lib/types/organization/FeatureList"
 import { SubscriptionCycle } from "@/components/ui-custom/Pricing/PricingClient"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"

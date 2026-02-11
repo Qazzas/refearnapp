@@ -1,6 +1,6 @@
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { OrgIdProps } from "@/lib/types/orgId"
-import { requireOrganizationWithOrg } from "@/lib/server/authGuards"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
+import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
 import IntegrationClientPage from "@/components/pages/Dashboard/Integration/IntegrationClientPage"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"

@@ -7,7 +7,7 @@ import * as bcrypt from "bcrypt"
 import { eq, and } from "drizzle-orm"
 import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
-import { MutationData } from "@/lib/types/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { AppError } from "@/lib/exceptions"
 

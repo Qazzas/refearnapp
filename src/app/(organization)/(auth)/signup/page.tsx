@@ -1,6 +1,6 @@
 import React from "react"
 import Signup from "@/components/pages/Signup"
-import { redirectIfAuthed } from "@/lib/server/authGuards"
+import { redirectIfAuthed } from "@/lib/server/auth/authGuards"
 import type { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export const metadata: Metadata = buildMetadata({

@@ -12,7 +12,7 @@ import { calculateExpirationDate } from "@/util/CalculateExpiration"
 import { getAffiliateLinkRecord } from "@/services/getAffiliateLinkRecord"
 import { getOrganizationById } from "@/services/getOrganizationById"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
-import { getPaddleAccount } from "@/lib/server/getPaddleAccount"
+import { getPaddleAccount } from "@/lib/server/organization/getPaddleAccount"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
 

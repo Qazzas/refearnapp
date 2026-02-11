@@ -1,12 +1,12 @@
 import React from "react"
 import Profile from "@/components/pages/Dashboard/Profile/Profile"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { ErrorCard } from "@/components/ui-custom/ErrorCard"
-import { requireTeamWithOrg } from "@/lib/server/authGuards"
-import { getTeamData } from "@/app/(organization)/organization/[orgId]/teams/dashboard/profile/action"
+import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getTeamData } from "@/lib/server/team/getTeamData"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {

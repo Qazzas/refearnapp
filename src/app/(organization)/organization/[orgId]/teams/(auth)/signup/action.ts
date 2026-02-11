@@ -6,7 +6,7 @@ import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/verificationEmail"
 import { customAlphabet } from "nanoid"
-import { MutationData } from "@/lib/types/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { AppError } from "@/lib/exceptions"
 

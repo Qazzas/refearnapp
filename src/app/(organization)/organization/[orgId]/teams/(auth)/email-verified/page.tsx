@@ -1,7 +1,7 @@
 import EmailVerified from "@/components/pages/Email-verified"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { OrgIdProps } from "@/lib/types/orgId"
-import { requireTeamWithOrg } from "@/lib/server/authGuards"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
+import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export async function generateMetadata({

@@ -1,9 +1,9 @@
 "use server"
 
-import { MutationData } from "@/lib/types/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrganizationCustomization } from "@/lib/organizationAction/saveOrganizationCustomization"
-import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
 

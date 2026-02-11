@@ -1,12 +1,15 @@
 "use server"
 
-import { ActionResult } from "@/lib/types/response"
-import { AffiliateBasePayout, AffiliateStats } from "@/lib/types/affiliateStats"
-import { getAffiliatesWithStatsAction } from "@/lib/server/getAffiliatesWithStats"
-import { OrderBy, OrderDir } from "@/lib/types/orderTypes"
+import { ActionResult } from "@/lib/types/organization/response"
+import {
+  AffiliateBasePayout,
+  AffiliateStats,
+} from "@/lib/types/affiliate/affiliateStats"
+import { getAffiliatesWithStatsAction } from "@/lib/server/affiliate/getAffiliatesWithStats"
+import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
 import { convertedCurrency } from "@/util/ConvertedCurrency"
 import { handleAction } from "@/lib/handleAction"
-import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 
 export async function getTeamAffiliatesWithStats(
   orgId: string,

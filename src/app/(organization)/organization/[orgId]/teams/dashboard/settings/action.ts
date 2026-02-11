@@ -1,19 +1,10 @@
 "use server"
-import { OrgData } from "@/lib/types/organization"
-import { ActionResult, MutationData } from "@/lib/types/response"
+import { OrgData } from "@/lib/types/organization/organization"
+import { ActionResult, MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
-import { getOrgData } from "@/lib/server/getOrgData"
+import { getOrgData } from "@/lib/server/organization/getOrgData"
 import { updateSettings } from "@/lib/organizationAction/UpdateSettings"
-import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
-
-export const orgTeamInfo = async (
-  orgId: string
-): Promise<ActionResult<OrgData>> => {
-  return handleAction("org Team Info", async () => {
-    await getTeamAuthAction(orgId)
-    return await getOrgData(orgId, true)
-  })
-}
+import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 export async function updateTeamOrgSettings(
   data: Partial<OrgData> & { id: string },
   isTeam: boolean = false

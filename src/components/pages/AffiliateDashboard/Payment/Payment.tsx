@@ -19,7 +19,7 @@ import { YearSelectCustomizationOptions } from "@/components/ui-custom/Customiza
 import { paymentColumns } from "@/components/pages/AffiliateDashboard/Payment/PaymentColumns"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
-import { dummyAffiliatePayments } from "@/lib/types/previewData"
+import { dummyAffiliatePayments } from "@/lib/types/organization/previewData"
 import { useAtomValue } from "jotai"
 import { dashboardThemeCustomizationAtom } from "@/store/DashboardCustomizationAtom"
 import { useAppQuery } from "@/hooks/useAppQuery"

@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { AffiliateLinkWithStats } from "@/lib/types/affiliateLinkWithStats"
+import { AffiliateLinkWithStats } from "@/lib/types/affiliate/affiliateLinkWithStats"
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Check, Copy } from "lucide-react"

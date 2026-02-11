@@ -2,7 +2,7 @@ import {
   DeepPartial,
   OrganizationAuthCustomizationSeed,
   OrganizationDashboardCustomizationSeed,
-} from "@/lib/types/customizationSeedTypes"
+} from "@/lib/types/organization/customizationSeedTypes"
 import { defaultAuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { defaultDashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
 import merge from "lodash/merge"

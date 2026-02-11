@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { VerifyServer } from "@/lib/server/verifyServer"
+import { VerifyServer } from "@/lib/server/auth/verifyServer"
 import { useRouter } from "next/navigation"
 import EmailVerified from "@/components/pages/Email-verified"
 import PendingState from "@/components/ui-custom/PendingState"

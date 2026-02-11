@@ -1,8 +1,8 @@
 import React from "react"
 import AffiliatesTable from "@/components/pages/Dashboard/Affiliates/Affiliates"
-import { OrgIdProps } from "@/lib/types/orgId"
+import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { requireOrganizationWithOrg } from "@/lib/server/authGuards"
+import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
 import { buildMetadata } from "@/util/BuildMetadata"
 import { Metadata } from "next"
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
-import { getUploadFile } from "@/lib/server/getUploadFile"
+import { getUploadFile } from "@/lib/server/internal/getUploadFile"
 import { handleRoute } from "@/lib/handleRoute"
 
 const s3Client = new S3Client({

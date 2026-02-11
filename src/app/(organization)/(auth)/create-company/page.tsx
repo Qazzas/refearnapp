@@ -1,6 +1,6 @@
 import React from "react"
 import { redirect } from "next/navigation"
-import { getOrganizationAuth } from "@/lib/server/getOrganizationAuth"
+import { getOrganizationAuth } from "@/lib/server/organization/getOrganizationAuth"
 import CreateCompany from "@/components/pages/Create-Company"
 import type { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
