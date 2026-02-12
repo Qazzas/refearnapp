@@ -20,9 +20,6 @@ export const GET = handleRoute(
     // Note: getDomainsAction already returns { rows: DomainRow[], hasNext: boolean }
     const result = await getDomainsAction(orgId, offset, domain)
 
-    return NextResponse.json({
-      ok: true,
-      data: result,
-    })
+    return NextResponse.json(result)
   }
 )
