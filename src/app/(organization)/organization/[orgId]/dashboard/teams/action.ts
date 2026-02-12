@@ -2,13 +2,12 @@
 
 import { db } from "@/db/drizzle"
 import { invitation, team } from "@/db/schema"
-import { and, eq, ilike } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 import { handleAction } from "@/lib/handleAction"
-import { ActionResult, MutationData } from "@/lib/types/organization/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { sendVerificationEmail } from "@/lib/verificationEmail"
-import { TeamRow } from "@/lib/types/internal/teamsRow"
 import { AppError } from "@/lib/exceptions"
 
 export const inviteTeamMember = async ({
@@ -91,46 +90,6 @@ export const inviteTeamMember = async ({
     return {
       ok: true,
       toast: "Invitation sent successfully.",
-    }
-  })
-}
-export async function getTeams(
-  orgId: string,
-  offset?: number,
-  email?: string
-): Promise<
-  ActionResult<{
-    rows: TeamRow[]
-    hasNext: boolean
-  }>
-> {
-  return handleAction("getTeams", async () => {
-    await getOrgAuth(orgId)
-    const PAGE_SIZE = 10
-    const whereClauses = [eq(team.organizationId, orgId)]
-
-    if (email) {
-      whereClauses.push(ilike(team.email, `%${email}%`))
-    }
-
-    const rows = await db
-      .select({
-        id: team.id,
-        email: team.email,
-        isActive: team.isActive,
-      })
-      .from(team)
-      .where(and(...whereClauses))
-      .limit(PAGE_SIZE + 1)
-      .offset(((offset ?? 1) - 1) * PAGE_SIZE)
-      .orderBy(team.createdAt)
-
-    return {
-      ok: true,
-      data: {
-        rows: rows.slice(0, PAGE_SIZE),
-        hasNext: rows.length > PAGE_SIZE,
-      },
     }
   })
 }

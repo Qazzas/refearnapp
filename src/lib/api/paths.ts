@@ -42,7 +42,7 @@ export const GET_AFFILIATE_PAYMENT_METHOD_PATH = (orgId: string) =>
 // =============================================================================
 // 🏢 ORGANIZATION (OWNER) DASHBOARD PATHS
 // =============================================================================
-
+export const GET_ORG = (orgId: string) => `/api/organization/${orgId}/org`
 export const GET_ORG_AFFILIATES_STATS_PATH = (
   orgId: string,
   query: {

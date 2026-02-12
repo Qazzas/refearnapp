@@ -4,20 +4,14 @@ import React from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, Trash2 } from "lucide-react"
-import Image from "next/image"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import {
-  deleteOrgPaddleAccount,
-  getOrgWebhookKey,
-} from "@/app/(organization)/organization/[orgId]/dashboard/integration/action"
-import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
+import { useQueryClient } from "@tanstack/react-query"
+import { deleteOrgPaddleAccount } from "@/app/(organization)/organization/[orgId]/dashboard/integration/action"
 import { AppResponse, useAppMutation } from "@/hooks/useAppMutation"
-import {
-  deleteTeamOrgPaddleAccount,
-  getTeamOrgWebhookKey,
-} from "@/app/(organization)/organization/[orgId]/teams/dashboard/integration/action"
+import { deleteTeamOrgPaddleAccount } from "@/app/(organization)/organization/[orgId]/teams/dashboard/integration/action"
 import PaddleImageButton from "@/components/ui-custom/PaddleImageButton"
 import { usePaddleImage } from "@/provider/PaddleImageProvider"
+import { useAppQuery } from "@/hooks/useAppQuery"
+import { api } from "@/lib/apiClient"
 
 interface DisconnectProps {
   orgId: string
@@ -25,16 +19,19 @@ interface DisconnectProps {
 }
 
 const Disconnect = ({ orgId, isTeam = false }: DisconnectProps) => {
-  const { showCustomToast } = useCustomToast()
   const queryClient = useQueryClient()
   const deleteFn = isTeam ? deleteTeamOrgPaddleAccount : deleteOrgPaddleAccount
-  const getFn = isTeam ? getTeamOrgWebhookKey : getOrgWebhookKey
   const { openImage } = usePaddleImage()
   // Fetch webhook key
-  const { data, isPending } = useQuery({
-    queryKey: ["paddle-webhook-key", orgId],
-    queryFn: async () => await getFn(orgId),
-  })
+  const { data, isPending } = useAppQuery(
+    ["paddle-webhook-key", orgId, isTeam],
+    (id) =>
+      isTeam
+        ? api.organization.teams.dashboard.integration.webhookKey([id])
+        : api.organization.dashboard.integration.webhookKey([id]),
+    [orgId] as const,
+    { enabled: !!orgId }
+  )
 
   const savedKey = data?.webhookPublicKey ?? ""
 

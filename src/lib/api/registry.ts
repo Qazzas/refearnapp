@@ -1,5 +1,5 @@
 import { ActionResult } from "@/lib/types/organization/response"
-import { WebsiteDomain } from "@/lib/types/internal/database"
+import { Organization, WebsiteDomain } from "@/lib/types/internal/database"
 import {
   AffiliateKpiStats,
   OrganizationKpiStats,
@@ -26,6 +26,7 @@ import {
   GET_AFFILIATE_PAYMENT_METHOD_PATH,
   GET_AFFILIATE_REFERRERS_PATH,
   GET_AFFILIATE_TIME_SERIES_PATH,
+  GET_ORG,
   GET_ORG_AFFILIATES_STATS_PATH,
   GET_ORG_CURRENCY_PATH,
   GET_ORG_CUSTOMIZATION_ALL_PATH,
@@ -90,6 +91,10 @@ export const API_CONFIG = {
     },
   },
   organization: {
+    org: {
+      path: GET_ORG,
+      response: {} as ActionResult<Organization>,
+    },
     domain: {
       active: {
         path: GET_ACTIVE_DOMAIN_PATH,

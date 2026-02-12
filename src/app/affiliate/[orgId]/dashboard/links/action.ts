@@ -27,21 +27,3 @@ export const createAffiliateLink = async (
     return { ok: true, toast: `Affiliate link created: ${fullUrl}` }
   })
 }
-
-export const getAffiliateLinksWithStats = async (
-  orgId: string,
-  year?: number,
-  month?: number
-): Promise<ActionResult<AffiliateLinkWithStats[]>> => {
-  return handleAction("getAffiliateLinksWithStats", async () => {
-    const decoded = await getAffiliateOrganization(orgId)
-    const currency = await getOrgCurrencyAffiliate(orgId)
-    const rate = await ExchangeRate(currency)
-    const rows = await getAffiliateLinksWithStatsAction(decoded, year, month)
-    const AffiliateLinkStats = rows.map((item) => ({
-      ...item,
-      commission: item.commission * rate,
-    }))
-    return { ok: true, data: AffiliateLinkStats }
-  })
-}

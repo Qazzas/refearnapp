@@ -17,7 +17,6 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import {
-  getTeams,
   inviteTeamMember,
   toggleTeamStatus,
   deleteTeamMember,
@@ -32,6 +31,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { PlanInfo } from "@/lib/types/organization/planInfo"
 import { useRouter } from "next/navigation"
 import { handlePlanRedirect } from "@/util/HandlePlanRedirect"
+import { api } from "@/lib/apiClient"
 
 const inviteSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -75,11 +75,10 @@ export default function Teams({
     isPending: searchPending,
   } = useAppQuery(
     ["org-teams", orgId, filters.offset, filters.email],
-    getTeams,
-    [orgId, filters.offset, filters.email],
+    (id, query) => api.organization.dashboard.teams([id, query]),
+    [orgId, { offset: filters.offset, email: filters.email }] as const,
     { enabled: !!orgId }
   )
-
   // Invite mutation
   const inviteMutation = useAppMutation(inviteTeamMember, {
     onSuccess: (res) => {

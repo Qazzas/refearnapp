@@ -1,10 +1,7 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { getAffiliatePaymentMethod } from "@/app/affiliate/[orgId]/dashboard/profile/action"
-import { ActionResult } from "@/lib/types/organization/response"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
 import { cn } from "@/lib/utils"
 import { DashboardCardCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardCardCustomizationOptions"
@@ -17,6 +14,8 @@ import {
 import { useAtomValue } from "jotai"
 import { DashboardButtonCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardButtonCustomizationOptions"
 import { useAffiliatePath } from "@/hooks/useUrl"
+import { useAppQuery } from "@/hooks/useAppQuery"
+import { api } from "@/lib/apiClient"
 type MissingPaypalEmailCardProps = {
   orgId: string
   affiliate: boolean
@@ -35,14 +34,17 @@ export function MissingPaypalEmailCard({
     useAtomValue(dashboardThemeCustomizationAtom)
   const { dashboardButtonTextColor, dashboardButtonBackgroundColor } =
     useAtomValue(dashboardButtonCustomizationAtom)
-  const { data, isLoading } = useQuery<ActionResult<AffiliatePaymentMethod>>({
-    queryKey: ["affiliatePaymentMethod", orgId],
-    queryFn: () => getAffiliatePaymentMethod(orgId), // pass orgId here
-    enabled: !!(!isPreview && affiliate && orgId),
-  })
+  const { data, isPending: isLoading } = useAppQuery(
+    ["affiliatePaymentMethod", orgId],
+    (id) => api.affiliate.dashboard.profile.paymentMethod([id]),
+    [orgId] as const,
+    {
+      enabled: !!(!isPreview && affiliate && orgId),
+    }
+  )
 
   if (isLoading) return null
-  if (!isPreview && (!data?.ok || data.data?.paypalEmail)) return null
+  if (!isPreview && (!data || data.paypalEmail)) return null
 
   const handleAddPayPal = () => {
     if (isPreview && typeof onOpenProfile === "function") {

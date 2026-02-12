@@ -1,9 +1,7 @@
 "use server"
 import { handleAction } from "@/lib/handleAction"
 import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
-import { ActionResult, MutationData } from "@/lib/types/organization/response"
-import { DomainRow } from "@/lib/types/organization/domainRow"
-import { getDomainsAction } from "@/lib/server/internal/getDomainsAction"
+import { MutationData } from "@/lib/types/organization/response"
 import { CreateDomainType } from "@/lib/types/internal/createDomainType"
 import { createDomainsAction } from "@/lib/server/internal/createDomainsAction"
 import { toggleDomainActiveAction } from "@/lib/server/internal/toggleDomainActiveAction"
@@ -11,21 +9,6 @@ import { makeDomainPrimaryAction } from "@/lib/server/internal/makeDomainPrimary
 import { toggleDomainRedirectAction } from "@/lib/server/internal/toggleDomainRedirectAction"
 import { deleteDomainAction } from "@/lib/server/organization/deleteDomainAction"
 import { verifyDomainDnsAction } from "@/lib/server/internal/verifyDomainDnsAction"
-export async function getDomains(
-  orgId: string,
-  offset?: number,
-  domain?: string
-): Promise<
-  ActionResult<{
-    rows: DomainRow[]
-    hasNext: boolean
-  }>
-> {
-  return handleAction("getDomains", async () => {
-    await getOrgAuth(orgId)
-    return getDomainsAction(orgId, offset, domain)
-  })
-}
 export async function createDomains({
   orgId,
   domain,

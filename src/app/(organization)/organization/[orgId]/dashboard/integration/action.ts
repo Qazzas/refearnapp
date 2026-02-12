@@ -7,7 +7,6 @@ import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrgPaddleWebhookKey } from "@/lib/organizationAction/saveOrgPaddleWebhookKey"
-import { getWebhookKey } from "@/lib/organizationAction/getWebhookKey"
 
 export async function savePaddleWebhookKey({
   orgId,
@@ -25,21 +24,6 @@ export async function savePaddleWebhookKey({
       ok: true,
       toast: "✅ Paddle webhook key saved successfully",
     }
-  })
-}
-export async function getOrgWebhookKey(
-  orgId: string
-): Promise<{ webhookPublicKey: string | null }> {
-  return handleAction("getOrgWebhookKey", async () => {
-    await getOrgAuth(orgId)
-
-    const existing = await getWebhookKey(orgId)
-
-    if (existing.length === 0) {
-      return { ok: true, webhookPublicKey: null } as any
-    }
-
-    return { ok: true, webhookPublicKey: existing[0].webhookPublicKey } as any
   })
 }
 export async function deleteOrgPaddleAccount(

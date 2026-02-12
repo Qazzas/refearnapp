@@ -10,10 +10,7 @@ import {
 } from "@tanstack/react-table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {
-  createAffiliateLink,
-  getAffiliateLinksWithStats,
-} from "@/app/affiliate/[orgId]/dashboard/links/action"
+import { createAffiliateLink } from "@/app/affiliate/[orgId]/dashboard/links/action"
 import { AffiliateLinkWithStats } from "@/lib/types/affiliate/affiliateLinkWithStats"
 import MonthSelect from "@/components/ui-custom/MonthSelect"
 import { DashboardThemeCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardThemeCustomizationOptions"
@@ -36,7 +33,7 @@ import { useAppMutation } from "@/hooks/useAppMutation"
 import { TableView } from "@/components/ui-custom/TableView"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
 import { useQueryClient } from "@tanstack/react-query"
-import { getOrgAction } from "@/lib/server/organization/getOrg"
+import { api } from "@/lib/apiClient"
 
 interface AffiliateLinkProps {
   orgId: string
@@ -79,8 +76,8 @@ export default function Links({
   }, [filters, isPreview])
   const { data: orgData } = useAppQuery(
     ["organization-settings", orgId],
-    getOrgAction,
-    [orgId],
+    (id) => api.organization.org([id]),
+    [orgId] as const,
     { enabled: !!orgId }
   )
   const displayCurrency = orgData?.currency || "USD"
@@ -90,8 +87,8 @@ export default function Links({
     isPending: searchPending,
   } = useAppQuery(
     ["affiliate-links", orgId, filters.year, filters.month],
-    getAffiliateLinksWithStats,
-    [orgId, filters.year, filters.month],
+    (id, year, month) => api.affiliate.dashboard.links([id, year, month]),
+    [orgId, filters.year, filters.month] as const,
     {
       enabled: !!(orgId && !isPreview),
     }

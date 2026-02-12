@@ -15,6 +15,7 @@ type AppQueryResponse<T> = {
 interface AppQueryResult<TData> {
   data: TData | undefined
   error: string | undefined
+  isError: boolean
   isPending: boolean
   refetch: () => Promise<QueryObserverResult<AppQueryResponse<TData>, Error>>
   queryResult: UseQueryResult<{ data?: TData; toast?: string }>
@@ -42,6 +43,7 @@ export function useAppQuery<Args extends unknown[], TData>(
   return {
     data: queryResult.data?.data,
     error: queryResult.data?.toast,
+    isError: queryResult.isError || !!queryResult.data?.toast,
     isPending: queryResult.isPending,
     refetch: queryResult.refetch,
     queryResult,

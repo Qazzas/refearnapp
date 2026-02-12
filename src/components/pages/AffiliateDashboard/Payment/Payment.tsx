@@ -11,7 +11,6 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import YearSelect from "@/components/ui-custom/YearSelect"
-import { getAffiliateCommissionByMonth } from "@/app/affiliate/[orgId]/dashboard/payment/action"
 import { DashboardThemeCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardThemeCustomizationOptions"
 import { DashboardCardCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardCardCustomizationOptions"
 import { TableCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/TableCustomizationOptions"
@@ -25,6 +24,7 @@ import { dashboardThemeCustomizationAtom } from "@/store/DashboardCustomizationA
 import { useAppQuery } from "@/hooks/useAppQuery"
 import { TableView } from "@/components/ui-custom/TableView"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
+import { api } from "@/lib/apiClient"
 
 interface AffiliateCommissionTableProps {
   orgId: string
@@ -63,8 +63,8 @@ export default function AffiliateCommissionTable({
     isPending,
   } = useAppQuery(
     ["affiliate-commissions", orgId, filters.year],
-    getAffiliateCommissionByMonth,
-    [orgId, filters.year],
+    (id, year) => api.affiliate.dashboard.payment([id, year]),
+    [orgId, filters.year] as const,
     {
       enabled: !!(orgId && !isPreview),
     }

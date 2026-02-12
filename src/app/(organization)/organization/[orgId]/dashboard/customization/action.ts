@@ -35,34 +35,3 @@ export async function saveCustomizationsAction(
     return { ok: true, toast: "Customization Saved Successfully" }
   })
 }
-export async function getAuthCustomization(
-  orgId: string
-): Promise<AuthCustomization> {
-  const [authRow] = await db
-    .select({ auth: organizationAuthCustomization.auth })
-    .from(organizationAuthCustomization)
-    .where(eq(organizationAuthCustomization.id, orgId))
-
-  return authRow?.auth as AuthCustomization
-}
-
-export async function getDashboardCustomization(
-  orgId: string
-): Promise<DashboardCustomization> {
-  const [dashboardRow] = await db
-    .select({ dashboard: organizationDashboardCustomization.dashboard })
-    .from(organizationDashboardCustomization)
-    .where(eq(organizationDashboardCustomization.id, orgId))
-
-  return dashboardRow?.dashboard as DashboardCustomization
-}
-export async function getCustomizations(
-  orgId: string
-): Promise<{ auth: AuthCustomization; dashboard: DashboardCustomization }> {
-  const [auth, dashboard] = await Promise.all([
-    getAuthCustomization(orgId),
-    getDashboardCustomization(orgId),
-  ])
-
-  return { auth, dashboard }
-}

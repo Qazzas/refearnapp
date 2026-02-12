@@ -4,24 +4,19 @@ import React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { useQuery } from "@tanstack/react-query"
 import { Loader2, CopyIcon, KeyRound } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { InputField } from "@/components/Auth/FormFields"
 import { Form } from "@/components/ui/form"
-import {
-  getOrgWebhookKey,
-  savePaddleWebhookKey,
-} from "@/app/(organization)/organization/[orgId]/dashboard/integration/action"
+import { savePaddleWebhookKey } from "@/app/(organization)/organization/[orgId]/dashboard/integration/action"
 import { useAppMutation } from "@/hooks/useAppMutation"
-import {
-  getTeamOrgWebhookKey,
-  saveTeamPaddleWebhookKey,
-} from "@/app/(organization)/organization/[orgId]/teams/dashboard/integration/action"
+import { saveTeamPaddleWebhookKey } from "@/app/(organization)/organization/[orgId]/teams/dashboard/integration/action"
 import { usePaddleImage } from "@/provider/PaddleImageProvider"
 import PaddleImageButton from "@/components/ui-custom/PaddleImageButton"
+import { useAppQuery } from "@/hooks/useAppQuery"
+import { api } from "@/lib/apiClient"
 
 const webhookSchema = z.object({
   webhookKey: z.string().min(1, "Webhook key cannot be empty"),
@@ -49,7 +44,6 @@ export default function Connect({
     defaultValues: { webhookKey: "" },
   })
   const saveFn = isTeam ? saveTeamPaddleWebhookKey : savePaddleWebhookKey
-  const getFn = isTeam ? getTeamOrgWebhookKey : getOrgWebhookKey
   const { openImage } = usePaddleImage()
   const mutation = useAppMutation(
     async (key: string) => {
@@ -66,10 +60,15 @@ export default function Connect({
   const onSubmit = (data: WebhookSchema) => {
     mutation.mutate(data.webhookKey)
   }
-  const { data, isPending } = useQuery({
-    queryKey: ["paddle-webhook-key", orgId],
-    queryFn: async () => await getFn(orgId),
-  })
+  const { data, isPending } = useAppQuery(
+    ["paddle-webhook-key", orgId, isTeam],
+    (id) =>
+      isTeam
+        ? api.organization.teams.dashboard.integration.webhookKey([id])
+        : api.organization.dashboard.integration.webhookKey([id]),
+    [orgId] as const,
+    { enabled: !!orgId }
+  )
 
   const savedKey = data?.webhookPublicKey ?? ""
 

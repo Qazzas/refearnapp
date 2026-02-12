@@ -1,30 +1,15 @@
 // app/actions/auth/getUser.ts
 "use server"
-import { ActionResult } from "@/lib/types/organization/response"
 import { revalidatePath } from "next/cache"
 import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
 import { updateAffiliatePasswordAction } from "@/lib/server/affiliate/updateAffiliatePassword"
 import { validateAffiliatePasswordAction } from "@/lib/server/affiliate/validateAffiliatePassword"
 import { updateAffiliateProfileAction } from "@/lib/server/affiliate/updateAffiliateProfile"
-import { getPayoutEmailMethod } from "@/lib/server/organization/getPayoutEmailMethod"
 import { getAffiliateAuthCapabilities } from "@/lib/server/affiliate/getAffiliateAuthCapabilities"
 import { getBaseUrl } from "@/lib/server/affiliate/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { handleAction } from "@/lib/handleAction"
 import { AppError } from "@/lib/exceptions"
-
-export const getAffiliatePaymentMethod = async (
-  orgId: string
-): Promise<ActionResult<AffiliatePaymentMethod>> => {
-  return handleAction("getAffiliatePaymentMethod", async () => {
-    const decoded = await getAffiliateOrganization(orgId)
-    const paypalMethod = await getPayoutEmailMethod(decoded)
-    return {
-      ok: true,
-      data: { paypalEmail: paypalMethod?.accountIdentifier ?? null },
-    }
-  })
-}
 export async function updateAffiliateProfile(
   orgId: string,
   data: {

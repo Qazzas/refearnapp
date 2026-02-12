@@ -1,10 +1,7 @@
-"use server"
 import { db } from "@/db/drizzle"
 import { organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { Organization } from "@/lib/types/organization/orgAuth"
-import { handleAction } from "@/lib/handleAction"
-import { ActionResult } from "@/lib/types/organization/response"
 import { AppError } from "@/lib/exceptions"
 
 export const getOrg = async (orgId: string): Promise<Organization> => {
@@ -21,12 +18,4 @@ export const getOrg = async (orgId: string): Promise<Organization> => {
   }
 
   return org
-}
-export const getOrgAction = async (
-  orgId: string
-): Promise<ActionResult<Organization>> => {
-  return handleAction("getAffiliateLinksWithStats", async () => {
-    const rows = await getOrg(orgId)
-    return { ok: true, data: rows }
-  })
 }

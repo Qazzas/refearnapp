@@ -1,4 +1,5 @@
 import { InferSelectModel } from "drizzle-orm"
-import { websiteDomain } from "@/db/schema"
+import { organization, websiteDomain } from "@/db/schema"
 
 export type WebsiteDomain = InferSelectModel<typeof websiteDomain>
+export type Organization = InferSelectModel<typeof organization>

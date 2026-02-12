@@ -1,8 +1,6 @@
 "use server"
 import { handleAction } from "@/lib/handleAction"
-import { ActionResult, MutationData } from "@/lib/types/organization/response"
-import { DomainRow } from "@/lib/types/organization/domainRow"
-import { getDomainsAction } from "@/lib/server/internal/getDomainsAction"
+import { MutationData } from "@/lib/types/organization/response"
 import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 import { CreateDomainType } from "@/lib/types/internal/createDomainType"
 import { createDomainsAction } from "@/lib/server/internal/createDomainsAction"
@@ -11,21 +9,6 @@ import { makeDomainPrimaryAction } from "@/lib/server/internal/makeDomainPrimary
 import { toggleDomainRedirectAction } from "@/lib/server/internal/toggleDomainRedirectAction"
 import { deleteDomainAction } from "@/lib/server/organization/deleteDomainAction"
 import { verifyDomainDnsAction } from "@/lib/server/internal/verifyDomainDnsAction"
-export async function getTeamDomains(
-  orgId: string,
-  offset?: number,
-  domain?: string
-): Promise<
-  ActionResult<{
-    rows: DomainRow[]
-    hasNext: boolean
-  }>
-> {
-  return handleAction("getTeamDomains", async () => {
-    await getTeamAuthAction(orgId)
-    return getDomainsAction(orgId, offset, domain)
-  })
-}
 export async function createTeamDomains({
   orgId,
   domain,

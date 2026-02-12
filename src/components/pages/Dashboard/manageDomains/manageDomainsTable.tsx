@@ -17,7 +17,6 @@ import { TableView } from "@/components/ui-custom/TableView"
 import {
   createDomains,
   deleteDomain,
-  getDomains,
   makeDomainPrimary,
   toggleDomainActive,
   toggleDomainRedirect,
@@ -29,7 +28,6 @@ import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import {
   createTeamDomains,
   deleteTeamDomain,
-  getTeamDomains,
   makeTeamDomainPrimary,
   toggleTeamDomainActive,
   toggleTeamDomainRedirect,
@@ -50,6 +48,7 @@ import {
   useDomainActionMeta,
 } from "@/hooks/useDomainActionDialog"
 import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
+import { api } from "@/lib/apiClient"
 interface AffiliatesTableManageDomainsProps {
   orgId: string
   affiliate: boolean
@@ -82,7 +81,6 @@ export function ManageDomainsTable({
   const { filters, setFilters } = useQueryFilter({
     emailKey: "domain",
   })
-  const getManageDomains = isTeam ? getTeamDomains : getDomains
   const createManageDomains = isTeam ? createTeamDomains : createDomains
   const toggleManageDomainActive = isTeam
     ? toggleTeamDomainActive
@@ -98,8 +96,11 @@ export function ManageDomainsTable({
   const queryClient = useQueryClient()
   const { data, error, isPending } = useAppQuery(
     ["org-domains", orgId, filters.offset, filters.email],
-    getManageDomains,
-    [orgId, filters.offset, filters.email],
+    (id, query) =>
+      isTeam
+        ? api.organization.teams.dashboard.manageDomains([id, query])
+        : api.organization.dashboard.manageDomains([id, query]),
+    [orgId, { offset: filters.offset, domain: filters.email }] as const,
     { enabled: !!orgId }
   )
   const toggleActiveMutation = useAppMutation(toggleManageDomainActive, {

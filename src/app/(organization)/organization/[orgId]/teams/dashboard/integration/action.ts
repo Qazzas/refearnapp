@@ -6,7 +6,6 @@ import { eq } from "drizzle-orm"
 import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrgPaddleWebhookKey } from "@/lib/organizationAction/saveOrgPaddleWebhookKey"
-import { getWebhookKey } from "@/lib/organizationAction/getWebhookKey"
 import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 
 export async function saveTeamPaddleWebhookKey({
@@ -24,21 +23,6 @@ export async function saveTeamPaddleWebhookKey({
       ok: true,
       toast: "✅ Paddle webhook key saved successfully",
     }
-  })
-}
-export async function getTeamOrgWebhookKey(
-  orgId: string
-): Promise<{ webhookPublicKey: string | null }> {
-  return handleAction("getOrgWebhookKey", async () => {
-    await getTeamAuthAction(orgId)
-
-    const existing = await getWebhookKey(orgId)
-
-    if (existing.length === 0) {
-      return { ok: true, webhookPublicKey: null } as any
-    }
-
-    return { ok: true, webhookPublicKey: existing[0].webhookPublicKey } as any
   })
 }
 export async function deleteTeamOrgPaddleAccount(

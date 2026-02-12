@@ -1,12 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
-import { useQuery } from "@tanstack/react-query"
-import {
-  getAuthCustomization,
-  getDashboardCustomization,
-  getCustomizations,
-} from "@/app/(organization)/organization/[orgId]/dashboard/customization/action"
+import { useEffect, useMemo } from "react"
 import { useSetAtom } from "jotai"
 import {
   cardCustomizationAtom,
@@ -56,6 +50,9 @@ import {
 } from "@/store/DashboardChangesAtom"
 import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
+import { api } from "@/lib/apiClient"
+import { useAppQuery } from "@/hooks/useAppQuery"
+import { ActionResult } from "@/lib/types/organization/response"
 
 type CustomizationType = "auth" | "dashboard" | "both"
 
@@ -119,22 +116,44 @@ export function useCustomizationSync(
     initialLogoutButtonCustomizationAtom
   )
 
-  const query = useQuery({
-    queryKey: ["customizations", type, orgId],
-    queryFn: async () => {
-      if (!orgId) return { auth: {}, dashboard: {} }
+  const apiCall = useMemo(() => {
+    if (!orgId) return null
+    // We navigate the proxy based on the type
+    if (type === "auth")
+      return () => api.organization.dashboard.customization.auth([orgId])
+    if (type === "dashboard")
+      return () => api.organization.dashboard.customization.dashboard([orgId])
+
+    return () => api.organization.dashboard.customization.all([orgId])
+  }, [type, orgId])
+  type SyncResult = {
+    auth: Partial<AuthCustomization> | null
+    dashboard: Partial<DashboardCustomization> | null
+  }
+
+  const query = useAppQuery(
+    ["customizations", type, orgId],
+    async (): Promise<ActionResult<SyncResult>> => {
+      if (!apiCall) return { ok: true, data: { auth: null, dashboard: null } }
+
+      const res = await apiCall()
       if (type === "auth") {
-        const auth = await getAuthCustomization(orgId)
-        return { auth, dashboard: {} }
+        return {
+          ok: true,
+          data: { auth: res.data as AuthCustomization, dashboard: null },
+        }
       }
       if (type === "dashboard") {
-        const dashboard = await getDashboardCustomization(orgId)
-        return { auth: {}, dashboard }
+        return {
+          ok: true,
+          data: { auth: null, dashboard: res.data as DashboardCustomization },
+        }
       }
-      return await getCustomizations(orgId)
+      return res as ActionResult<SyncResult>
     },
-    enabled: !!orgId,
-  })
+    [] as const,
+    { enabled: !!orgId }
+  )
 
   useEffect(() => {
     if (!query.data) return

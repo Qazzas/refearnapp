@@ -10,15 +10,14 @@ import {
 } from "@tanstack/react-table"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import MonthSelect from "@/components/ui-custom/MonthSelect"
-import { getAffiliatesWithStats } from "@/app/(organization)/organization/[orgId]/dashboard/affiliates/action"
 import { TableTop } from "@/components/ui-custom/TableTop"
 import { AffiliatesColumns } from "@/components/pages/Dashboard/Affiliates/AffiliatesColumns"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
 import PaginationControls from "@/components/ui-custom/PaginationControls"
 import { useAppQuery } from "@/hooks/useAppQuery"
 import { TableView } from "@/components/ui-custom/TableView"
-import { getTeamAffiliatesWithStats } from "@/app/(organization)/organization/[orgId]/teams/dashboard/affiliates/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
+import { api } from "@/lib/apiClient"
 
 interface AffiliatesTableProps {
   orgId: string
@@ -46,7 +45,6 @@ export default function AffiliatesTable({
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const { filters, setFilters } = useQueryFilter()
-  const fetchFn = isTeam ? getTeamAffiliatesWithStats : getAffiliatesWithStats
   const {
     data: searchData,
     error: searchError,
@@ -62,16 +60,22 @@ export default function AffiliatesTable({
       filters.offset,
       filters.email,
     ],
-    fetchFn,
+    // The fetch function logic switches based on isTeam
+    (id, query) =>
+      isTeam
+        ? api.organization.teams.dashboard.affiliates([id, query])
+        : api.organization.dashboard.affiliates([id, query]),
     [
       orgId,
-      filters.year,
-      filters.month,
-      filters.orderBy === "none" ? undefined : filters.orderBy,
-      filters.orderDir,
-      filters.offset,
-      filters.email,
-    ],
+      {
+        year: filters.year,
+        month: filters.month,
+        orderBy: filters.orderBy === "none" ? undefined : filters.orderBy,
+        orderDir: filters.orderDir,
+        offset: filters.offset,
+        email: filters.email,
+      },
+    ] as const,
     {
       enabled: !!(!affiliate && orgId),
     }

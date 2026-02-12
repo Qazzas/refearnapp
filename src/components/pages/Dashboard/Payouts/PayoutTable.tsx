@@ -16,9 +16,6 @@ import {
   createAffiliatePayouts,
   createExportAffiliatePayouts,
   createExportAffiliatePayoutsBulk,
-  getAffiliatePayouts,
-  getAffiliatePayoutsBulk,
-  getUnpaidMonths,
 } from "@/app/(organization)/organization/[orgId]/dashboard/payout/action"
 import { useEffect, useState } from "react"
 import MonthSelect from "@/components/ui-custom/MonthSelect"
@@ -38,9 +35,6 @@ import {
   createTeamAffiliatePayouts,
   createTeamExportAffiliatePayouts,
   createTeamExportAffiliatePayoutsBulk,
-  getTeamAffiliatePayouts,
-  getTeamAffiliatePayoutsBulk,
-  getTeamUnpaidMonths,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/payout/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { useAppMutation } from "@/hooks/useAppMutation"
@@ -50,6 +44,7 @@ import { ActionResult } from "@/lib/types/organization/response"
 import { useCachedValidation } from "@/hooks/useCachedValidation"
 import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
+import { api } from "@/lib/apiClient"
 
 interface AffiliatesTablePayoutProps {
   orgId: string
@@ -73,11 +68,6 @@ export default function PayoutTable({
   const [unpaidOpen, setUnpaidOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const { showCustomToast } = useCustomToast()
-  const fetchPayouts = isTeam ? getTeamAffiliatePayouts : getAffiliatePayouts
-  const fetchPayoutsBulk = isTeam
-    ? getTeamAffiliatePayoutsBulk
-    : getAffiliatePayoutsBulk
-  const fetchUnpaidMonths = isTeam ? getTeamUnpaidMonths : getUnpaidMonths
   const createPayouts = isTeam
     ? createTeamAffiliatePayouts
     : createAffiliatePayouts
@@ -121,16 +111,24 @@ export default function PayoutTable({
       filters.offset,
       filters.email,
     ],
-    fetchPayoutsBulk,
+    (id, query) =>
+      isTeam
+        ? api.organization.teams.dashboard.payout.affiliateBulkPayout([
+            id,
+            query,
+          ])
+        : api.organization.dashboard.payout.affiliateBulkPayout([id, query]),
     [
-      "TABLE",
       orgId,
-      selectedMonths,
-      filters.orderBy,
-      filters.orderDir,
-      filters.offset,
-      filters.email,
-    ],
+      {
+        mode: "TABLE",
+        months: selectedMonths,
+        orderBy: filters.orderBy,
+        orderDir: filters.orderDir,
+        offset: filters.offset,
+        email: filters.email,
+      },
+    ] as const,
     {
       enabled: !!(
         !affiliate &&
@@ -306,28 +304,37 @@ export default function PayoutTable({
       filters.offset,
       filters.email,
     ],
-    fetchPayouts,
+    (id, query) =>
+      isTeam
+        ? api.organization.teams.dashboard.payout.affiliatePayout([id, query])
+        : api.organization.dashboard.payout.affiliatePayout([id, query]),
     [
-      "TABLE",
       orgId,
-      filters.year,
-      filters.month,
-      filters.orderBy,
-      filters.orderDir,
-      filters.offset,
-      filters.email,
-    ],
-    {
-      enabled: !!(!affiliate && orgId) && !isUnpaidMode,
-    }
+      {
+        mode: "TABLE",
+        year: filters.year,
+        month: filters.month,
+        orderBy: filters.orderBy,
+        orderDir: filters.orderDir,
+        offset: filters.offset,
+        email: filters.email,
+      },
+    ] as const,
+    { enabled: !!(!affiliate && orgId) && !isUnpaidMode }
   )
   const {
     data: unpaidMonthData,
     error: pendingMonthError,
     isPending: pendingMonth,
-  } = useAppQuery(["unpaid-months", orgId], fetchUnpaidMonths, [orgId], {
-    enabled: !affiliate && unpaidOpen,
-  })
+  } = useAppQuery(
+    ["unpaid-months", orgId],
+    (id) =>
+      isTeam
+        ? api.organization.teams.dashboard.payout.unpaidMonths([id])
+        : api.organization.dashboard.payout.unpaidMonths([id]),
+    [orgId] as const,
+    { enabled: !affiliate && unpaidOpen }
+  )
   const applyUnpaidMonths = () => {
     if (selectedMonths.length > 0) {
       setIsUnpaidMode(true)
