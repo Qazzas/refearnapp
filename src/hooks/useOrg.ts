@@ -1,23 +1,22 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useAppQuery } from "@/hooks/useAppQuery"
+import { api } from "@/lib/apiClient"
 import { Organization } from "@/lib/types/organization/orgAuth"
-import { getOrg } from "@/lib/server/organization/getOrg"
 
 export function useOrg(orgId?: string, affiliate?: boolean) {
-  const {
-    data: org,
-    isLoading,
+  const { data, isPending, isError, error, refetch } = useAppQuery(
+    ["org", orgId],
+    (id) => api.organization.org([id]),
+    [orgId!] as const,
+    { enabled: !!affiliate && !!orgId }
+  )
+
+  return {
+    org: data as Organization | undefined,
+    isLoading: isPending,
     isError,
     error,
-  } = useQuery<Organization>({
-    queryKey: ["org", orgId],
-    queryFn: () => {
-      if (!orgId) throw new Error("No orgId provided")
-      return getOrg(orgId)
-    },
-    enabled: !!affiliate && !!orgId,
-  })
-
-  return { org, isLoading, isError, error }
+    refetch,
+  }
 }
