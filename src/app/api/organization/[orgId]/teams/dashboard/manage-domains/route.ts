@@ -20,9 +20,6 @@ export const GET = handleRoute(
     // 3. Fetch Data using the shared internal utility
     const result = await getDomainsAction(orgId, offset, domain)
 
-    return NextResponse.json({
-      ok: true,
-      data: result,
-    })
+    return NextResponse.json(result)
   }
 )
