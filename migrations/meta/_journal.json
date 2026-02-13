@@ -15,6 +15,13 @@
       "when": 1770996236679,
       "tag": "0001_fantastic_serpent_society",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770996392646,
+      "tag": "0002_numerous_ben_urich",
+      "breakpoints": true
     }
   ]
 }
