@@ -1,1 +1,0 @@
-ALTER TABLE "promotion_codes" ALTER COLUMN "provider" SET DATA TYPE "public"."payment_provider" USING "provider"::text::"public"."payment_provider";
