@@ -1,5 +1,5 @@
 {
-  "id": "5813b6d5-ea0d-426c-9493-a32aff327db1",
+  "id": "ae92cc4e-7812-483e-a6d3-5d0033e997eb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -2877,14 +2877,6 @@
       "values": [
         "FEEDBACK",
         "SUPPORT"
-      ]
-    },
-    "public.value_type": {
-      "name": "value_type",
-      "schema": "public",
-      "values": [
-        "PERCENTAGE",
-        "FLAT_FEE"
       ]
     }
   },
