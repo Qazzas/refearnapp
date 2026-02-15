@@ -13,7 +13,7 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: "RefearnApp | Coupons Page",
-    description: "Affiliates Page",
+    description: "Coupons Page",
     url: `https://refearnapp.com/organization/${orgId}/dashboard/coupons`,
     indexable: false,
   })
