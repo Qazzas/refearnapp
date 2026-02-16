@@ -607,7 +607,7 @@ export const referrals = pgTable("referrals", {
   promotionCodeId: uuid("promotion_code_id").references(
     () => promotionCodes.id
   ),
-  affiliateLinkId: uuid("referral_link_id").references(() => affiliateLink.id),
+  affiliateLinkId: text("referral_link_id").references(() => affiliateLink.id),
   signedAt: timestamp("signed_at").defaultNow().notNull(),
   convertedAt: timestamp("converted_at"),
   totalRevenue: numeric("total_revenue", { precision: 15, scale: 2 }).default(

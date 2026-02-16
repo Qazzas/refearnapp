@@ -1,5 +1,5 @@
 {
-  "id": "0fe9592d-50fd-414a-97dd-5f6168a2f2f6",
+  "id": "b9d04361-d476-4654-903c-6df9b0b2e7f8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -2154,7 +2154,7 @@
         },
         "referral_link_id": {
           "name": "referral_link_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
