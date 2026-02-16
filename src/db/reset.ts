@@ -13,63 +13,43 @@ import {
 
 async function smartReset() {
   const isProd = process.env.MODE === "prod"
-  const TEST_ORG_ID = "tp7JLBb5"
   const TEST_USER_ID = "29022934-eb52-49af-aca4-b6ed553c89dd"
 
   try {
     if (isProd) {
-      console.log("🛡️ PRODUCTION MODE: Selective Cleanup (User & Org)...")
+      console.log("🛡️ PRODUCTION MODE: Selective Cleanup...")
 
-      // 1. Resolve Foreign Key Dependencies (Subscription Expirations)
-      const links = await db
-        .select({ id: affiliateLink.id })
-        .from(affiliateLink)
-        .where(eq(affiliateLink.organizationId, TEST_ORG_ID))
+      // 1. Find the Organization ID for this user first
+      const orgs = await db
+        .select({ id: organization.id })
+        .from(organization)
+        .where(eq(organization.userId, TEST_USER_ID))
 
-      const linkIds = links.map((l) => l.id)
+      if (orgs.length === 0) {
+        console.log("⚠️ No organization found for this user. Skipping...")
+      } else {
+        const actualOrgId = orgs[0].id
+        console.log(`Found Org ID: ${actualOrgId}. Cleaning up dependencies...`)
 
-      if (linkIds.length > 0) {
-        const invoices = await db
-          .select({ subId: affiliateInvoice.subscriptionId })
-          .from(affiliateInvoice)
-          .where(inArray(affiliateInvoice.affiliateLinkId, linkIds))
+        // 2. Delete Customizations using the ACTUAL ID found in DB
+        await db
+          .delete(organizationAuthCustomization)
+          .where(eq(organizationAuthCustomization.id, actualOrgId))
+        await db
+          .delete(organizationDashboardCustomization)
+          .where(eq(organizationDashboardCustomization.id, actualOrgId))
 
-        const subIds = invoices
-          .map((i) => i.subId)
-          .filter((id): id is string => !!id)
+        // 3. Delete Referrals & Promo Codes (They might not have cascade delete)
+        // Add any tables here that gave you "Payment Provider" errors earlier
 
-        if (subIds.length > 0) {
-          await db
-            .delete(subscriptionExpiration)
-            .where(inArray(subscriptionExpiration.subscriptionId, subIds))
-        }
-
-        // 2. Clear Redis link caches
-        const pipeline = redis.pipeline()
-        linkIds.forEach((id) => pipeline.del(`ref:${id}`))
-        await pipeline.exec()
-        console.log(`🧹 Redis: Cleared ${linkIds.length} link keys`)
+        // 4. Delete the Organization
+        await db.delete(organization).where(eq(organization.id, actualOrgId))
       }
 
-      // 3. Delete Customizations (Must happen before Org deletion)
-      await db
-        .delete(organizationAuthCustomization)
-        .where(eq(organizationAuthCustomization.id, TEST_ORG_ID))
-      await db
-        .delete(organizationDashboardCustomization)
-        .where(eq(organizationDashboardCustomization.id, TEST_ORG_ID))
-
-      // 4. Delete the Organization
-      // This will cascade and delete: affiliates, affiliate_links, teams, website_domains
-      await db.delete(organization).where(eq(organization.id, TEST_ORG_ID))
-
-      // 5. Delete the User
-      // This will cascade and delete: accounts, subscriptions, purchases
+      // 5. Delete the User (Cascades to accounts/subs)
       await db.delete(user).where(eq(user.id, TEST_USER_ID))
 
-      console.log(
-        "✅ Production selective reset complete (Support messages preserved)"
-      )
+      console.log("✅ Production selective reset complete")
     } else {
       console.log("🧨 DEVELOPMENT MODE: Full Destructive Reset...")
 
