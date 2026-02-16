@@ -55,6 +55,5 @@ jobs:
           echo "🚀 Starting Reset and Seed sequence for ${{ github.event.inputs.target }}..."
           bun drizzle-kit migrate
           bun src/db/reset.ts
-          bun src/db/currencySeed.ts
           bun src/db/seeds/seedFun1.ts
           echo "✅ Database operation successful."
