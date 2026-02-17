@@ -4,9 +4,9 @@ import React, { useEffect, useState, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import deepEqual from "fast-deep-equal" // Import deepEqual
+import deepEqual from "fast-deep-equal"
 import { Form } from "@/components/ui/form"
-import { Button } from "@/components/ui/button" // Shadcn button
+import { Button } from "@/components/ui/button"
 import {
   Percent,
   DollarSign,
