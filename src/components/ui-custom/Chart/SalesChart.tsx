@@ -119,10 +119,15 @@ export function ChartDailyMetrics({
   const data = React.useMemo(() => {
     if (previewSimulation === "empty") return []
     const source = isPreview ? dummyChartData : (searchData ?? [])
-    return source.map((item) => ({
+    return source.map((item: any) => ({
       ...item,
       date: item.createdAt,
       visits: item.visitors,
+      signups: item.signups,
+      sales: item.sales,
+      amount: item.amount,
+      clickToSignupRate: item.clickToSignupRate,
+      signupToPaidRate: item.signupToPaidRate,
     }))
   }, [isPreview, searchData, previewSimulation])
   const {
@@ -142,17 +147,24 @@ export function ChartDailyMetrics({
   } = useAtomValue(dashboardThemeCustomizationAtom)
   const baseColors: any = {
     visits: (affiliate && chartPrimaryColor) || "#60A5FA",
+    signups: "#34D399",
     sales: (affiliate && chartSecondaryColor) || "#A78BFA",
-    conversionRate: (affiliate && chartTertiaryColor) || "#5EEAD4",
+    clickToSignupRate: (affiliate && chartTertiaryColor) || "#5EEAD4",
+    signupToPaidRate: "#F472B6",
     amount: (affiliate && chartQuaternaryColor) || "#F59E0B",
   }
   const symbol = formatCurrency(0, currency).replace(/[0.,\s]/g, "")
   const chartConfig: ChartConfig = {
     visits: { label: "Visits", color: "var(--chart-1)" },
+    signups: { label: "Signups", color: "var(--chart-5)" },
     sales: { label: "Sales", color: "var(--chart-2)" },
-    conversionRate: {
-      label: "Conversion Rate (%)",
+    clickToSignupRate: {
+      label: "Click to Signup (%)",
       color: "var(--chart-3)",
+    },
+    signupToPaidRate: {
+      label: "Signup to Paid (%)",
+      color: "var(--chart-6)",
     },
     amount: {
       label: `${affiliate ? "Commission" : "Revenue"} (${symbol})`,
@@ -388,10 +400,13 @@ export function ChartDailyMetrics({
                     />
                   ))}
                   <ChartLegend
+                    verticalAlign="bottom"
+                    height={isPreview ? 60 : 36}
                     content={
                       <ChartLegendContent
                         affiliate={affiliate}
                         isPreview={isPreview}
+                        className="flex-wrap justify-center gap-x-4 gap-y-2"
                       />
                     }
                   />

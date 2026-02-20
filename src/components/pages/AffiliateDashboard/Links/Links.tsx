@@ -93,7 +93,6 @@ export default function Links({
     if (!dummyAffiliateLinksRaw) return []
 
     return dummyAffiliateLinksRaw.map((link) => {
-      // Helper function to check date matches
       const dateMatches = (dateStr: Date) => {
         const d = new Date(dateStr)
         const matchesYear = filters.year
@@ -107,25 +106,28 @@ export default function Links({
 
       const filteredClicks = link.clicks.filter((c) => dateMatches(c.createdAt))
       const filteredSales = link.sales.filter((s) => dateMatches(s.createdAt))
-
-      // NEW: filter commissions by year/month
       const filteredCommissions = link.commissions.filter((com) =>
         dateMatches(com.createdAt)
       )
 
-      // aggregate totals
       const totalClicks = filteredClicks.reduce((sum, c) => sum + c.count, 0)
       const totalSales = filteredSales.reduce((sum, s) => sum + s.count, 0)
-
-      // NEW: aggregate total commission
       const totalCommission = filteredCommissions.reduce(
         (sum, com) => sum + com.amount,
         0
       )
 
-      const conversionRate =
+      // Simulate signups for preview purposes (assuming a slightly higher number than sales)
+      const totalSignups = Math.ceil(totalSales * 1.5)
+
+      // Calculate the two rates for the preview simulation
+      const clickToSignupRate =
         totalClicks > 0
-          ? parseFloat(((totalSales / totalClicks) * 100).toFixed(2))
+          ? parseFloat(((totalSignups / totalClicks) * 100).toFixed(2))
+          : 0
+      const signupToPaidRate =
+        totalSignups > 0
+          ? parseFloat(((totalSales / totalSignups) * 100).toFixed(2))
           : 0
 
       return {
@@ -133,8 +135,10 @@ export default function Links({
         fullUrl: link.fullUrl,
         createdAt: link.createdAt,
         clicks: totalClicks,
+        signups: totalSignups,
         sales: totalSales,
-        conversionRate,
+        clickToSignupRate,
+        signupToPaidRate,
         commission: totalCommission,
       } satisfies AffiliateLinkWithStats
     })

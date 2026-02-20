@@ -7,12 +7,16 @@ export interface AffiliateStats {
   paid: number
   unpaid: number
   links: string[]
-  conversionRate: number
+  clickToSignupRate: number
+  signupToPaidRate: number
+  signups: number
   currency: string
 }
 
-export interface AffiliatePayout
-  extends Omit<AffiliateStats, "conversionRate"> {
+export interface AffiliatePayout extends Omit<
+  AffiliateStats,
+  "clickToSignupRate" | "signupToPaidRate"
+> {
   paypalEmail?: string
 }
 export interface AffiliateBasePayout extends Omit<AffiliateStats, "currency"> {

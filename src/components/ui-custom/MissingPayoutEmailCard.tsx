@@ -16,6 +16,7 @@ import { DashboardButtonCustomizationOptions } from "@/components/ui-custom/Cust
 import { useAffiliatePath } from "@/hooks/useUrl"
 import { useAppQuery } from "@/hooks/useAppQuery"
 import { api } from "@/lib/apiClient"
+import { showMissingPaypalAtom } from "@/store/MissingPaypalAtom"
 type MissingPaypalEmailCardProps = {
   orgId: string
   affiliate: boolean
@@ -29,6 +30,7 @@ export function MissingPaypalEmailCard({
   onOpenProfile,
 }: MissingPaypalEmailCardProps) {
   const dashboardCardStyle = useDashboardCard(affiliate)
+  const showMissingPaypal = useAtomValue(showMissingPaypalAtom)
   const { goTo } = useAffiliatePath(orgId)
   const { missingPaypalHeaderColor, missingPaypalDescriptionColor } =
     useAtomValue(dashboardThemeCustomizationAtom)
@@ -39,13 +41,16 @@ export function MissingPaypalEmailCard({
     (id) => api.affiliate.dashboard.profile.paymentMethod([id]),
     [orgId] as const,
     {
-      enabled: !!(!isPreview && affiliate && orgId),
+      enabled: !isPreview && affiliate && !!orgId,
     }
   )
 
-  if (isLoading) return null
-  if (!isPreview && (!data || data.paypalEmail)) return null
-
+  if (isPreview) {
+    if (!showMissingPaypal) return null
+  } else {
+    if (isLoading) return null
+    if (data?.paypalEmail) return null
+  }
   const handleAddPayPal = () => {
     if (isPreview && typeof onOpenProfile === "function") {
       onOpenProfile()
@@ -92,8 +97,7 @@ export function MissingPaypalEmailCard({
               color: affiliate ? missingPaypalDescriptionColor : undefined,
             }}
           >
-            You haven’t added a PayPal email yet. Please add one to receive
-            payouts.
+            You haven’t added a PayPal email yet.
           </p>
           {isPreview && affiliate && (
             <DashboardThemeCustomizationOptions

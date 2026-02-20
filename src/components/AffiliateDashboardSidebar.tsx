@@ -23,6 +23,7 @@ import { useAffiliatePath } from "@/hooks/useUrl"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { SidebarCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/SidebarCustomizationOptions"
 import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
+import { showNotificationAtom } from "@/store/ShowNotificationAtom"
 
 type Props = {
   orgId: string
@@ -46,7 +47,12 @@ const AffiliateDashboardSidebar = ({
   const pathname = usePathname()
   useCloseSidebarOnNavigation()
   const { getPath } = useAffiliatePath(orgId)
-  const displayBadgeCount = isPreview ? 3 : unseenCouponsCount
+  const showNotification = useAtomValue(showNotificationAtom)
+  const displayBadgeCount = isPreview
+    ? showNotification
+      ? 3
+      : 0
+    : unseenCouponsCount
   const items = [
     {
       title: "Dashboard",
@@ -73,7 +79,12 @@ const AffiliateDashboardSidebar = ({
   const itemsPreview = [
     { title: "Dashboard", key: "dashboard", icon: BarChart3 },
     { title: "Links", key: "links", icon: LinkIcon },
-    { title: "Coupons", key: "coupons", icon: Ticket },
+    {
+      title: "Coupons",
+      key: "coupons",
+      icon: Ticket,
+      badge: displayBadgeCount > 0 ? displayBadgeCount : null,
+    },
     { title: "Payment", key: "payment", icon: Users },
   ]
   const [hoveredKey, setHoveredKey] = useState<string | null>(null)

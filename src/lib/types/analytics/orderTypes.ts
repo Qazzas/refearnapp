@@ -1,5 +1,7 @@
 export type OrderBy =
-  | "conversionRate"
+  | "clickToSignupRate"
+  | "signupToPaidRate"
+  | "signups"
   | "commission"
   | "sales"
   | "visits"

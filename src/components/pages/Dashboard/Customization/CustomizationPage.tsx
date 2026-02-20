@@ -23,6 +23,7 @@ import { saveTeamCustomizationsAction } from "@/app/(organization)/organization/
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { SimulationInfoCard } from "@/components/ui-custom/SimulationInfoCard"
+import { showNotificationAtom } from "@/store/ShowNotificationAtom"
 
 export default function CustomizationPage({
   orgId,
@@ -38,6 +39,7 @@ export default function CustomizationPage({
   useVerifyTeamSession(orgId, isTeam)
   const authHasChanges = useAtomValue(authHasChangesAtom)
   const dashboardHasChanges = useAtomValue(dashboardHasChangesAtom)
+  const [showNotification, setShowNotification] = useAtom(showNotificationAtom)
   const [showMissingPaypal, setShowMissingPaypal] = useAtom(
     showMissingPaypalAtom
   )
@@ -198,6 +200,19 @@ export default function CustomizationPage({
                     )}
                   >
                     Show Empty
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="toggle-notifications"
+                    checked={showNotification}
+                    onCheckedChange={setShowNotification}
+                  />
+                  <label
+                    htmlFor="toggle-notifications"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Show Notifications
                   </label>
                 </div>
               </div>

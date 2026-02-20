@@ -11,8 +11,8 @@ import { DashboardThemeCustomizationOptions } from "@/components/ui-custom/Custo
 import { useAtomValue } from "jotai"
 import { dashboardThemeCustomizationAtom } from "@/store/DashboardCustomizationAtom"
 import { MissingPaypalEmailCard } from "@/components/ui-custom/MissingPayoutEmailCard"
-import { showMissingPaypalAtom } from "@/store/MissingPaypalAtom"
 import { DomainHeader } from "@/components/ui-custom/DomainHeader"
+import AffiliateCouponsTable from "@/components/pages/AffiliateDashboard/AffiliateCoupon/affiliateCouponTable"
 
 export function DashboardCustomization({
   orgId,
@@ -26,7 +26,6 @@ export function DashboardCustomization({
   setSelectedPage: (selectedPage: string) => void
 }) {
   const { mainBackgroundColor } = useAtomValue(dashboardThemeCustomizationAtom)
-  const showMissingPaypal = useAtomValue(showMissingPaypalAtom)
   if (!orgId) {
     return <div className="text-red-500">Invalid organization ID</div>
   }
@@ -62,40 +61,45 @@ export function DashboardCustomization({
               <DashboardThemeCustomizationOptions name="mainBackgroundColor" />
               {selectedPage === "dashboard" && (
                 <div className="space-y-6">
-                  {showMissingPaypal && (
-                    <MissingPaypalEmailCard
-                      orgId={orgId}
-                      affiliate
-                      isPreview
-                      onOpenProfile={() => setSelectedPage("profile")}
-                    />
-                  )}
+                  <MissingPaypalEmailCard
+                    orgId={orgId}
+                    affiliate
+                    isPreview
+                    onOpenProfile={() => setSelectedPage("profile")}
+                  />
                   <AffiliateOverview orgId={orgId} affiliate isPreview />
                 </div>
               )}
               {selectedPage === "links" && (
                 <div className="space-y-6">
-                  {showMissingPaypal && (
-                    <MissingPaypalEmailCard
-                      orgId={orgId}
-                      affiliate
-                      isPreview
-                      onOpenProfile={() => setSelectedPage("profile")}
-                    />
-                  )}
+                  <MissingPaypalEmailCard
+                    orgId={orgId}
+                    affiliate
+                    isPreview
+                    onOpenProfile={() => setSelectedPage("profile")}
+                  />
                   <Links orgId={orgId} affiliate isPreview />
+                </div>
+              )}
+              {selectedPage === "coupons" && (
+                <div className="space-y-6">
+                  <MissingPaypalEmailCard
+                    orgId={orgId}
+                    affiliate
+                    isPreview
+                    onOpenProfile={() => setSelectedPage("profile")}
+                  />
+                  <AffiliateCouponsTable orgId={orgId} isPreview />
                 </div>
               )}
               {selectedPage === "payment" && (
                 <div className="space-y-6">
-                  {showMissingPaypal && (
-                    <MissingPaypalEmailCard
-                      orgId={orgId}
-                      affiliate
-                      isPreview
-                      onOpenProfile={() => setSelectedPage("profile")}
-                    />
-                  )}
+                  <MissingPaypalEmailCard
+                    orgId={orgId}
+                    affiliate
+                    isPreview
+                    onOpenProfile={() => setSelectedPage("profile")}
+                  />
                   <PaymentTable orgId={orgId} affiliate isPreview />
                 </div>
               )}

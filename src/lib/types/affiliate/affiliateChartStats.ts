@@ -1,8 +1,10 @@
 export interface AffiliateKpiTimeSeries {
   createdAt: string
   visitors: number
+  signups: number
   sales: number
   amount: number
-  conversionRate: number
+  clickToSignupRate: number
+  signupToPaidRate: number
 }
 export type OrganizationKpiTimeSeries = AffiliateKpiTimeSeries

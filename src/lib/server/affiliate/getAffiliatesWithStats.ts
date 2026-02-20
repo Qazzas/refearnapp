@@ -6,6 +6,7 @@ import {
   affiliateInvoice,
   organization,
   affiliatePayoutMethod,
+  referrals,
 } from "@/db/schema"
 import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
@@ -14,15 +15,9 @@ import {
   buildAffiliateStatsSelect,
   ExcludableFields,
 } from "@/util/BuildAffiliateStatsSelect"
+import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
 
-type OrderableFields =
-  | "conversionRate"
-  | "commission"
-  | "sales"
-  | "visits"
-  | "email"
-  | "commissionPaid"
-  | "commissionUnpaid"
+type OrderableFields = PayoutSortKeys
 function applyOptionalLimitAndOffset<
   T extends { limit: (n: number) => any; offset: (n: number) => any },
 >(q: T, limit?: number, offset?: number) {
@@ -78,6 +73,28 @@ export async function getAffiliatesWithStatsAction(
     .where(eq(affiliate.organizationId, orgId))
     .groupBy(affiliate.id, organization.websiteUrl, organization.referralParam)
     .as("click_sq")
+
+  // 2. NEW: Isolated Signups (Referrals) Aggregation
+  const referralSq = db
+    .select({
+      affiliateId: affiliate.id,
+      signupCount: sql`count(distinct ${referrals.id})`.as("signup_count"),
+    })
+    .from(affiliate)
+    .leftJoin(
+      referrals,
+      buildWhereWithDate(
+        [eq(referrals.affiliateId, affiliate.id)],
+        referrals,
+        year,
+        month,
+        false,
+        months
+      )
+    )
+    .where(eq(affiliate.organizationId, orgId))
+    .groupBy(affiliate.id)
+    .as("ref_sq")
 
   // 2. Isolated Sales & Commission Aggregation
   const salesSqBase = db
@@ -163,6 +180,8 @@ export async function getAffiliatesWithStatsAction(
 
   // 5. Final select fragments
   const visitsSql = sql<number>`coalesce(${clickSq.clicks}, 0)`.mapWith(Number)
+  const signupsSql =
+    sql<number>`coalesce(${referralSq.signupCount}, 0)`.mapWith(Number)
   const salesCountSql =
     sql<number>`coalesce(${salesSqBase.salesCount}, 0)`.mapWith(Number)
   const commissionSql =
@@ -184,13 +203,16 @@ export async function getAffiliatesWithStatsAction(
       "commission",
       "paid",
       "unpaid",
-      "conversionRate",
+      "clickToSignupRate",
+      "signupToPaidRate",
+      "signups",
       "links",
     ] as ExcludableFields[],
   })
   const selectedFields = {
     ...baseFields,
     visitors: visitsSql,
+    signups: signupsSql,
     sales: salesCountSql,
     commission: commissionSql,
     paid: paidAmountSql,
@@ -198,10 +220,12 @@ export async function getAffiliatesWithStatsAction(
     links: linksSql,
     currency: organization.currency,
     paypalEmail: affiliatePayoutMethod.accountIdentifier,
-    conversionRate:
-      sql<number>`((${salesCountSql})::float / nullif((${visitsSql}), 0)::float) * 100`.mapWith(
-        Number
-      ),
+    clickToSignupRate: sql<number>`
+      coalesce((${signupsSql})::float / nullif((${visitsSql}), 0)::float * 100, 0)
+    `.mapWith(Number),
+    signupToPaidRate: sql<number>`
+      coalesce((${salesCountSql})::float / nullif((${signupsSql}), 0)::float * 100, 0)
+    `.mapWith(Number),
   }
 
   // 6. Sorting Logic
@@ -214,6 +238,8 @@ export async function getAffiliatesWithStatsAction(
       commissionPaid: paidAmountSql,
       commissionUnpaid: unpaidAmountSql,
       email: affiliate.email,
+      clickToSignupRate: sql`(${signupsSql})::float / nullif((${visitsSql}), 0)`,
+      signupToPaidRate: sql`(${salesCountSql})::float / nullif((${signupsSql}), 0)`,
     }
     const base = orderByMap[opts.orderBy] ?? affiliate.email
     return opts.orderDir === "asc" ? base : desc(base)
@@ -229,6 +255,7 @@ export async function getAffiliatesWithStatsAction(
     .select(selectedFields)
     .from(affiliate)
     .leftJoin(clickSq, eq(clickSq.affiliateId, affiliate.id))
+    .leftJoin(referralSq, eq(referralSq.affiliateId, affiliate.id))
     .leftJoin(salesSqBase, eq(salesSqBase.affiliateId, affiliate.id))
     .leftJoin(paidSq, eq(paidSq.affiliateId, affiliate.id))
     .leftJoin(unpaidSq, eq(unpaidSq.affiliateId, affiliate.id))

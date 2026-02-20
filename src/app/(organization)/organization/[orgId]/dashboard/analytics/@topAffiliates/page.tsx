@@ -14,7 +14,14 @@ const topAffiliatesPage = async ({ params }: OrgIdProps) => {
         orgId={orgId}
         cardTitle="Top Affiliates"
         mode="top"
-        orderOptions={["sales", "visits", "conversionRate"]}
+        orderOptions={[
+          "sales",
+          "visits",
+          "signups",
+          "commission",
+          "clickToSignupRate",
+          "signupToPaidRate",
+        ]}
       />
     </>
   )

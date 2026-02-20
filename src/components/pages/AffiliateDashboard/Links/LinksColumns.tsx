@@ -110,6 +110,30 @@ export const useLinksColumns = (
         ),
       },
       {
+        accessorKey: "signups",
+        header: () => (
+          <span
+            style={{
+              color:
+                (affiliate && dashboardTable.tableHeaderTextColor) || undefined,
+            }}
+          >
+            Signups
+          </span>
+        ),
+        cell: ({ row }) => (
+          <div
+            style={{
+              color:
+                (affiliate && dashboardTable.tableRowTertiaryTextColor) ||
+                undefined,
+            }}
+          >
+            {row.getValue("signups")}
+          </div>
+        ),
+      },
+      {
         accessorKey: "sales",
         header: () => (
           <span
@@ -134,7 +158,7 @@ export const useLinksColumns = (
         ),
       },
       {
-        accessorKey: "conversionRate",
+        accessorKey: "clickToSignupRate",
         header: () => (
           <span
             style={{
@@ -142,7 +166,7 @@ export const useLinksColumns = (
                 (affiliate && dashboardTable.tableHeaderTextColor) || undefined,
             }}
           >
-            Conversion Rate
+            Click to Signup
           </span>
         ),
         cell: ({ row }) => (
@@ -153,7 +177,31 @@ export const useLinksColumns = (
                 undefined,
             }}
           >
-            {row.getValue("conversionRate")}%
+            {formatValue("Click to Signup", row.getValue("clickToSignupRate"))}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "signupToPaidRate",
+        header: () => (
+          <span
+            style={{
+              color:
+                (affiliate && dashboardTable.tableHeaderTextColor) || undefined,
+            }}
+          >
+            Signup to Paid
+          </span>
+        ),
+        cell: ({ row }) => (
+          <div
+            style={{
+              color:
+                (affiliate && dashboardTable.tableRowTertiaryTextColor) ||
+                undefined,
+            }}
+          >
+            {formatValue("Signup to Paid", row.getValue("signupToPaidRate"))}
           </div>
         ),
       },

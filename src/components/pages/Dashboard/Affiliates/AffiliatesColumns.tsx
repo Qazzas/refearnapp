@@ -11,11 +11,24 @@ export const AffiliatesColumns = (): ColumnDef<AffiliateStats>[] => {
     commonAffiliateColumns.visitors,
     commonAffiliateColumns.sales,
     {
-      accessorKey: "conversionRate",
-      header: "Conversion Rate",
+      accessorKey: "signups",
+      header: "Signups",
+      cell: ({ row }) => <div>{row.original.signups ?? 0}</div>,
+    },
+    {
+      accessorKey: "clickToSignupRate",
+      header: "C2S Rate",
       cell: ({ row }) => {
-        const rate = parseFloat(row.getValue("conversionRate"))
-        return <div>{isNaN(rate) ? "-" : `${rate.toFixed(2)}%`}</div>
+        const rate = parseFloat(row.getValue("clickToSignupRate"))
+        return <div>{isNaN(rate) ? "0.00%" : `${rate.toFixed(2)}%`}</div>
+      },
+    },
+    {
+      accessorKey: "signupToPaidRate",
+      header: "S2P Rate",
+      cell: ({ row }) => {
+        const rate = parseFloat(row.getValue("signupToPaidRate"))
+        return <div>{isNaN(rate) ? "0.00%" : `${rate.toFixed(2)}%`}</div>
       },
     },
     commonAffiliateColumns.commission,

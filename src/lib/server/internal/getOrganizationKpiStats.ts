@@ -1,6 +1,5 @@
-// @/lib/server/internal/getOrganizationKpiStatsAction.ts
 import { db } from "@/db/drizzle"
-import { eq, sql, and } from "drizzle-orm"
+import { eq, sql, and, SQL } from "drizzle-orm"
 import {
   affiliate,
   affiliateClick,
@@ -15,11 +14,16 @@ export async function getOrganizationKpiStatsAction(
   year?: number,
   month?: number
 ) {
+  // Helper to safely handle the date filter array for Drizzle's and()
+  const getDateFilters = (table: any) => {
+    const filters = buildWhereWithDate([], table, year, month)
+    return Array.isArray(filters) ? filters : [filters]
+  }
+
+  // 1. Total Links count for the Org (Usually not date-filtered, but added for consistency)
   const linkSq = db
     .select({
-      linkCount: sql`count(distinct ${affiliateLink.id})`
-        .mapWith(Number)
-        .as("link_count"),
+      linkCount: sql`count(distinct ${affiliateLink.id})`.as("link_count"),
       organizationId: affiliate.organizationId,
     })
     .from(affiliateLink)
@@ -27,57 +31,45 @@ export async function getOrganizationKpiStatsAction(
     .where(eq(affiliate.organizationId, orgId))
     .groupBy(affiliate.organizationId)
     .as("link_sq")
-  // 1. Aggregate Clicks
+
+  // 2. Aggregate Clicks by Affiliate (Date Filtered)
   const clickSq = db
     .select({
-      affiliateId: affiliate.id,
-      clicks: sql`count(distinct ${affiliateClick.id})`.as("clicks"),
+      affiliateId: affiliateLink.affiliateId,
+      clicks: sql`count(${affiliateClick.id})`.as("clicks"),
     })
-    .from(affiliate)
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(
-      affiliateClick,
-      buildWhereWithDate(
-        [eq(affiliateClick.affiliateLinkId, affiliateLink.id)],
-        affiliateClick,
-        year,
-        month
-      )
+    .from(affiliateClick)
+    .innerJoin(
+      affiliateLink,
+      eq(affiliateLink.id, affiliateClick.affiliateLinkId)
     )
-    .where(eq(affiliate.organizationId, orgId))
-    .groupBy(affiliate.id)
+    .where(and(...getDateFilters(affiliateClick)))
+    .groupBy(affiliateLink.affiliateId)
     .as("click_sq")
 
-  // 2. Aggregate Referrals
+  // 3. Aggregate Referrals by Affiliate (Date Filtered)
   const referralSq = db
     .select({
-      affiliateId: affiliate.id,
-      signups: sql`count(distinct ${referrals.id})`.as("signups"),
-      paidReferrals:
-        sql`count(distinct case when ${referrals.convertedAt} is not null then ${referrals.id} end)`.as(
-          "paid_referrals"
-        ),
+      affiliateId: referrals.affiliateId,
+      signups: sql<number>`count(
+      case when ${referrals.convertedAt} is null then 1 end
+      )`.as("signups"),
+      paidReferrals: sql<number>`count(
+      case when ${referrals.convertedAt} is not null then 1 end
+      )`.as("paid_referrals"),
     })
-    .from(affiliate)
-    .leftJoin(
-      referrals,
-      buildWhereWithDate(
-        [eq(referrals.organizationId, orgId)],
-        referrals,
-        year,
-        month
-      )
+    .from(referrals)
+    .where(
+      and(eq(referrals.organizationId, orgId), ...getDateFilters(referrals))
     )
-    .where(eq(affiliate.organizationId, orgId))
-    .groupBy(affiliate.id)
+    .groupBy(referrals.affiliateId)
     .as("ref_sq")
-
-  // 3. Aggregate Invoices
+  // 4. Aggregate Invoices by Affiliate (Date Filtered)
   const invoiceSq = db
     .select({
-      affiliateId: affiliate.id,
+      affiliateId: affiliateLink.affiliateId,
       salesCount:
-        sql`count(distinct case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.id} end)`.as(
+        sql`count(case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then 1 end)`.as(
           "sales_count"
         ),
       totalComm:
@@ -97,22 +89,16 @@ export async function getOrganizationKpiStatsAction(
           "total_amt"
         ),
     })
-    .from(affiliate)
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(
-      affiliateInvoice,
-      buildWhereWithDate(
-        [eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)],
-        affiliateInvoice,
-        year,
-        month
-      )
+    .from(affiliateInvoice)
+    .innerJoin(
+      affiliateLink,
+      eq(affiliateLink.id, affiliateInvoice.affiliateLinkId)
     )
-    .where(eq(affiliate.organizationId, orgId))
-    .groupBy(affiliate.id)
+    .where(and(...getDateFilters(affiliateInvoice)))
+    .groupBy(affiliateLink.affiliateId)
     .as("inv_sq")
 
-  // 4. Final Join
+  // 5. Final Join
   return db
     .select({
       totalAffiliates: sql<number>`count(distinct ${affiliate.id})`.mapWith(
@@ -130,12 +116,12 @@ export async function getOrganizationKpiStatsAction(
       totalLinks: sql<number>`coalesce(max(${linkSq.linkCount}), 0)`.mapWith(
         Number
       ),
-      // Rates calculated on final sums
+
       clickToSignupRate: sql<number>`
-        coalesce((sum(${referralSq.signups})::float / nullif(sum(${clickSq.clicks}), 0)::float) * 100, 0)
+        coalesce(round(((sum(${referralSq.signups})::float / nullif(sum(${clickSq.clicks}), 0)::float) * 100)::numeric, 2), 0)
       `.mapWith(Number),
       signupToPaidRate: sql<number>`
-        coalesce((sum(${referralSq.paidReferrals})::float / nullif(sum(${referralSq.signups}), 0)::float) * 100, 0)
+        coalesce(round(((sum(${referralSq.paidReferrals})::float / nullif(sum(${referralSq.signups}), 0)::float) * 100)::numeric, 2), 0)
       `.mapWith(Number),
 
       sales: sql<number>`coalesce(sum(${invoiceSq.salesCount}), 0)`.mapWith(

@@ -11,11 +11,19 @@ export const formatValue = (
     "Total Amount",
   ]
 
+  // Add percentage labels check
+  const percentageLabels = ["Click to Signup", "Signup to Paid"]
+
   if (monetaryLabels.includes(label) && currency) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
     }).format(value)
+  }
+
+  // Handle Percentage Formatting
+  if (percentageLabels.includes(label)) {
+    return `${value.toLocaleString()}%`
   }
 
   return value.toLocaleString()

@@ -10,7 +10,8 @@ import { AffiliateCouponData } from "@/lib/types/affiliate/affiliateCouponData"
 
 export const affiliateCouponColumns = (
   onDetails: (coupon: AffiliateCouponData) => void,
-  showCustomToast: any
+  showCustomToast: any,
+  showNotification: boolean = true
 ): ColumnDef<AffiliateCouponData>[] => [
   {
     accessorKey: "code",
@@ -81,7 +82,7 @@ export const affiliateCouponColumns = (
   {
     id: "actions",
     cell: ({ row }) => {
-      const isNew = !row.original.isSeenByAffiliate
+      const isNew = !row.original.isSeenByAffiliate && showNotification
       return (
         <div className="relative inline-block">
           <Button

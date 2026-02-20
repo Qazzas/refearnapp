@@ -13,23 +13,13 @@ export const affiliateStatsFields = {
   email: affiliate.email,
 
   visitors: sql<number>`COUNT(DISTINCT ${affiliateClick.id})`.mapWith(Number),
-
+  signups: sql<number>`0`.mapWith(Number),
   sales: sql<number>`COUNT(DISTINCT CASE 
     WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time') 
     THEN ${affiliateInvoice.id} END
 )`.mapWith(Number),
-
-  conversionRate: sql<number>`CASE
-  WHEN COUNT(DISTINCT ${affiliateClick.id}) = 0 THEN 0
-  ELSE (
-    COUNT(DISTINCT CASE 
-      WHEN ${affiliateInvoice.reason} IN ('subscription_create', 'one_time') 
-      THEN ${affiliateInvoice.id} END
-    )::float
-    / COUNT(DISTINCT ${affiliateClick.id})::float
-  ) * 100
-END`.mapWith(Number),
-
+  clickToSignupRate: sql<number>`0`.mapWith(Number),
+  signupToPaidRate: sql<number>`0`.mapWith(Number),
   commission:
     sql<number>`COALESCE(SUM(${affiliateInvoice.commission}), 0)`.mapWith(
       Number

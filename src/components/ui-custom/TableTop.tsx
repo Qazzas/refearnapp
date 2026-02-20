@@ -51,34 +51,35 @@ export const TableTop = <TData, TOrder extends string>({
           />
           <div className="flex items-center gap-2">
             {rightActions}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="px-2 lg:px-4">
-                  <Settings2 className={`h-4 w-4 ${iconHiddenAt}`} />
-                  <div className={`${textVisibleAt} items-center gap-2`}>
-                    Columns <ChevronDown className="h-4 w-4" />
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(value)
-                      }
-                      className="capitalize"
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {!affiliate && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="px-2 lg:px-4">
+                    <Settings2 className={`h-4 w-4 ${iconHiddenAt}`} />
+                    <div className={`${textVisibleAt} items-center gap-2`}>
+                      Columns <ChevronDown className="h-4 w-4" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {table
+                    .getAllColumns()
+                    .filter((column) => column.getCanHide())
+                    .map((column) => (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(value)
+                        }
+                        className="capitalize"
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       ) : (

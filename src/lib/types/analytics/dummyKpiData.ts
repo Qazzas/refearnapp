@@ -2,7 +2,9 @@ import {
   DollarSign,
   Grid3X3,
   Link2,
+  Percent,
   ShoppingCart,
+  UserCheck,
   Users,
   Wallet,
   XCircle,
@@ -30,6 +32,21 @@ export const initialKpiData = [
     icon: Grid3X3,
     color: "text-amber-600",
     bg: "bg-amber-100",
+  },
+  {
+    label: "Total Signups",
+    value: 210,
+    icon: UserCheck,
+  },
+  {
+    label: "Click to Signup",
+    value: 14.9,
+    icon: Percent,
+  },
+  {
+    label: "Signup to Paid",
+    value: 46.6,
+    icon: Percent,
   },
   {
     label: "Total Sales",
@@ -72,6 +89,10 @@ export const getDummyAffiliateStats = (
 ): AffiliateKpiStats => ({
   totalLinks: 45,
   totalVisitors: 1250,
+  totalSignups: 180,
+  totalPaidReferrals: 84,
+  clickToSignupRate: 14.4,
+  signupToPaidRate: 46.67,
   totalSales: 84,
   totalCommission: 3200.5,
   totalCommissionPaid: 2100.0,

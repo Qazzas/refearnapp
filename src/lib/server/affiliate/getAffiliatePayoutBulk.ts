@@ -1,16 +1,10 @@
 import { getAffiliatesWithStatsAction } from "@/lib/server/affiliate/getAffiliatesWithStats"
+import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
 
 export async function getAffiliatePayoutBulkAction(
   orgId: string,
   months: { month: number; year: number }[],
-  orderBy?:
-    | "conversionRate"
-    | "commission"
-    | "sales"
-    | "visits"
-    | "email"
-    | "commissionPaid"
-    | "commissionUnpaid",
+  orderBy?: PayoutSortKeys,
   orderDir?: "asc" | "desc",
   limit?: number,
   offset?: number,
@@ -22,7 +16,7 @@ export async function getAffiliatePayoutBulkAction(
     undefined,
     months,
     {
-      exclude: ["conversionRate"],
+      exclude: ["signupToPaidRate", "clickToSignupRate"],
       orderBy,
       orderDir,
       limit,
