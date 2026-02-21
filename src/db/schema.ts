@@ -262,6 +262,7 @@ export const organization = pgTable(
       .$defaultFn(() => generateOrganizationId()),
     name: text("name").notNull(),
     websiteUrl: text("website_name").notNull(),
+    supportEmail: text("support_email"),
     logoUrl: text("logo_url"),
     openGraphUrl: text("open_graph_url"),
     description: text("description"),

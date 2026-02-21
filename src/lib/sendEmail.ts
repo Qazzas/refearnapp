@@ -6,12 +6,16 @@ type SendEmailInput = {
   subject: string
   html: string
   replyTo?: string
+  fromName?: string
+  fromEmail?: string
 }
 export const sendEmail = async ({
   to,
   subject,
   html,
   replyTo,
+  fromName = "RefearnApp",
+  fromEmail = "noreply@refearnapp.com",
 }: SendEmailInput) => {
   if (process.env.NODE_ENV === "development") {
     const transporter = nodemailer.createTransport({
@@ -21,7 +25,7 @@ export const sendEmail = async ({
     })
 
     return transporter.sendMail({
-      from: '"RefearnApp" <noreply@refearnapp.com>',
+      from: `"${fromName}" <${fromEmail}>`,
       to,
       subject,
       html,
@@ -36,8 +40,8 @@ export const sendEmail = async ({
 
   return client.sendMail({
     from: {
-      address: "noreply@refearnapp.com",
-      name: "RefearnApp",
+      address: fromEmail,
+      name: fromName,
     },
     to: [
       {
