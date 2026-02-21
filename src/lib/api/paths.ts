@@ -5,6 +5,10 @@ import { OrderDir, OrderBy } from "@/lib/types/analytics/orderTypes"
 // 🤳 AFFILIATE DASHBOARD PATHS
 // =============================================================================
 
+export const GET_AFFILIATE_REFERRALS_TABLE_PATH = (
+  orgId: string,
+  query: { offset?: number }
+) => withQuery(`/api/affiliate/${orgId}/dashboard/referrals`, query)
 export const GET_AFFILIATE_KPI_PATH = (
   orgId: string,
   year?: number,
@@ -46,6 +50,11 @@ export const GET_AFFILIATE_PAYMENT_METHOD_PATH = (orgId: string) =>
 // =============================================================================
 // 🏢 ORGANIZATION (OWNER) DASHBOARD PATHS
 // =============================================================================
+
+export const GET_ORG_REFERRALS_TABLE_PATH = (
+  orgId: string,
+  query: { offset?: number }
+) => withQuery(`/api/organization/${orgId}/dashboard/referrals`, query)
 export const GET_AFFILIATE_LOOKUP_PATH = (
   orgId: string,
   query: { offset: number; context: "admin" | "team"; search?: string }
@@ -162,6 +171,10 @@ export const GET_ORG_CURRENCY_PATH = (orgId: string) =>
 // 👥 TEAM (STAFF) DASHBOARD PATHS
 // =============================================================================
 
+export const GET_TEAM_REFERRALS_TABLE_PATH = (
+  orgId: string,
+  query: { offset?: number }
+) => withQuery(`/api/organization/${orgId}/teams/dashboard/referrals`, query)
 export const GET_TEAM_PROMOTION_CODES_PATH = (
   orgId: string,
   query: { offset?: number; code?: string }

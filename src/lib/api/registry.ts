@@ -26,6 +26,7 @@ import {
   GET_AFFILIATE_PAYMENT,
   GET_AFFILIATE_PAYMENT_METHOD_PATH,
   GET_AFFILIATE_PROMOTION_CODES_PATH,
+  GET_AFFILIATE_REFERRALS_TABLE_PATH,
   GET_AFFILIATE_REFERRERS_PATH,
   GET_AFFILIATE_TIME_SERIES_PATH,
   GET_ORG,
@@ -40,6 +41,7 @@ import {
   GET_ORG_PAYOUTS_PATH,
   GET_ORG_PAYOUTS_UNPAID_PATH,
   GET_ORG_PROMOTION_CODES_PATH,
+  GET_ORG_REFERRALS_TABLE_PATH,
   GET_ORG_REFERRERS_PATH,
   GET_ORG_TEAM_MEMBERS_PATH,
   GET_ORG_TIME_SERIES_PATH,
@@ -52,6 +54,7 @@ import {
   GET_TEAM_PAYOUTS_PATH,
   GET_TEAM_PAYOUTS_UNPAID_PATH,
   GET_TEAM_PROMOTION_CODES_PATH,
+  GET_TEAM_REFERRALS_TABLE_PATH,
   GET_TEAM_REFERRERS_PATH,
   GET_TEAM_TIME_SERIES_PATH,
   GET_TEAM_WEBHOOK_KEY_PATH,
@@ -64,6 +67,7 @@ import { UnpaidMonth } from "@/lib/types/organization/unpaidMonth"
 import { TeamRow } from "@/lib/types/internal/teamsRow"
 import { PromotionCodeType } from "@/lib/types/organization/promotion"
 import { AffiliateCouponData } from "@/lib/types/affiliate/affiliateCouponData"
+import { ReferralRow } from "@/lib/types/internal/ReferralRow"
 
 export const API_CONFIG = {
   affiliate: {
@@ -81,6 +85,13 @@ export const API_CONFIG = {
           path: GET_AFFILIATE_TIME_SERIES_PATH,
           response: {} as ActionResult<AffiliateKpiTimeSeries[]>,
         },
+      },
+      referrals: {
+        path: GET_AFFILIATE_REFERRALS_TABLE_PATH,
+        response: {} as ActionResult<{
+          rows: ReferralRow[]
+          hasNext: boolean
+        }>,
       },
       links: {
         path: GET_AFFILIATE_LINKS_PATH,
@@ -144,6 +155,13 @@ export const API_CONFIG = {
         path: GET_ORG_AFFILIATES_STATS_PATH,
         response: {} as ActionResult<{
           rows: AffiliateStats[]
+          hasNext: boolean
+        }>,
+      },
+      referrals: {
+        path: GET_ORG_REFERRALS_TABLE_PATH,
+        response: {} as ActionResult<{
+          rows: ReferralRow[]
           hasNext: boolean
         }>,
       },
@@ -226,6 +244,13 @@ export const API_CONFIG = {
           path: GET_TEAM_AFFILIATES_STATS_PATH,
           response: {} as ActionResult<{
             rows: AffiliateStats[]
+            hasNext: boolean
+          }>,
+        },
+        referrals: {
+          path: GET_TEAM_REFERRALS_TABLE_PATH,
+          response: {} as ActionResult<{
+            rows: ReferralRow[]
             hasNext: boolean
           }>,
         },
