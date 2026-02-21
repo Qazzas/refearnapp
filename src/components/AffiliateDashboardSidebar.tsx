@@ -2,7 +2,14 @@
 
 import React, { useState } from "react"
 import { usePathname } from "next/navigation"
-import { BarChart3, Link as LinkIcon, Users, User, Ticket } from "lucide-react"
+import {
+  BarChart3,
+  Link as LinkIcon,
+  Users,
+  User,
+  Ticket,
+  MousePointerClick,
+} from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -65,6 +72,11 @@ const AffiliateDashboardSidebar = ({
       icon: LinkIcon,
     },
     {
+      title: "Referrals",
+      url: getPath("dashboard/referrals"),
+      icon: MousePointerClick,
+    },
+    {
       title: "Coupons",
       url: getPath("dashboard/coupons"),
       icon: Ticket,
@@ -79,6 +91,7 @@ const AffiliateDashboardSidebar = ({
   const itemsPreview = [
     { title: "Dashboard", key: "dashboard", icon: BarChart3 },
     { title: "Links", key: "links", icon: LinkIcon },
+    { title: "Referrals", key: "referrals", icon: MousePointerClick },
     {
       title: "Coupons",
       key: "coupons",

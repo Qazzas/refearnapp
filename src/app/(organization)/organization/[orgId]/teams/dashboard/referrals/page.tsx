@@ -27,3 +27,4 @@ const referralPage = async ({ params }: OrgIdProps) => {
     </>
   )
 }
+export default referralPage

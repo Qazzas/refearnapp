@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import deepEqual from "fast-deep-equal" // Import deepEqual
 import { Form } from "@/components/ui/form"
-import { Button } from "@/components/ui/button" // Shadcn button
+import { Button } from "@/components/ui/button"
 import {
   Percent,
   DollarSign,
@@ -24,8 +24,12 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import {
   unlinkAffiliateAction,
-  updatePromotionAssignmentAction, // We will create this action next
+  updatePromotionAssignmentAction,
 } from "@/app/(organization)/organization/[orgId]/dashboard/coupons/action"
+import {
+  unlinkTeamAffiliateAction,
+  updateTeamPromotionAssignmentAction,
+} from "@/app/(organization)/organization/[orgId]/teams/dashboard/coupons/action"
 
 const assignSchema = z.object({
   affiliateId: z.string().min(1, "Please select an affiliate"),
@@ -113,23 +117,29 @@ export function AssignAffiliateForm({
   const { mutate: handleUnlink, isPending: unlinking } = useAppMutation<
     any,
     void
-  >(() => unlinkAffiliateAction(orgId, codeId), {
-    onSuccess: (res) => {
-      if (res.ok) {
-        queryClient
-          .invalidateQueries({
-            queryKey: [isTeam ? "team-coupons" : "org-coupons"],
-          })
-          .then(() => console.log("invalidated"))
-        queryClient
-          .invalidateQueries({
-            queryKey: ["promo-settings", orgId, codeId],
-          })
-          .then(() => console.log("invalidated"))
-        form.setValue("affiliateId", "")
-      }
+  >(
+    () => {
+      const action = isTeam ? unlinkTeamAffiliateAction : unlinkAffiliateAction
+      return action(orgId, codeId)
     },
-  })
+    {
+      onSuccess: (res) => {
+        if (res.ok) {
+          queryClient
+            .invalidateQueries({
+              queryKey: [isTeam ? "team-coupons" : "org-coupons"],
+            })
+            .then(() => console.log("invalidated"))
+          queryClient
+            .invalidateQueries({
+              queryKey: ["promo-settings", orgId, codeId],
+            })
+            .then(() => console.log("invalidated"))
+          form.setValue("affiliateId", "")
+        }
+      },
+    }
+  )
   const watchedAffiliateId = form.watch("affiliateId")
   useEffect(() => {
     if (!watchedAffiliateId) {
@@ -149,7 +159,12 @@ export function AssignAffiliateForm({
   }, [watchedAffiliateId, options, initialAffiliate])
   // 6. Update Assignment Mutation
   const { mutate: updateAssignment, isPending: isSaving } = useAppMutation(
-    (data) => updatePromotionAssignmentAction(orgId, codeId, data),
+    (data) => {
+      const action = isTeam
+        ? updateTeamPromotionAssignmentAction
+        : updatePromotionAssignmentAction
+      return action(orgId, codeId, data)
+    },
     {
       onSuccess: (res) => {
         if (res.ok) {

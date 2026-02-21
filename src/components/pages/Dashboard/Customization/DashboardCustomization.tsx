@@ -13,6 +13,7 @@ import { dashboardThemeCustomizationAtom } from "@/store/DashboardCustomizationA
 import { MissingPaypalEmailCard } from "@/components/ui-custom/MissingPayoutEmailCard"
 import { DomainHeader } from "@/components/ui-custom/DomainHeader"
 import AffiliateCouponsTable from "@/components/pages/AffiliateDashboard/AffiliateCoupon/affiliateCouponTable"
+import AffiliateReferralsTable from "@/components/pages/AffiliateDashboard/referrals/AffiliateReferralTable"
 
 export function DashboardCustomization({
   orgId,
@@ -81,7 +82,7 @@ export function DashboardCustomization({
                   <Links orgId={orgId} affiliate isPreview />
                 </div>
               )}
-              {selectedPage === "coupons" && (
+              {selectedPage === "referrals" && (
                 <div className="space-y-6">
                   <MissingPaypalEmailCard
                     orgId={orgId}
@@ -89,7 +90,7 @@ export function DashboardCustomization({
                     isPreview
                     onOpenProfile={() => setSelectedPage("profile")}
                   />
-                  <AffiliateCouponsTable orgId={orgId} isPreview />
+                  <AffiliateReferralsTable orgId={orgId} isPreview />
                 </div>
               )}
               {selectedPage === "payment" && (

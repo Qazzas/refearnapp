@@ -12,6 +12,7 @@ import {
   User,
   Globe,
   MailQuestion,
+  MousePointerClick,
 } from "lucide-react"
 import {
   Sidebar,
@@ -68,6 +69,11 @@ const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
       title: "Integration",
       url: `/organization/${orgId}/teams/dashboard/integration`,
       icon: Layers,
+    },
+    {
+      title: "Referrals",
+      url: `/organization/${orgId}/dashboard/referrals`,
+      icon: MousePointerClick,
     },
     {
       title: "Settings",

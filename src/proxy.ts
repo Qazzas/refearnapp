@@ -12,7 +12,7 @@ export async function proxy(req: NextRequest) {
   if (
     isReservedDomain(host) ||
     host.endsWith(".vercel.app") ||
-    host.startsWith("localhost") ||
+    host.startsWith("localhost:3000") ||
     host.startsWith("127.0.0.1")
   ) {
     return NextResponse.next()

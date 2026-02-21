@@ -1,10 +1,10 @@
 import React from "react"
 import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
+import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import { buildMetadata } from "@/util/BuildMetadata"
 import { Metadata } from "next"
-import OrgReferralsTable from "@/components/pages/Dashboard/Referrals/OrgReferralsTable"
+import PromotionCodesTable from "@/components/pages/Dashboard/Coupons/PromotionCodesTable"
 
 export async function generateMetadata({
   params,
@@ -12,20 +12,19 @@ export async function generateMetadata({
   const orgId = await getValidatedOrgFromParams({ params })
 
   return buildMetadata({
-    title: "RefearnApp | Referrals Page",
-    description: "Referrals Page",
-    url: `https://refearnapp.com/organization/${orgId}/dashboard/referrals`,
+    title: "RefearnApp | Coupons Team Page",
+    description: "Coupons Team Page",
+    url: `https://refearnapp.com/organization/${orgId}/teams/dashboard/coupons`,
     indexable: false,
   })
 }
-const referralPage = async ({ params }: OrgIdProps) => {
+const couponsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
-  await requireOrganizationWithOrg(orgId)
+  await requireTeamWithOrg(orgId)
   return (
     <>
-      <OrgReferralsTable orgId={orgId} isTeam={false} />
+      <PromotionCodesTable orgId={orgId} isTeam={true} />
     </>
   )
 }
-
-export default referralPage
+export default couponsPage

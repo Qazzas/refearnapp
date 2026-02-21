@@ -13,6 +13,7 @@ import {
   Globe,
   MailQuestion,
   TicketPercent,
+  MousePointerClick,
 } from "lucide-react"
 import {
   Sidebar,
@@ -80,6 +81,11 @@ const OrganizationDashboardSidebar = ({
       title: "Integration",
       url: `/organization/${orgId}/dashboard/integration`,
       icon: Layers,
+    },
+    {
+      title: "Referrals",
+      url: `/organization/${orgId}/dashboard/referrals`,
+      icon: MousePointerClick,
     },
     {
       title: "Coupons",
