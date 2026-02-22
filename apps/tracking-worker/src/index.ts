@@ -8,9 +8,9 @@ export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
-		const PAGES_URL = 'https://refearnapp.pages.dev';
-		const VERCEL_ORIGIN = 'https://origin.refearnapp.com';
-		const PRIMARY_HOST = 'www.refearnapp.com';
+		const PAGES_URL = env.PAGES_URL || 'https://refearnapp.pages.dev';
+		const VERCEL_ORIGIN = env.NEXT_APP_URL || 'https://origin.refearnapp.com';
+		const PRIMARY_HOST = env.PRIMARY_HOST || 'www.refearnapp.com';
 
 		// 1. SPECIFIC PUBLIC ASSETS (Strict Whitelist)
 		// These are the files you manually put in /public
