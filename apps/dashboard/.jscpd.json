@@ -1,0 +1,14 @@
+{
+  "threshold": 50,
+  "reporters": ["html", "console"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/.idea/**",
+    "**/.git/**",
+    "**/migrations/**",
+    "**/.next/**",
+    "**/reports/**"
+  ],
+  "absolute": true,
+  "output": "reports/jscpd"
+}
