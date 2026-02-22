@@ -54,7 +54,6 @@ export function ManageDomainsTable({
   isTeam = false,
 }: AffiliatesTableManageDomainsProps) {
   useVerifyTeamSession(orgId, isTeam)
-  const [rowSelection] = useState({})
   const [domainType, setDomainType] = useState<DomainInputType | null>(null)
   const [open, setOpen] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)

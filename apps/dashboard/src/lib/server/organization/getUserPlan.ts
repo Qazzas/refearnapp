@@ -11,6 +11,12 @@ function isSubscriptionValid(sub: typeof subscription.$inferSelect | null) {
 }
 
 export async function getUserPlan(): Promise<PlanInfo> {
+  if (process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true") {
+    return {
+      plan: "ULTIMATE",
+      type: "PURCHASE",
+    }
+  }
   const { userId } = await getOrgAuthForPlan()
 
   const [userSub, userPurchase] = await Promise.all([

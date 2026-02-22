@@ -6,6 +6,7 @@ import { addDomainToVercel } from "@/lib/server/internal/manageVercelDomain"
 import { and, eq, ne } from "drizzle-orm"
 import { isReservedDomain } from "@/lib/constants/domains"
 import { AppError } from "@/lib/exceptions"
+import { addDomainToCloudflare } from "@/lib/server/internal/manageCloudflareDomains"
 
 export async function createDomainsAction({
   orgId,
@@ -52,7 +53,11 @@ export async function createDomainsAction({
         "You can only connect one custom domain or subdomain per organization",
     })
   }
-  await addDomainToVercel(finalDomain)
+  if (process.env.IS_SELF_HOSTED === "true") {
+    await addDomainToCloudflare(finalDomain)
+  } else {
+    await addDomainToVercel(finalDomain)
+  }
   await db.insert(websiteDomain).values({
     orgId,
     domainName: finalDomain,

@@ -6,6 +6,10 @@ import {
   verifyDomainOnVercel,
 } from "@/lib/server/internal/manageVercelDomain"
 import { AppError } from "@/lib/exceptions"
+import {
+  getCloudflareDomainStatus,
+  refreshCloudflareVerification,
+} from "@/lib/server/internal/manageCloudflareDomains"
 
 export async function verifyDomainDnsAction({
   orgId,
@@ -14,6 +18,7 @@ export async function verifyDomainDnsAction({
   orgId: string
   domainId: string
 }) {
+  let isFullyActive = false
   const [domain] = await db
     .select({
       domainName: websiteDomain.domainName,
@@ -26,11 +31,20 @@ export async function verifyDomainDnsAction({
     throw new AppError({ ok: false, toast: "Domain not found" })
   }
 
-  const verifyData = (await verifyDomainOnVercel(domain.domainName)) as any
-  // 2. Check DNS Configuration (The missing piece)
-  const configData = (await getVercelDomainConfig(domain.domainName)) as any
-  const isDnsValid = !configData.misconfigured
-  const isFullyActive = verifyData.verified && isDnsValid
+  if (process.env.IS_SELF_HOSTED === "true") {
+    let cfStatus = await getCloudflareDomainStatus(domain.domainName)
+    if (cfStatus.status !== "active" || cfStatus.sslStatus !== "active") {
+      await refreshCloudflareVerification(cfStatus.id)
+      cfStatus = await getCloudflareDomainStatus(domain.domainName)
+    }
+
+    isFullyActive =
+      cfStatus.status === "active" && cfStatus.sslStatus === "active"
+  } else {
+    const verifyData = (await verifyDomainOnVercel(domain.domainName)) as any
+    const configData = (await getVercelDomainConfig(domain.domainName)) as any
+    isFullyActive = verifyData.verified && !configData.misconfigured
+  }
   await db
     .update(websiteDomain)
     .set({

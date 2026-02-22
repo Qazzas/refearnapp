@@ -36,28 +36,29 @@ export const inviteTeamMember = async ({
         },
       })
     }
-    // 🟢 Enforce plan-based restrictions
+    const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true"
     const plan = await getUserPlan()
 
-    // Fetch how many team members currently exist
-    const teamCount = await db.query.team.findMany({
-      where: eq(team.organizationId, orgId),
-    })
-
-    if (plan.plan === "FREE") {
-      throw new AppError({
-        status: 403,
-        toast: "Free plan users cannot invite team members.",
+    // 🟢 Enforce plan-based restrictions (Skip if Self-Hosted)
+    if (!isSelfHosted) {
+      const teamCount = await db.query.team.findMany({
+        where: eq(team.organizationId, orgId),
       })
-    }
 
-    if (plan.plan === "PRO" && teamCount.length >= 3) {
-      throw new AppError({
-        status: 403,
-        toast: "Pro plan allows up to 3 team members. Upgrade for more.",
-      })
-    }
+      if (plan.plan === "FREE") {
+        throw new AppError({
+          status: 403,
+          toast: "Free plan users cannot invite team members.",
+        })
+      }
 
+      if (plan.plan === "PRO" && teamCount.length >= 3) {
+        throw new AppError({
+          status: 403,
+          toast: "Pro plan allows up to 3 team members. Upgrade for more.",
+        })
+      }
+    }
     // Check if this email is already invited
     const existingTeamMember = await db.query.team.findFirst({
       where: and(eq(team.email, email), eq(team.organizationId, orgId)),

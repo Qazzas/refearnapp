@@ -3,6 +3,10 @@ import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
 import { deleteDomainFromVercel } from "@/lib/server/internal/manageVercelDomain"
 import { AppError } from "@/lib/exceptions"
+import {
+  deleteDomainFromCloudflare,
+  getCloudflareDomainStatus,
+} from "@/lib/server/internal/manageCloudflareDomains"
 
 export async function deleteDomainAction({
   orgId,
@@ -31,8 +35,14 @@ export async function deleteDomainAction({
   if (domain.isPrimary) {
     throw new AppError({ ok: false, toast: "Primary domain cannot be deleted" })
   }
+  // Inside deleteDomainAction...
   if (domain.type !== "DEFAULT") {
-    await deleteDomainFromVercel(domain.domainName)
+    if (process.env.IS_SELF_HOSTED === "true") {
+      const cfData = await getCloudflareDomainStatus(domain.domainName)
+      await deleteDomainFromCloudflare(cfData.id)
+    } else {
+      await deleteDomainFromVercel(domain.domainName)
+    }
   }
   await db
     .delete(websiteDomain)

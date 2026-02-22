@@ -54,6 +54,7 @@ const OrganizationDashboardSidebar = ({
   UserData,
 }: Props) => {
   const pathname = usePathname()
+  const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true"
   useCloseSidebarOnNavigation()
   const { mutate: switchOrg, isPending } = useSwitchOrg()
   const items = [
@@ -167,7 +168,9 @@ const OrganizationDashboardSidebar = ({
   }
   const currentOrg = orgs?.find((o) => o.id === orgId)
   const canCreate =
-    plan.plan === "ULTIMATE" || (plan.plan === "PRO" && orgs.length < 1)
+    isSelfHosted ||
+    plan.plan === "ULTIMATE" ||
+    (plan.plan === "PRO" && orgs.length < 1)
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-center py-4">
@@ -261,56 +264,61 @@ const OrganizationDashboardSidebar = ({
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
-        {/* 🆓 FREE USERS → Upgrade or Purchase */}
-        {plan.plan === "FREE" && (
-          <Link
-            href={`/organization/${orgId}/dashboard/pricing`}
-            scroll={false}
-            className="block w-full"
-          >
-            <Button className="w-full">Upgrade or Purchase</Button>
-          </Link>
-        )}
-
-        {/* 💼 PRO PURCHASE USERS → Offer Ultimate purchase */}
-        {plan.type === "PURCHASE" && plan.plan === "PRO" && (
-          <Link
-            href={`/organization/${orgId}/dashboard/pricing`}
-            scroll={false}
-            className="block w-full"
-          >
-            <Button className="w-full">Purchase Ultimate Bundle</Button>
-          </Link>
-        )}
-
-        {/* 🔁 SUBSCRIPTION or EXPIRED → Manage + Purchase */}
-        {(plan.type === "SUBSCRIPTION" || plan.type === "EXPIRED") &&
-          (plan.plan === "PRO" || plan.plan === "ULTIMATE") && (
-            <>
-              {!plan.hasPendingPurchase && (
-                <Button
-                  className="w-full"
-                  onClick={() => {
-                    openPortal()
-                  }}
-                >
-                  Manage Subscription
-                </Button>
-              )}
-
+        {/* 🛡️ SELF-HOSTED: Show a "Pro License" badge instead of billing buttons */}
+        {isSelfHosted ? (
+          <div className="px-3 py-2 mb-2 rounded-md bg-green-500/10 border border-green-500/20">
+            <p className="text-xs font-bold text-green-600 text-center uppercase tracking-wider">
+              Self-Hosted License
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* 🆓 FREE USERS → Upgrade or Purchase */}
+            {plan.plan === "FREE" && (
               <Link
                 href={`/organization/${orgId}/dashboard/pricing`}
                 scroll={false}
                 className="block w-full"
               >
-                <Button variant="outline" className="w-full">
-                  {plan.hasPendingPurchase
-                    ? "Purchase One-Time Plan"
-                    : "Change Plan"}
-                </Button>
+                <Button className="w-full">Upgrade or Purchase</Button>
               </Link>
-            </>
-          )}
+            )}
+
+            {/* 💼 PRO PURCHASE USERS → Offer Ultimate purchase */}
+            {plan.type === "PURCHASE" && plan.plan === "PRO" && (
+              <Link
+                href={`/organization/${orgId}/dashboard/pricing`}
+                scroll={false}
+                className="block w-full"
+              >
+                <Button className="w-full">Purchase Ultimate Bundle</Button>
+              </Link>
+            )}
+
+            {/* 🔁 SUBSCRIPTION or EXPIRED → Manage + Purchase */}
+            {(plan.type === "SUBSCRIPTION" || plan.type === "EXPIRED") &&
+              (plan.plan === "PRO" || plan.plan === "ULTIMATE") && (
+                <>
+                  {!plan.hasPendingPurchase && (
+                    <Button className="w-full" onClick={() => openPortal()}>
+                      Manage Subscription
+                    </Button>
+                  )}
+                  <Link
+                    href={`/organization/${orgId}/dashboard/pricing`}
+                    scroll={false}
+                    className="block w-full"
+                  >
+                    <Button variant="outline" className="w-full">
+                      {plan.hasPendingPurchase
+                        ? "Purchase One-Time Plan"
+                        : "Change Plan"}
+                    </Button>
+                  </Link>
+                </>
+              )}
+          </>
+        )}
 
         <Link href={`/organization/${orgId}/dashboard/profile`}>
           <div className="flex items-center space-x-3 p-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors cursor-pointer">

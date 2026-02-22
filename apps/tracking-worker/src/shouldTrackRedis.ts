@@ -1,6 +1,7 @@
 import { RedisLinkMetadata } from './redisLinkMetadata';
 
-export function shouldTrackRedis(org: RedisLinkMetadata): boolean {
+export function shouldTrackRedis(org: RedisLinkMetadata, isSelfHosted: boolean): boolean {
+	if (isSelfHosted) return true;
 	if (!org) return false;
 
 	const { paymentType, expiresAt } = org;
