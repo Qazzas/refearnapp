@@ -61,7 +61,7 @@ export function DomainInputField({
 
     setDomainType(newType)
     onDomainTypeChange?.(newType)
-  }, [domainValue])
+  }, [domainValue, onDomainTypeChange])
   const displayDomain =
     !domainValue || !normalized
       ? ""
