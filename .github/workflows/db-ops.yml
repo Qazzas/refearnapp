@@ -1,14 +1,12 @@
 name: Database Operations
 
 on:
-  # 1. Automatic: Run migrations on push to main
   push:
     branches: [main]
     paths:
-      - 'src/db/schema.ts'
-      - 'migrations/**'
+      - 'apps/dashboard/src/db/schema.ts'  # Updated path
+      - 'apps/dashboard/migrations/**'     # Updated path
 
-  # 2. Manual: Trigger Reset/Seed from the GitHub Actions tab
   workflow_dispatch:
     inputs:
       target:
@@ -23,6 +21,11 @@ on:
 jobs:
   database-tasks:
     runs-on: ubuntu-latest
+    # This line tells GitHub to run all 'run' commands inside the dashboard folder
+    defaults:
+      run:
+        working-directory: apps/dashboard
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -33,16 +36,14 @@ jobs:
           bun-version: latest
 
       - name: Install Dependencies
+        # Bun is smart enough to find the root pnpm-lock.yaml or local package.json
         run: bun install
 
-      # Fixed Indentation and Logic
-      # This ensures 'main' branch pushes go to PROD
       - name: Auto Migrate Schema
         env:
           SUPABASE_DATABASE_URL: ${{ (github.ref == 'refs/heads/main' || github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
-        run: bun drizzle-kit migrate
+        run: bunx drizzle-kit migrate
 
-      # Only run the Reset/Seed sequence if the user clicked "Run Workflow" manually
       - name: Manual Reset and Seed
         if: github.event_name == 'workflow_dispatch'
         env:
