@@ -1,5 +1,5 @@
 {
-  "id": "a679c1ea-8630-4137-b528-68091995a94e",
+  "id": "6941ad3b-d23b-455d-bdb4-5fcc920f3727",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1104,6 +1104,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "support_email": {
+          "name": "support_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "logo_url": {
           "name": "logo_url",
