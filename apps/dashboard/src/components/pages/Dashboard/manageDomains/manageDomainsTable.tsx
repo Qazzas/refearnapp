@@ -343,34 +343,65 @@ export function ManageDomainsTable({
       >
         {actionDialog?.type === "verify-dns" && (
           <div className="space-y-3 text-sm">
-            {actionDialog.domainType === "CUSTOM_DOMAIN" ? (
-              <div className="rounded-md border p-3 bg-gray-50 font-mono">
-                <div>
-                  <b>Type:</b> A
+            {process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true" ? (
+              /* ☁️ SELF-HOSTED: Cloudflare CNAME Logic */
+              <div className="space-y-4">
+                <div className="p-2 bg-blue-50 border border-blue-100 rounded text-blue-800 text-[10px] leading-relaxed">
+                  Point your domain to your worker instance:{" "}
+                  <b>{process.env.NEXT_PUBLIC_CNAME_TARGET}</b>
                 </div>
-                <div>
-                  <b>Name:</b> @
-                </div>
-                <div>
-                  <b>Value:</b> 216.198.79.1
+                <div className="rounded-md border p-3 bg-gray-50 font-mono text-xs space-y-1">
+                  <div>
+                    <b>Type:</b> CNAME
+                  </div>
+                  <div>
+                    <b>Name:</b>{" "}
+                    {actionDialog.domainName?.includes(".") &&
+                    actionDialog.domainType !== "CUSTOM_DOMAIN"
+                      ? actionDialog.domainName.split(".")[0]
+                      : "@"}
+                  </div>
+                  <div className="break-all">
+                    <b>Value:</b> {process.env.NEXT_PUBLIC_CNAME_TARGET}
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="rounded-md border p-3 bg-gray-50 font-mono">
-                <div>
-                  <b>Type:</b> CNAME
-                </div>
-                <div>
-                  <b>Name:</b> {actionDialog.domainName?.split(".")[0]}
-                </div>
-                <div>
-                  <b>Value:</b> abf46c59de406f48.vercel-dns-017.com.
-                </div>
-              </div>
+              /* 🔺 NORMAL HOSTING: Vercel A/CNAME Logic */
+              <>
+                {actionDialog.domainType === "CUSTOM_DOMAIN" ? (
+                  <div className="rounded-md border p-3 bg-gray-50 font-mono">
+                    <div>
+                      <b>Type:</b> A
+                    </div>
+                    <div>
+                      <b>Name:</b> @
+                    </div>
+                    <div>
+                      <b>Value:</b> 216.198.79.1
+                    </div>{" "}
+                    {/* Updated to standard Vercel IP */}
+                  </div>
+                ) : (
+                  <div className="rounded-md border p-3 bg-gray-50 font-mono">
+                    <div>
+                      <b>Type:</b> CNAME
+                    </div>
+                    <div>
+                      <b>Name:</b> {actionDialog.domainName?.split(".")[0]}
+                    </div>
+                    <div>
+                      <b>Value:</b> cname.vercel-dns.com
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
-            <p className="text-xs text-gray-500">
+            <p className="text-[10px] text-gray-500 italic">
               DNS changes may take a few minutes to propagate.
+              {process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true" &&
+                " SSL verification can take up to 15 mins."}
             </p>
           </div>
         )}

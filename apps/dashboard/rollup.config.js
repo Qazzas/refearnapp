@@ -17,10 +17,8 @@ export default {
   plugins: [
     replace({
       preventAssignment: true,
-      "process.env.CLOUDFLARE_URL": JSON.stringify(
-        isProd
-          ? "https://tracking-worker.zekariyasberihun8.workers.dev"
-          : "https://tracking-worker-dev.zekariyasberihun8.workers.dev"
+      "process.env.NODE_ENV": JSON.stringify(
+        process.env.NODE_ENV || "production"
       ),
     }),
     nodeResolve(),

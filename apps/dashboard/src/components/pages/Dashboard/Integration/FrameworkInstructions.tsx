@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { CopyButton } from "@/components/ui/copy-button"
 import { Card } from "@/components/ui/card"
@@ -14,43 +14,47 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 
-const scriptUrl =
-  "https://affiliate-marketing-ten.vercel.app/affiliateTrackingJavascript.js"
-
-const frameworks = [
-  {
-    name: "Next.js",
-    description:
-      "Place the script using the built-in `next/script` component, typically in your `_app.tsx` or a layout component.",
-    code: `<Script src="${scriptUrl}" />`,
-    language: "tsx",
-  },
-  {
-    name: "React",
-    description:
-      'Insert this inside your main HTML template (e.g. in "public/index.html" if using CRA).',
-    code: `<script src="${scriptUrl}"></script>`,
-    language: "html",
-  },
-  {
-    name: "Vue",
-    description:
-      'Add the script to your "public/index.html" file before the closing </body> tag.',
-    code: `<script src="${scriptUrl}"></script>`,
-    language: "html",
-  },
-  {
-    name: "Svelte / SvelteKit",
-    description:
-      'Place this in the HTML template (e.g. "app.html" or "__layout.svelte" depending on your setup).',
-    code: `<script src="${scriptUrl}"></script>`,
-    language: "html",
-  },
-]
-
 export default function FrameworkInstructions() {
   const [value, setValue] = React.useState("Next.js")
+  // 1. Detect the origin (fallback to your cloud domain during SSR)
+  const [origin, setOrigin] = useState("https://refearnapp.com")
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin)
+    }
+  }, [])
+  const frameworks = useMemo(() => {
+    const url = `${origin}/affiliateTrackingJavascript.js`
+
+    return [
+      {
+        name: "Next.js",
+        description:
+          "Place the script using the built-in next/script component...",
+        code: `<Script src="${url}" />`,
+        language: "tsx",
+      },
+      {
+        name: "React",
+        description: "Insert this inside your main HTML template...",
+        code: `<script src="${url}"></script>`,
+        language: "html",
+      },
+      {
+        name: "Vue",
+        description: "Add the script to your public/index.html file...",
+        code: `<script src="${url}"></script>`,
+        language: "html",
+      },
+      {
+        name: "Svelte / SvelteKit",
+        description: "Place this in the HTML template...",
+        code: `<script src="${url}"></script>`,
+        language: "html",
+      },
+    ]
+  }, [origin])
   return (
     <div className="mt-8 space-y-6 text-left">
       <p className="text-muted-foreground">

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import FrameworkInstructions from "@/components/pages/Dashboard/Integration/FrameworkInstructions"
 import Connect from "@/components/pages/Dashboard/Integration/Paddle/Connect"
@@ -18,10 +18,18 @@ export default function PaddleIntegration({
   isTeam?: boolean
 }) {
   const [copied, setCopied] = useState(false)
-  const WEBHOOK_URL = `https://origin.refearnapp.com/api/webhooks/paddle/${orgId}`
+  const [webhookUrl, setWebhookUrl] = useState("")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const currentOrigin = window.location.origin
+
+      setWebhookUrl(`${currentOrigin}/api/webhooks/paddle/${orgId}`)
+    }
+  }, [orgId])
   const handleCopy = () => {
     navigator.clipboard
-      .writeText(WEBHOOK_URL)
+      .writeText(webhookUrl)
       .then(() => console.log("Webhook URL copied to clipboard"))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -40,7 +48,7 @@ export default function PaddleIntegration({
           {/* CONNECT PADDLE */}
           <TabsContent value="connect">
             <Connect
-              WEBHOOK_URL={WEBHOOK_URL}
+              WEBHOOK_URL={webhookUrl}
               copied={copied}
               handleCopy={handleCopy}
               orgId={orgId}

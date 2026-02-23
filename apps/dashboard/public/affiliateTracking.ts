@@ -1,10 +1,12 @@
 import { UAParser } from "ua-parser-js"
 
-// 1. Let Rollup swap this variable based on the build flag
-const CLOUDFLARE_URL = process.env.CLOUDFLARE_URL
+const scriptTag = document.currentScript as HTMLScriptElement
+const scriptUrl = new URL(scriptTag?.src || window.location.href)
+
+// This replaces the hardcoded Rollup variable with the dynamic origin
+const CLOUDFLARE_URL = scriptUrl.origin
 const TRACKING_ENDPOINT = `${CLOUDFLARE_URL}/track`
 const ORGID_ENDPOINT = `${CLOUDFLARE_URL}/org`
-
 const REF_KEYS = ["ref", "aff", "via"]
 
 function convertToSeconds(value: number, unit: string): number {
