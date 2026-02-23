@@ -42,7 +42,7 @@ jobs:
       - name: Auto Migrate Schema
         env:
           SUPABASE_DATABASE_URL: ${{ (github.ref == 'refs/heads/main' || github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
-        run: bunx drizzle-kit migrate
+        run: bun run db:migrate
 
       - name: Manual Reset and Seed
         if: github.event_name == 'workflow_dispatch'
