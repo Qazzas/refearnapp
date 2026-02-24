@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { initializePaddle } from '@paddle/paddle-js';
-const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN;
-const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV;
+import { paddleConfig } from '@repo/paddle';
+const PADDLE_TOKEN = paddleConfig.client.token;
+const PADDLE_ENV = paddleConfig.env;
 const PADDLE_IDS = {
-  pro_one_time: import.meta.env.PUBLIC_PADDLE_PRO_ID,
-  ult_one_time: import.meta.env.PUBLIC_PADDLE_ULT_ID,
+  pro_one_time: paddleConfig.priceIds.PURCHASE.PRO,
+  ult_one_time: paddleConfig.priceIds.PURCHASE.ULTIMATE,
 };
 const activePaddle = ref(null);
 onMounted(async () => {

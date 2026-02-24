@@ -10,9 +10,11 @@ import vue from '@astrojs/vue';
 // https://astro.build/config
 export default defineConfig({
   vite: {
-    plugins: [tailwindcss()]
+    // @ts-ignore
+    plugins: [tailwindcss()],
+    envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   },
 
   adapter: cloudflare(),
-  integrations: [vue()]
+  integrations: [vue()],
 });

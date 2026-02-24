@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@repo/paddle':
-        specifier: workspace:*
-        version: link:packages/paddle-config
     devDependencies:
       turbo:
         specifier: latest
