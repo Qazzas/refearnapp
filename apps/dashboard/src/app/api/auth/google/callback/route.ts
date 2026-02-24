@@ -18,11 +18,10 @@ import { assignLifetimePurchase } from "@/lib/server/organization/assignLifetime
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions" // Assuming you have this for custom errors
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
-const REDIRECT_URI = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/google/callback`
-
 export const GET = handleRoute("Google OAuth Callback", async (req) => {
+  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
+  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
+  const REDIRECT_URI = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/google/callback`
   const url = new URL(req.url)
   const code = url.searchParams.get("code")
   const stateRaw = url.searchParams.get("state") || ""

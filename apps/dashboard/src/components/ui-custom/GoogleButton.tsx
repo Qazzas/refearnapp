@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { googleButtonCustomizationAtom } from "@/store/AuthCustomizationAtom"
 import { useAtomValue } from "jotai"
+import { useEffect, useState } from "react"
 
 type GoogleButtonProps = {
   affiliate: boolean
@@ -26,9 +27,12 @@ export function GoogleButton({
     googleButtonBackgroundColor,
     googleIconColor,
   } = useAtomValue(googleButtonCustomizationAtom)
+  const [txnId, setTxnId] = useState<string | null>(null)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    setTxnId(urlParams.get("txn"))
+  }, [])
   const type = isTeam ? "team" : affiliate ? "affiliate" : "organization"
-  const urlParams = new URLSearchParams(window.location.search)
-  const txnId = urlParams.get("txn")
   const handleClick = () => {
     if (isPreview) {
       window.open("https://www.google.com", "_blank")
