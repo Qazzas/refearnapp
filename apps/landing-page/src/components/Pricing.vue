@@ -7,14 +7,6 @@ const PADDLE_IDS = {
   pro_one_time: import.meta.env.PUBLIC_PADDLE_PRO_ID,
   ult_one_time: import.meta.env.PUBLIC_PADDLE_ULT_ID,
 };
-onMounted(async () => {
-  console.log('--- PRODUCTION ENV CHECK ---');
-  console.log('Token:', PADDLE_TOKEN);
-  console.log('Env:', PADDLE_ENV);
-  console.log('Pro ID:', PADDLE_IDS);
-  console.log('----------------------------');
-});
-
 const activePaddle = ref(null);
 onMounted(async () => {
   const paddleInstance = await initializePaddle({
