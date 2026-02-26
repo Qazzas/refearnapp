@@ -11,9 +11,9 @@ export default {
 		const PAGES_URL = env.PAGES_URL || 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = env.PRIMARY_HOST || 'www.refearnapp.com';
-		if (url.pathname === '/' && env.IS_SELF_HOSTED === 'true') {
-			return Response.redirect(`${url.origin}/signup`, 307);
-		}
+		// if (url.pathname === '/' && env.IS_SELF_HOSTED === 'true') {
+		// 	return Response.redirect(`${url.origin}/signup`, 307);
+		// }
 		// 1. SPECIFIC PUBLIC ASSETS (Strict Whitelist)
 		// These are the files you manually put in /public
 		const publicAssets = [
