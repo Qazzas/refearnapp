@@ -4,7 +4,7 @@ services:
   dashboard:
     build:
       context: .
-      target: runner
+      target: dashboard
       args:
         - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
         - NEXT_PUBLIC_SELF_HOSTED=${NEXT_PUBLIC_SELF_HOSTED}
@@ -12,6 +12,8 @@ services:
         - NEXT_PUBLIC_CNAME_TARGET=${NEXT_PUBLIC_CNAME_TARGET}
     ports:
       - "3000:3000"
-    # Keep env_file for RUNTIME secrets (DATABASE_URL, etc.)
+    environment:
+      - NEXT_PUBLIC_RESERVED_SUBDOMAINS=${NEXT_PUBLIC_RESERVED_SUBDOMAINS}
+      - REDIRECTION_URL=${REDIRECTION_URL}
     env_file: .env
     restart: always
