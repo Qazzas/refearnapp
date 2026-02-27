@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import type { PlanInfo } from "@/lib/types/organization/planInfo"
@@ -8,6 +8,7 @@ import { featuresList } from "@/util/FeatureList"
 import { SubscriptionSection } from "@/components/ui-custom/Pricing/SubscriptionSection"
 import { PricingGrid } from "@/components/ui-custom/Pricing/PricingGrid"
 import { getResponsiveTabSize } from "@/util/GetResponsiveTabSize"
+import { useParams, useRouter } from "next/navigation"
 
 export type BillingType = "SUBSCRIPTION" | "PURCHASE"
 export type SubscriptionCycle = "MONTHLY" | "YEARLY"
@@ -27,10 +28,20 @@ export default function PricingClient({
   const [activeTab, setActiveTab] = useState<BillingType>("PURCHASE")
   const [subscriptionCycle, setSubscriptionCycle] =
     useState<SubscriptionCycle>("MONTHLY")
-
-  const isCurrentPlan = (targetPlan: PlanInfo["plan"]) =>
-    plan?.plan === targetPlan
-
+  const router = useRouter()
+  const params = useParams()
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+  useEffect(() => {
+    if (isSelfHosted && dashboard) {
+      const orgId = params?.orgId
+      if (orgId) {
+        router.replace(`/organization/${orgId}/dashboard/analytics`)
+      } else {
+        router.replace("/signup")
+      }
+    }
+  }, [isSelfHosted, dashboard, router, params])
+  if (isSelfHosted && dashboard) return null
   const getButtonText = (
     targetPlan: PlanInfo["plan"],
     billingType: BillingType

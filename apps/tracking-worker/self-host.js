@@ -27,26 +27,23 @@ async function setup() {
 	// --- STEP 2: COLLECT DATA ---
 	console.log('\n📝 Configuration:');
 	const domain = prompt('Enter domain (e.g., voteflow.xyz):');
-	const ip = prompt('Enter Server IP:');
-	const pagesUrl = prompt('Landing Page URL (Optional):') || '';
-
+	const backendUrl = prompt('Enter Backend URL (e.g., https://origin.voteflow.xyz):');
 	console.log('\n🔒 Security:');
 	const internalSecret = prompt('INTERNAL_SECRET:');
 	const redisUrl = prompt('REDIS_URL:');
 	const redisToken = prompt('REDIS_TOKEN:');
 
-	if (!domain || !ip || !internalSecret || !redisUrl || !redisToken) {
+	if (!domain || !backendUrl || !internalSecret || !redisUrl || !redisToken) {
 		console.error('❌ Error: Missing required values.');
 		process.exit(1);
 	}
-
 	const workerName = `${domain.replace(/\./g, '-')}-tracker`;
 
 	// --- STEP 3: DEPLOY ---
 	try {
 		console.log(`\n📦 Step 1: Deploying Worker Code...`);
 
-		await $`npx wrangler deploy src/index.ts --name ${workerName} --compatibility-date 2024-04-01 --var PRIMARY_HOST:${domain} --var MAIN_APP_URL:http://${ip}:3000 --var PAGES_URL:${pagesUrl} --var IS_SELF_HOSTED:true`;
+		await $`npx wrangler deploy src/index.ts --name ${workerName} --compatibility-date 2024-04-01 --var PRIMARY_HOST:${domain} --var MAIN_APP_URL:${backendUrl} --var IS_SELF_HOSTED:true`;
 
 		console.log(`\n🔒 Step 2: Uploading Secrets...`);
 

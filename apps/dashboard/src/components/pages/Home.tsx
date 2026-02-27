@@ -7,8 +7,20 @@ import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import PricingClient from "@/components/ui-custom/Pricing/PricingClient"
 import FAQ from "@/components/sections/FAQ"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 const Home = () => {
+  const router = useRouter()
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+  useEffect(() => {
+    if (isSelfHosted) {
+      router.replace("/signup")
+    }
+  }, [isSelfHosted, router])
+  if (isSelfHosted) {
+    return null
+  }
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
