@@ -179,12 +179,12 @@ export default {
 
 			if (type === 'sync') {
 				// We pass a mock event object to trick the handler
-				await handleScheduled({ cron: '*/5 * * * *' }, env, ctx);
+				await handleScheduled({ cron: '*/5 * * * *' }, env);
 				return new Response('Sync triggered manually', { status: 200 });
 			}
 
 			if (type === 'seed') {
-				await handleScheduled({ cron: '0 0 * * *' }, env, ctx);
+				await handleScheduled({ cron: '0 0 * * *' }, env);
 				return new Response('Currency seed triggered manually', { status: 200 });
 			}
 
@@ -204,6 +204,6 @@ export default {
 		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
-		ctx.waitUntil(handleScheduled(event, env, ctx));
+		ctx.waitUntil(handleScheduled(event, env));
 	},
 };

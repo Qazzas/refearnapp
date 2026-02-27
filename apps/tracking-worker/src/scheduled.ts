@@ -1,6 +1,6 @@
 import { Redis } from '@upstash/redis/cloudflare';
 
-export async function handleScheduled(event: any, env: any, ctx: any) {
+export async function handleScheduled(event: any, env: any) {
 	console.log(`⏰ Cron Triggered: ${event.cron} at ${new Date().toISOString()}`);
 
 	switch (event.cron) {
