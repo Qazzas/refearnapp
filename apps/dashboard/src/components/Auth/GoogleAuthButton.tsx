@@ -9,13 +9,11 @@ import { useState } from "react"
 
 interface GoogleAuthButtonProps {
   action: "login" | "signup"
-  redirectTo?: string
   buttonText?: string
 }
 
 export const GoogleAuthButton = ({
   action = "login",
-  redirectTo = "/dashboard",
   buttonText = "Continue with Google",
 }: GoogleAuthButtonProps) => {
   const { toast } = useToast()

@@ -1,8 +1,7 @@
 "use server"
 import { OrgData } from "@/lib/types/organization/organization"
-import { ActionResult, MutationData } from "@/lib/types/organization/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
-import { getOrgData } from "@/lib/server/organization/getOrgData"
 import { updateSettings } from "@/lib/organizationAction/UpdateSettings"
 import { getTeamAuthAction } from "@/lib/server/team/getTeamAuthAction"
 export async function updateTeamOrgSettings(

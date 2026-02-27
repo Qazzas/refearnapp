@@ -2,7 +2,7 @@
 "use server"
 
 import { db } from "@/db/drizzle"
-import { affiliateAccount, teamAccount } from "@/db/schema"
+import { teamAccount } from "@/db/schema"
 import * as bcrypt from "bcrypt"
 import { eq, and } from "drizzle-orm"
 import jwt from "jsonwebtoken"

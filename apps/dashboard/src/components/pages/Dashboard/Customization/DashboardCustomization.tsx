@@ -12,7 +12,6 @@ import { useAtomValue } from "jotai"
 import { dashboardThemeCustomizationAtom } from "@/store/DashboardCustomizationAtom"
 import { MissingPaypalEmailCard } from "@/components/ui-custom/MissingPayoutEmailCard"
 import { DomainHeader } from "@/components/ui-custom/DomainHeader"
-import AffiliateCouponsTable from "@/components/pages/AffiliateDashboard/AffiliateCoupon/affiliateCouponTable"
 import AffiliateReferralsTable from "@/components/pages/AffiliateDashboard/referrals/AffiliateReferralTable"
 
 export function DashboardCustomization({

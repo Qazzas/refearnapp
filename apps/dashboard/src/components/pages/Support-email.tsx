@@ -11,13 +11,7 @@ import { sendTeamSupportMessage } from "@/app/(organization)/organization/[orgId
 import { sendSupportMessage } from "@/app/(organization)/organization/[orgId]/dashboard/supportEmail/action"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { Loader2, Mail, MessageSquare, LifeBuoy } from "lucide-react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 
 const supportSchema = z.object({
   header: z.string().min(1, "Subject is required"),

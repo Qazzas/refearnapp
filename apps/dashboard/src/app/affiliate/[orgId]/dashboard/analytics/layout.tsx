@@ -2,7 +2,6 @@
 import { MissingPaypalEmailCard } from "@/components/ui-custom/MissingPayoutEmailCard"
 import React from "react"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
-import { CustomizationProvider } from "@/app/affiliate/[orgId]/dashboard/customizationProvider"
 import { Metadata } from "next"
 import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"

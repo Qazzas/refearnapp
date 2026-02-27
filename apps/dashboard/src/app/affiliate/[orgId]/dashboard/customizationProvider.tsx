@@ -2,6 +2,7 @@
 import { useCustomizationSync } from "@/hooks/useCustomizationSync"
 import PendingState from "@/components/ui-custom/PendingState"
 import ErrorState from "@/components/ui-custom/ErrorState"
+import { ReactNode } from "react"
 
 export function CustomizationProvider({
   orgId,
@@ -9,7 +10,7 @@ export function CustomizationProvider({
   affiliate,
 }: {
   orgId: string
-  children: React.ReactNode
+  children: ReactNode
   affiliate: boolean
 }) {
   const { isPending, isError, refetch } = useCustomizationSync(

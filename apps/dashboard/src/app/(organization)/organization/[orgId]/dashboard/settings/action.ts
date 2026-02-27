@@ -1,10 +1,9 @@
 // app/actions/auth/orgInfo.ts
 "use server"
 import { OrgData } from "@/lib/types/organization/organization"
-import { ActionResult, MutationData } from "@/lib/types/organization/response"
+import { MutationData } from "@/lib/types/organization/response"
 import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { handleAction } from "@/lib/handleAction"
-import { getOrgData } from "@/lib/server/organization/getOrgData"
 import { updateSettings } from "@/lib/organizationAction/UpdateSettings"
 export async function updateOrgSettings(
   data: Partial<OrgData> & { id: string }

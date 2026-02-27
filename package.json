@@ -7,10 +7,18 @@
     "build": "turbo run build",
     "deploy:tracker": "pnpm --filter @repo/tracking-worker run deploy:self",
     "lint": "turbo run lint",
+    "lint:unused": "eslint . --config eslint.unused.config.mjs",
+    "lint:unused:fix": "eslint . --config eslint.unused.config.mjs --fix",
     "clean": "turbo run clean && rm -rf node_modules",
     "logs": "wrangler tail --filter @repo/tracking-worker"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "eslint": "^9.39.3",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "globals": "^17.3.0",
     "turbo": "latest"
   }
 }

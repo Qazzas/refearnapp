@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input"
-import { useEffect, useRef, useState } from "react"
+import { ChangeEvent, useEffect, useRef, useState } from "react"
 
 interface SearchInputProps {
   value: string
@@ -22,7 +22,7 @@ export function SearchInput({
     setLocalValue(value)
   }, [value])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const next = e.target.value
     setLocalValue(next)
 

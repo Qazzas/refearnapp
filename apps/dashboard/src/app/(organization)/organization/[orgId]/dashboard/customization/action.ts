@@ -1,21 +1,7 @@
 "use server"
 
-import { db } from "@/db/drizzle"
-import {
-  organizationAuthCustomization,
-  organizationDashboardCustomization,
-} from "@/db/schema"
-
-import { eq } from "drizzle-orm"
-import {
-  AuthCustomization,
-  defaultAuthCustomization,
-} from "@/customization/Auth/defaultAuthCustomization"
-import {
-  DashboardCustomization,
-  defaultDashboardCustomization,
-} from "@/customization/Dashboard/defaultDashboardCustomization"
-import { deepMerge } from "@/util/DeepMerge"
+import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
+import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
 import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"

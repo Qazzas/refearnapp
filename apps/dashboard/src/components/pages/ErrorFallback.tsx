@@ -3,7 +3,7 @@
 import React, { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
-import { AlertCircle, Rocket } from "lucide-react"
+import { AlertCircle } from "lucide-react"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 
 export default function ErrorFallback({

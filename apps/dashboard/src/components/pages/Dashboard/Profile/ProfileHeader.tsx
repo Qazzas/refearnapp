@@ -1,4 +1,3 @@
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import { DashboardThemeCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardThemeCustomizationOptions"
 import React from "react"
 import { useAtomValue } from "jotai"

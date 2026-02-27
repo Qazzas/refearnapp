@@ -2,7 +2,6 @@
 "use server"
 
 import { handleAction } from "@/lib/handleAction"
-import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { unlinkAffiliateService } from "@/lib/server/organization/unlinkAffiliateAction"
 import { MutationData } from "@/lib/types/organization/response"
 import { updatePromotionAssignmentService } from "@/lib/server/organization/updatePromotionAssignmentService"
