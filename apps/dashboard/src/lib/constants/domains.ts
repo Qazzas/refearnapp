@@ -21,10 +21,22 @@ const safeGetHostname = (input: string): string | null => {
  */
 const getReservedSubdomains = (): string[] => {
   const envValue = process.env.NEXT_PUBLIC_RESERVED_SUBDOMAINS || ""
-  return envValue
+  const reserved = envValue
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter((s) => s !== "")
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  if (baseUrl) {
+    const hostname = safeGetHostname(baseUrl)
+    if (hostname && hostname.includes(".")) {
+      const parts = hostname.split(".")
+      if (parts.length >= 3) {
+        reserved.push(parts[0])
+      }
+    }
+  }
+
+  return Array.from(new Set(reserved)) // Remove duplicates
 }
 
 /**
@@ -36,11 +48,20 @@ const getSystemBaseDomains = (): string[] => {
     process.env.NEXT_PUBLIC_BASE_URL,
     process.env.REDIRECTION_URL,
     process.env.EMAIL_DOMAIN,
+    process.env.NEXT_PUBLIC_APP_DOMAIN,
   ]
 
   rawInputs.forEach((input) => {
     const hostname = safeGetHostname(input || "")
-    if (hostname) domains.add(hostname)
+    if (hostname) {
+      domains.add(hostname)
+      if (hostname.includes(".")) {
+        const parts = hostname.split(".")
+        if (parts.length >= 3) {
+          domains.add(parts.slice(1).join("."))
+        }
+      }
+    }
   })
 
   return Array.from(domains)
