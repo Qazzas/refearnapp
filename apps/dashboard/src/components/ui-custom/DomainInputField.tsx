@@ -16,6 +16,7 @@ export function DomainInputField({
     type: "platform" | "custom-main" | "custom-subdomain" | null
   ) => void
 }) {
+  const baseDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || "refearnapp.com"
   const [domainType, setDomainType] = useState<
     "platform" | "custom-main" | "custom-subdomain" | null
   >(null)
@@ -43,32 +44,32 @@ export function DomainInputField({
 
   useEffect(() => {
     const normalized = domainValue.replace(/^https?:\/\//, "").toLowerCase()
-    let newType: typeof domainType = null
+    let newType: any = null
 
     if (!normalized) newType = null
+    // Check if it's a platform subdomain (either just 'apple' or 'apple.base.com')
     else if (
-      normalized.endsWith(".refearnapp.com") ||
-      /^[a-z0-9-]+$/i.test(normalized)
+      normalized.endsWith(`.${baseDomain}`) ||
+      !normalized.includes(".")
     ) {
       newType = "platform"
     } else {
       const parsed = parse(normalized)
       if (parsed.domain) {
-        if (parsed.subdomain) newType = "custom-subdomain"
-        else newType = "custom-main"
+        newType = parsed.subdomain ? "custom-subdomain" : "custom-main"
       }
     }
 
     setDomainType(newType)
     onDomainTypeChange?.(newType)
-  }, [domainValue, onDomainTypeChange])
+  }, [domainValue, baseDomain, onDomainTypeChange])
   const displayDomain =
     !domainValue || !normalized
       ? ""
       : domainType === "platform"
-        ? normalized.includes(".refearnapp.com")
+        ? normalized.endsWith(`.${baseDomain}`)
           ? normalized
-          : `${normalized}.refearnapp.com`
+          : `${normalized}.${baseDomain}`
         : normalized
   return (
     <div className="flex flex-col gap-2">

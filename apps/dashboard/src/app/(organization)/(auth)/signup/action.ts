@@ -9,6 +9,7 @@ import { customAlphabet } from "nanoid"
 import { MutationData } from "@/lib/types/organization/response"
 import { handleAction } from "@/lib/handleAction"
 import { AppError } from "@/lib/exceptions"
+import { restrictSelfHostedSignup } from "@/lib/server/organization/selfHostedGuards"
 
 type CreateUserPayload = {
   name: string
@@ -26,6 +27,7 @@ export const SignupServer = async ({
   transactionId,
 }: CreateUserPayload & { transactionId?: string }): Promise<MutationData> => {
   return handleAction("Signup Server", async () => {
+    await restrictSelfHostedSignup(false)
     if (!email || !password || !name) {
       throw new AppError({
         status: 400,

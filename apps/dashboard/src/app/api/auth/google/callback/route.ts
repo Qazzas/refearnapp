@@ -17,6 +17,7 @@ import { assignFreeTrialSubscription } from "@/lib/server/organization/assignFre
 import { assignLifetimePurchase } from "@/lib/server/organization/assignLifetimePurchase"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions" // Assuming you have this for custom errors
+import { restrictSelfHostedSignup } from "@/lib/server/organization/selfHostedGuards"
 
 export const GET = handleRoute("Google OAuth Callback", async (req) => {
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
@@ -157,6 +158,7 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
         appUser = existingUserByEmail
         if (txnId) await assignLifetimePurchase(existingUserByEmail.id, txnId)
       } else {
+        await restrictSelfHostedSignup()
         const [createdUser] = await db
           .insert(user)
           .values({ name, email, type: "ORGANIZATION", role: "OWNER" })

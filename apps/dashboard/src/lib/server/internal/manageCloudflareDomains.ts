@@ -4,6 +4,14 @@ const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID
 const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN
 
 export async function addDomainToCloudflare(domain: string) {
+  if (!CLOUDFLARE_ZONE_ID || !CLOUDFLARE_API_TOKEN) {
+    throw new AppError({
+      status: 500,
+      toast:
+        "Cloudflare configuration is missing. Please check CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_TOKEN in your environment variables.",
+      error: "MISSING_CF_CONFIG",
+    })
+  }
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/custom_hostnames`,
     {

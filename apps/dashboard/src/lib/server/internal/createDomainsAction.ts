@@ -39,21 +39,24 @@ export async function createDomainsAction({
     })
     return
   }
-  const existingCustomDomains = await db
-    .select()
-    .from(websiteDomain)
-    .where(
-      and(eq(websiteDomain.orgId, orgId), ne(websiteDomain.type, "DEFAULT"))
-    )
+  const isSelfHosted = process.env.IS_SELF_HOSTED === "true"
+  if (!isSelfHosted) {
+    const existingCustomDomains = await db
+      .select()
+      .from(websiteDomain)
+      .where(
+        and(eq(websiteDomain.orgId, orgId), ne(websiteDomain.type, "DEFAULT"))
+      )
 
-  if (existingCustomDomains.length >= 1) {
-    throw new AppError({
-      ok: false,
-      toast:
-        "You can only connect one custom domain or subdomain per organization",
-    })
+    if (existingCustomDomains.length >= 1) {
+      throw new AppError({
+        ok: false,
+        toast:
+          "You can only connect one custom domain per organization in the Cloud version.",
+      })
+    }
   }
-  if (process.env.IS_SELF_HOSTED === "true") {
+  if (isSelfHosted) {
     await addDomainToCloudflare(finalDomain)
   } else {
     await addDomainToVercel(finalDomain)

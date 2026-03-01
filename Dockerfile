@@ -46,16 +46,36 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Install 'tsx' or 'bun' globally if you use them for seeding, or use node
+RUN npm install -g tsx
+
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
-# Copy Next.js standalone output
-
+# 1. Copy Standalone Files
 COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/.next/static ./apps/dashboard/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/public ./apps/dashboard/public
 
+# 2. Copy Database Migrations & Seeding Scripts (Crucial for self-hosting)
+# Assuming migrations are in apps/dashboard/drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/drizzle ./apps/dashboard/drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/src/db ./apps/dashboard/src/db
+COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/drizzle.config.ts ./apps/dashboard/
+
+# 3. Create an entrypoint script
+RUN echo '#!/bin/sh \n\
+echo "Running migrations..." \n\
+# We use the bundled drizzle-kit if available or npx \n\
+npx drizzle-kit push --force --config apps/dashboard/drizzle.config.ts \n\
+echo "Seeding exchange rates..." \n\
+npx tsx apps/dashboard/src/db/currencySeed.ts \n\
+echo "Starting Next.js..." \n\
+node apps/dashboard/server.js' > /app/entrypoint.sh
+
+RUN chmod +x /app/entrypoint.sh && chown nextjs:nodejs /app/entrypoint.sh
+
 USER nextjs
 EXPOSE 3000
 
-# server.js is the entry point for standalone mode
-CMD ["node", "apps/dashboard/server.js"]
+# Use the entrypoint script
+CMD ["/app/entrypoint.sh"]

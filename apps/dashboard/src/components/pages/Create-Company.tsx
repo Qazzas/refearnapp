@@ -88,8 +88,9 @@ const CreateCompany = ({ mode, embed }: CreateCompanyProps) => {
 
   const onSubmit = (data: CompanyFormValues) => {
     let domain = data.defaultDomain.trim().toLowerCase()
-    if (!domain.includes(".") && !domain.endsWith(".refearnapp.com")) {
-      domain = `${domain}.refearnapp.com`
+    const baseDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || "refearnapp.com"
+    if (!domain.includes(".")) {
+      domain = `${domain}.${baseDomain}`
     }
     if (
       domainCache.shouldSkip(
