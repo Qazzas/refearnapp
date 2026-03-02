@@ -190,10 +190,9 @@ export default {
 
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
-		const actualHost = url.host;
 		const headers = new Headers(request.headers);
-		headers.set('host', actualHost);
-		headers.set('x-forwarded-host', actualHost);
+		headers.set('host', PRIMARY_HOST);
+		headers.set('x-forwarded-host', PRIMARY_HOST);
 		headers.set('x-forwarded-proto', 'https');
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
