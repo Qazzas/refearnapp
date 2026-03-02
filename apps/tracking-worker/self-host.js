@@ -48,7 +48,7 @@ async function setup() {
 		console.error('❌ Error: Missing required values.');
 		process.exit(1);
 	}
-	const workerName = `${domain.replace(/\./g, '-')}-tracker`;
+	const workerName = `${cleanDomain.replace(/\./g, '-')}-tracker`;
 
 	// --- STEP 3: DEPLOY ---
 	try {
