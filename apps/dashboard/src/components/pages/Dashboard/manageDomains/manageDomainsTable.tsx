@@ -53,6 +53,10 @@ export function ManageDomainsTable({
   affiliate = false,
   isTeam = false,
 }: AffiliatesTableManageDomainsProps) {
+  const cleanCnameTarget = (process.env.NEXT_PUBLIC_CNAME_TARGET || "")
+    .replace(/^https?:\/\//, "")
+    .split("/")[0]
+    .toLowerCase()
   useVerifyTeamSession(orgId, isTeam)
   const [domainType, setDomainType] = useState<DomainInputType | null>(null)
   const [open, setOpen] = useState(false)
@@ -348,7 +352,7 @@ export function ManageDomainsTable({
               <div className="space-y-4">
                 <div className="p-2 bg-blue-50 border border-blue-100 rounded text-blue-800 text-[10px] leading-relaxed">
                   Point your domain to your worker instance:{" "}
-                  <b>{process.env.NEXT_PUBLIC_CNAME_TARGET}</b>
+                  <b>{cleanCnameTarget}</b>
                 </div>
                 <div className="rounded-md border p-3 bg-gray-50 font-mono text-xs space-y-1">
                   <div>
@@ -362,7 +366,7 @@ export function ManageDomainsTable({
                       : "@"}
                   </div>
                   <div className="break-all">
-                    <b>Value:</b> {process.env.NEXT_PUBLIC_CNAME_TARGET}
+                    <b>Value:</b> {cleanCnameTarget}
                   </div>
                 </div>
               </div>

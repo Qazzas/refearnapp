@@ -49,6 +49,7 @@ const getSystemBaseDomains = (): string[] => {
     process.env.REDIRECTION_URL,
     process.env.EMAIL_DOMAIN,
     process.env.NEXT_PUBLIC_APP_DOMAIN,
+    process.env.R2_ACCESS_URL,
   ]
 
   rawInputs.forEach((input) => {

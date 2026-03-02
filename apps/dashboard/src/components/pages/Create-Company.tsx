@@ -87,19 +87,40 @@ const CreateCompany = ({ mode, embed }: CreateCompanyProps) => {
   })
 
   const onSubmit = (data: CompanyFormValues) => {
-    let domain = data.defaultDomain.trim().toLowerCase()
-    const baseDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || "refearnapp.com"
-    if (!domain.includes(".")) {
-      domain = `${domain}.${baseDomain}`
+    // 1. Clean the user input (strip protocol and www)
+    let userInput = data.defaultDomain
+      .trim()
+      .toLowerCase()
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .split("/")[0]
+
+    // 2. Clean the App Domain from ENV
+    const rawAppDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || "refearnapp.com"
+    const cleanAppDomain = rawAppDomain
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .split("/")[0]
+
+    // 3. Construct the final domain
+    // If user entered "acme", make it "acme.voteflow.xyz"
+    // If user entered "acme.com", keep it "acme.com"
+    let finalDomain = userInput
+    if (!userInput.includes(".")) {
+      finalDomain = `${userInput}.${cleanAppDomain}`
     }
+
+    // 4. Cache & Mutation
     if (
       domainCache.shouldSkip(
-        domain,
-        `Domain name "${domain}" already exists. Please choose another one.`
+        finalDomain,
+        `Domain name "${finalDomain}" already exists. Please choose another one.`
       )
-    )
+    ) {
       return
-    mutate({ ...data, defaultDomain: domain, mode })
+    }
+
+    mutate({ ...data, defaultDomain: finalDomain, mode })
   }
   const formContent = (
     <Form {...form}>
