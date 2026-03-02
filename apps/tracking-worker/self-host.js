@@ -26,41 +26,46 @@ async function setup() {
 
 	// --- STEP 2: COLLECT DATA ---
 	console.log('\n📝 Configuration:');
-	let rawDomain = prompt('Enter domain:');
-	const cleanDomain =
-		rawDomain
-			?.replace(/^https?:\/\//, '')
-			.replace(/\/$/, '')
-			.toLowerCase() || '';
-	const domain = `https://${cleanDomain}`;
-	let rawBackend = prompt('Enter Backend URL:');
-	const cleanBackend =
-		rawBackend
-			?.replace(/^https?:\/\//, '')
-			.replace(/\/$/, '')
-			.toLowerCase() || '';
-	const backendUrl = cleanBackend.startsWith('www.') ? cleanBackend : `www.${cleanBackend}`;
+
+	const rawVpsDomain = prompt('Enter VPS App URL:');
+	const rawPublicDomain = prompt('Enter Public Worker Domain:');
 	const internalSecret = prompt('INTERNAL_SECRET:');
 	const redisUrl = prompt('REDIS_URL:');
 	const redisToken = prompt('REDIS_TOKEN:');
 
-	if (!domain || !backendUrl || !internalSecret || !redisUrl || !redisToken) {
-		console.error('❌ Error: Missing required values.');
+	// Strict Blank Check
+	if (!rawVpsDomain?.trim() || !rawPublicDomain?.trim() || !internalSecret?.trim() || !redisUrl?.trim() || !redisToken?.trim()) {
+		console.error('\n❌ Error: All values are required. Deployment aborted.');
 		process.exit(1);
 	}
-	const workerName = `${cleanDomain.replace(/\./g, '-')}-tracker`;
+
+	// Formatting: Main App URL gets https://
+	const cleanApp = rawVpsDomain
+		.replace(/^https?:\/\//, '')
+		.replace(/\/$/, '')
+		.toLowerCase();
+	const mainAppUrl = `https://${cleanApp}`;
+
+	// Formatting: VPS Primary Host gets www.
+	const cleanVps = rawPublicDomain
+		.replace(/^https?:\/\//, '')
+		.replace(/\/$/, '')
+		.toLowerCase();
+	const vpsPrimaryHost = cleanVps.startsWith('www.') ? cleanVps : `www.${cleanVps}`;
+
+	// Use cleanApp for Worker Name (no dots, no https)
+	const workerName = `${cleanVps.replace(/\./g, '-')}-tracker`;
 
 	// --- STEP 3: DEPLOY ---
 	try {
 		console.log(`\n📦 Step 1: Deploying Worker Code...`);
 
-		await $`npx wrangler deploy src/index.ts --name ${workerName} --compatibility-date 2024-04-01 --var PRIMARY_HOST:${backendUrl} --var MAIN_APP_URL:${domain} --var IS_SELF_HOSTED:true`;
+		// PRIMARY_HOST gets the www domain (VPS), MAIN_APP_URL gets the https domain (App)
+		await $`npx wrangler deploy src/index.ts --name ${workerName} --compatibility-date 2024-04-01 --var PRIMARY_HOST:${vpsPrimaryHost} --var MAIN_APP_URL:${mainAppUrl} --var IS_SELF_HOSTED:true`;
 
 		console.log(`\n🔒 Step 2: Uploading Secrets...`);
 
-		// Helper function using the 'echo' method you preferred
 		const setSecret = async (k, v) => {
-			// We use .nothrow() and remove .quiet() temporarily if you need to debug errors here
 			await $`echo "${v.trim()}" | npx wrangler secret put ${k} --name ${workerName}`.quiet();
 			console.log(`  ✅ ${k} secured.`);
 		};
@@ -69,7 +74,7 @@ async function setup() {
 		await setSecret('UPSTASH_REDIS_REST_URL', redisUrl);
 		await setSecret('UPSTASH_REDIS_REST_TOKEN', redisToken);
 
-		console.log(`\n🎉 SUCCESS! Tracker live at ${domain}`);
+		console.log(`\n🎉 SUCCESS! Tracker live for ${vpsPrimaryHost}`);
 		console.log(`🔗 Dashboard: https://dash.cloudflare.com/?to=/:account/workers/services/view/${workerName}/production`);
 	} catch (e) {
 		console.error('\n❌ Deployment failed.');
