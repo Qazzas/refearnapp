@@ -168,7 +168,14 @@ export function ManageDomainsTable({
   const createDomainMutation = useAppMutation(createManageDomains, {
     affiliate,
   })
-  const tableData = data?.rows ?? []
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => console.log("Copied to clipboard"))
+  }
+  const tableData = useMemo(() => {
+    return data?.rows ?? []
+  }, [data])
   const hasNext = data?.hasNext ?? false
   const columns = useMemo(
     () =>
@@ -365,8 +372,17 @@ export function ManageDomainsTable({
                       ? actionDialog.domainName.split(".")[0]
                       : "@"}
                   </div>
-                  <div className="break-all">
-                    <b>Value:</b> {cleanCnameTarget}
+                  <div className="break-all flex items-center justify-between">
+                    <div>
+                      <b>Value:</b> {cleanCnameTarget}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(cleanCnameTarget)}
+                    >
+                      Copy
+                    </Button>
                   </div>
                 </div>
               </div>

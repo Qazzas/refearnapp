@@ -26,9 +26,20 @@ async function setup() {
 
 	// --- STEP 2: COLLECT DATA ---
 	console.log('\n📝 Configuration:');
-	const domain = prompt('Enter domain (e.g., voteflow.xyz):');
-	const backendUrl = prompt('Enter Backend URL (e.g., https://origin.voteflow.xyz):');
-	console.log('\n🔒 Security:');
+	let rawDomain = prompt('Enter domain:');
+	const cleanDomain =
+		rawDomain
+			?.replace(/^https?:\/\//, '')
+			.replace(/\/$/, '')
+			.toLowerCase() || '';
+	const domain = `https://${cleanDomain}`;
+	let rawBackend = prompt('Enter Backend URL:');
+	const cleanBackend =
+		rawBackend
+			?.replace(/^https?:\/\//, '')
+			.replace(/\/$/, '')
+			.toLowerCase() || '';
+	const backendUrl = cleanBackend.startsWith('www.') ? cleanBackend : `www.${cleanBackend}`;
 	const internalSecret = prompt('INTERNAL_SECRET:');
 	const redisUrl = prompt('REDIS_URL:');
 	const redisToken = prompt('REDIS_TOKEN:');

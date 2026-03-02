@@ -15,6 +15,7 @@ apps/tracking-worker/dist/
 apps/tracking-worker/.wrangler/
 
 # Env files (Important!)
+.env.example
 .env
 .env.local
 .env.production
