@@ -39,8 +39,9 @@ export default {
 		// Astro compiled files (JS/CSS) always live here.
 		// Your Vercel app likely doesn't use this specific folder name.
 		const isCompiledAsset = url.pathname.startsWith('/_astro/');
+		const isDocsPage = url.pathname.startsWith('/docs');
 		const shouldServeAstro =
-			isExplicitAsset || isCompiledAsset || (!isSelfHosted && (isHome || isLegalPage || isToolPage || isComparePage));
+			isExplicitAsset || isCompiledAsset || (!isSelfHosted && (isHome || isLegalPage || isToolPage || isComparePage || isDocsPage));
 		if (shouldServeAstro) {
 			const resp = await fetch(`${PAGES_URL}${url.pathname}${url.search}`);
 			const newResp = new Response(resp.body, resp);
