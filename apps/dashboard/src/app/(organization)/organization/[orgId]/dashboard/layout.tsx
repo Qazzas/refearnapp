@@ -13,6 +13,8 @@ import { getUserOrgs } from "@/lib/server/organization/getUserOrgs"
 import React from "react"
 import { SubscriptionStatusBanner } from "@/components/ui-custom/SubscriptionStatusBanner"
 import { getUserData } from "@/lib/server/organization/getUserProfile"
+import { checkVersion } from "@/lib/server/organization/check-update"
+import { SystemUpdate } from "@/components/ui-custom/SystemUpdate"
 interface OrganizationDashboardLayoutProps extends OrgIdProps {
   children: React.ReactNode
 }
@@ -26,6 +28,9 @@ export default async function DashboardLayout({
   const orgs = await getUserOrgs(decoded.id)
   const userResponse = await getUserData()
   const user = userResponse.ok ? userResponse.data : null
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+  const updateResult = isSelfHosted ? await checkVersion() : null
+  const updateInfo = updateResult?.ok ? updateResult.data : null
   return (
     <SidebarProvider affiliate={false} orgId={orgId}>
       <OrganizationDashboardSidebar
@@ -33,12 +38,14 @@ export default async function DashboardLayout({
         plan={plan}
         orgs={orgs}
         UserData={user}
+        updateInfo={updateInfo}
       />
       <SidebarInset className="relative flex w-full flex-1 flex-col bg-background overflow-auto">
         <div className="md:hidden px-6 pt-4">
           <SidebarTrigger />
         </div>
         <div className="py-6 px-6 w-full max-w-7xl mx-auto">
+          <SystemUpdate variant="banner" updateInfo={updateInfo} />
           <SubscriptionStatusBanner plan={plan} orgId={orgId} />
           {children}
         </div>

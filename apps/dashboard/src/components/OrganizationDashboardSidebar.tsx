@@ -38,6 +38,7 @@ import { usePaddlePortal } from "@/hooks/usePaddlePortal"
 import { handlePlanRedirect } from "@/util/HandlePlanRedirect"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
+import { SystemUpdate } from "@/components/ui-custom/SystemUpdate"
 
 // Menu items for the sidebar
 
@@ -46,12 +47,14 @@ type Props = {
   plan: PlanInfo
   orgs: { id: string; name: string }[]
   UserData: OrganizationData | null
+  updateInfo?: { isNewer: boolean; latestVersion: string; url: string } | null
 }
 const OrganizationDashboardSidebar = ({
   orgId,
   plan,
   orgs,
   UserData,
+  updateInfo,
 }: Props) => {
   const pathname = usePathname()
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
@@ -268,6 +271,7 @@ const OrganizationDashboardSidebar = ({
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
+        <SystemUpdate variant="badge" updateInfo={updateInfo} />
         {/* 🛡️ SELF-HOSTED: Show a "Pro License" badge instead of billing buttons */}
         {isSelfHosted ? (
           <div className="px-3 py-2 mb-2 rounded-md bg-green-500/10 border border-green-500/20">
