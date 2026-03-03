@@ -1,5 +1,8 @@
 import { z } from "zod"
 
+// Ensure this matches the constant in your other files
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN || "refearnapp.com"
+
 export const subdomainSchema = z
   .string()
   .min(2, "Subdomain must be at least 2 characters long")
@@ -30,7 +33,8 @@ export const hostnameSchema = z
     const last = labels[labels.length - 1]
     return !(!/^[a-z]{2,63}$/.test(last) && last.length < 2)
   }, "Invalid hostname or domain")
-  // 🚫 Add extra refine for multi-level refearnapp.com
+
+  // 🚫 DYNAMIC REFINE for the primary app domain
   .refine((raw) => {
     const v = raw
       .trim()
@@ -39,20 +43,23 @@ export const hostnameSchema = z
       .toLowerCase()
 
     const parts = v.split(".")
-    const isRefearnDomain =
-      v === "refearnapp.com" || v.endsWith(".refearnapp.com")
+    const isPrimaryDomain = v === APP_DOMAIN || v.endsWith(`.${APP_DOMAIN}`)
 
-    // Allow refearnapp.com itself
-    if (v === "refearnapp.com") return true
+    // Allow the primary domain itself (e.g., voteflow.xyz)
+    if (v === APP_DOMAIN) return true
 
-    // Allow only one subdomain before refearnapp.com
-    if (isRefearnDomain) {
-      return parts.length === 3 // e.g., shipfast.refearnapp.com ✅
+    // Allow only one subdomain level before the primary domain
+    if (isPrimaryDomain) {
+      const basePartsCount = APP_DOMAIN.split(".").length
+      // If domain is 'voteflow.xyz' (2 parts), 'test.voteflow.xyz' is 3 parts.
+      return parts.length === basePartsCount + 1
     }
 
-    return true // For custom domains
-  }, "Invalid subdomain: only one level allowed before refearnapp.com (e.g., shipfast.refearnapp.com)")
+    return true // For external custom domains (e.g., myproduct.com)
+  }, `Invalid subdomain: only one level allowed before ${APP_DOMAIN} (e.g., app.${APP_DOMAIN})`)
+
 export const domainCreateSchema = z.object({
   defaultDomain: z.union([subdomainSchema, hostnameSchema]),
 })
+
 export type DomainCreateForm = z.infer<typeof domainCreateSchema>

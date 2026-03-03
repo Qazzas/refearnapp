@@ -20,7 +20,7 @@ const redirectFromHost = redirectFromUrl ? getHostname(redirectFromUrl) : null
 const nextConfig: NextConfig = {
   async redirects() {
     // Only redirect if both URLs are provided and we are in self-hosted mode
-    if (isSelfHosted && redirectFromHost && baseUrl) {
+    if (!isSelfHosted && redirectFromHost && baseUrl) {
       return [
         {
           has: [
