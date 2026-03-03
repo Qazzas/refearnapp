@@ -190,27 +190,11 @@ export default {
 
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
-		// --- FINAL FORWARDING LOGIC ---
 		const headers = new Headers(request.headers);
-		let finalPath = url.pathname;
-		const host = url.hostname;
-
-		// 🚀 SELF-HOSTED ONLY: Handle Affiliate Subdomain Rewriting
-		if (isSelfHosted) {
-			const subdomain = host.split('.')[0];
-			const isSystemDomain = host === 'voteflow.xyz' || host === 'www.voteflow.xyz' || host === 'origin.voteflow.xyz';
-			if (!isSystemDomain && !finalPath.startsWith('/affiliate/')) {
-				const cleanPath = finalPath === '/' ? '' : finalPath;
-				finalPath = `/affiliate/${subdomain}${cleanPath}`;
-			}
-			headers.set('host', host);
-			headers.set('x-forwarded-host', host);
-		} else {
-			headers.set('host', PRIMARY_HOST);
-			headers.set('x-forwarded-host', PRIMARY_HOST);
-		}
+		headers.set('host', PRIMARY_HOST);
+		headers.set('x-forwarded-host', PRIMARY_HOST);
 		headers.set('x-forwarded-proto', 'https');
-		const newRequest = new Request(`${VERCEL_ORIGIN}${finalPath}${url.search}`, {
+		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
