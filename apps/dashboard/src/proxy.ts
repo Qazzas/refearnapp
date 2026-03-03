@@ -76,7 +76,10 @@ export async function proxy(req: NextRequest) {
    * 🟢 Active domain → rewrite
    */
   if (req.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL("/login", req.url), 307)
+    const affiliateHome = new URL(`/affiliate/${domain.orgId}`, req.url)
+    const response = NextResponse.rewrite(affiliateHome)
+    response.headers.set("x-current-host", host)
+    return response
   }
   const rewriteUrl = new URL(
     `/affiliate/${domain.orgId}${req.nextUrl.pathname}${req.nextUrl.search}`,
