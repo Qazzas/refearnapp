@@ -66,6 +66,13 @@ async function run() {
   }
 
   // --- STEP 3: SEEDING ---
+  console.log("\n🌱 Running system initialization...")
+  try {
+    await $`bun src/scripts/seedSystem.ts`
+    console.log("✅ System version initialized.")
+  } catch (err) {
+    console.warn("⚠️ System seeding failed.")
+  }
   console.log("\n🌱 Running currency seed script...")
   try {
     await $`bun src/db/currencySeed.ts` // NEW: Use Bun directly

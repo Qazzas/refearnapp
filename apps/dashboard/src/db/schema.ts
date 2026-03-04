@@ -690,7 +690,12 @@ export const invitation = pgTable(
   },
   (table) => [index("invitation_created_at_idx").on(table.createdAt)]
 )
-
+export const systemSettings = pgTable("system_settings", {
+  id: integer("id").primaryKey().default(1),
+  installedVersion: text("installed_version").notNull().default("0.1.0"),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  latestAvailableVersion: text("latest_available_version"),
+})
 export const organizationDashboardCustomization = pgTable(
   "organization_dashboard_customization",
   {
