@@ -21,10 +21,7 @@ on:
 jobs:
   database-tasks:
     runs-on: ubuntu-latest
-    # This line tells GitHub to run all 'run' commands inside the dashboard folder
-    defaults:
-      run:
-        working-directory: apps/dashboard
+    # ❌ REMOVE the 'defaults' block here. We want to control where we run things.
 
     steps:
       - name: Checkout Code
@@ -36,13 +33,14 @@ jobs:
           bun-version: latest
 
       - name: Install Dependencies
-        # Bun is smart enough to find the root pnpm-lock.yaml or local package.json
+        # ✅ Run this at the ROOT (no cd) so workspaces resolve correctly
         run: bun install
 
       - name: Auto Migrate Schema
         env:
           SUPABASE_DATABASE_URL: ${{ (github.ref == 'refs/heads/main' || github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
-        run: bun run db:migrate
+        # ✅ Navigate into the app folder ONLY for the command
+        run: cd apps/dashboard && bun run db:migrate
 
       - name: Manual Reset and Seed
         if: github.event_name == 'workflow_dispatch'
@@ -52,8 +50,10 @@ jobs:
           UPSTASH_REDIS_REST_TOKEN: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_REDIS_TOKEN || secrets.DEV_REDIS_TOKEN }}
           CURRENCY_API_KEY: ${{ secrets.CURRENCY_API_KEY }}
           MODE: ${{ github.event.inputs.target }}
+        # ✅ Navigate into the app folder for scripts too
         run: |
-          echo "🚀 Starting Reset and Seed sequence for ${{ github.event.inputs.target }}..."
+          cd apps/dashboard
+          echo "🚀 Starting Reset and Seed sequence..."
           bun src/db/reset.ts
           bun src/db/seeds/seedFun1.ts
           echo "✅ Database operation successful."
