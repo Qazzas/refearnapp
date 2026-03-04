@@ -82,7 +82,7 @@ async function run() {
     console.error(err.message)
   }
 
-  console.log("\n✨ ALL DONE! Your database is ready for Voteflow.\n")
+  console.log("\n✨ ALL DONE! Your database is ready.\n")
 }
 
 run()
