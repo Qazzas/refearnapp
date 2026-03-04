@@ -5,7 +5,7 @@ import path from "path"
 const envPath = path.resolve(".env")
 
 async function run() {
-  console.log("\n🗄️  Voteflow: Database Setup & Sync\n")
+  console.log("\n🗄️Database Setup & Sync\n")
 
   // --- STEP 1: ENV CHECK ---
   if (!fs.existsSync(envPath)) {
@@ -68,7 +68,7 @@ async function run() {
   // --- STEP 3: SEEDING ---
   console.log("\n🌱 Running system initialization...")
   try {
-    await $`bun src/scripts/seedSystem.ts`
+    await $`bun src/db/seedSystem.ts`
     console.log("✅ System version initialized.")
   } catch (err) {
     console.warn("⚠️ System seeding failed.")
