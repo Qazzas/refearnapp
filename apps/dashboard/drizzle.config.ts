@@ -6,4 +6,7 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.SUPABASE_DATABASE_URL!,
   },
+  schemaFilter: ["public"],
+  verbose: true,
+  strict: true,
 })
