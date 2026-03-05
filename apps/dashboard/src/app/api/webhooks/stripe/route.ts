@@ -323,8 +323,11 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
         .insert(promotionCodes)
         .values(promoInserts)
         .onConflictDoUpdate({
-          target: [promotionCodes.externalId],
-          set: { updatedAt: new Date() },
+          target: [promotionCodes.externalId, promotionCodes.organizationId],
+          set: {
+            isActive: promo.active,
+            updatedAt: new Date(),
+          },
         })
 
       break
