@@ -181,28 +181,41 @@ export default {
 		}
 		// --- TRACK SIGNUP (LEAD) ---
 		if (url.pathname === '/track-signup' && request.method === 'POST') {
-			const { email } = (await request.json()) as { email: string };
+			const body = (await request.json()) as { email: string; manualCookieData?: string };
+			const { email, manualCookieData } = body;
 			if (!email) return new Response('Missing email', { status: 400, headers: credentialedCorsHeaders });
 
 			const cookieHeader = request.headers.get('Cookie') || '';
 			const cookieName = 'refearnapp_affiliate_cookie';
 			const rawCookie = cookieHeader.split('; ').find((row) => row.trim().startsWith(`${cookieName}=`));
 
-			if (!rawCookie) {
-				return new Response(JSON.stringify({ success: false, reason: 'No cookie' }), { status: 200, headers: credentialedCorsHeaders });
+			let affiliateData = null;
+
+			// 1. Extract the data from whichever source is available
+			if (rawCookie) {
+				const cookieValue = decodeURIComponent(rawCookie.split('=')[1]);
+				affiliateData = JSON.parse(cookieValue);
+			} else if (manualCookieData) {
+				affiliateData = JSON.parse(manualCookieData);
+			}
+
+			// 2. Check if we actually got something
+			if (!affiliateData) {
+				return new Response(JSON.stringify({ success: false, reason: 'No affiliate data' }), {
+					status: 200,
+					headers: credentialedCorsHeaders,
+				});
 			}
 
 			try {
-				const cookieValue = decodeURIComponent(rawCookie.split('=')[1]);
-				const affiliateData = JSON.parse(cookieValue);
+				// 3. USE the affiliateData we already found above
 				const code = affiliateData.code;
 
-				// 1. Get Org Settings from Redis (The ref:{code} object)
 				const org = await getOrgSettings(code, redis);
 				if (!org) return new Response('Org not found', { status: 404, headers: credentialedCorsHeaders });
+
 				const updatedCookieData = { ...affiliateData, email: email.toLowerCase() };
 
-				// 3. Update Stats & Usage (Clutter-free)
 				const now = new Date();
 				const monthStr = now.toISOString().slice(0, 7);
 				const dateStr = now.toISOString().slice(0, 10);
@@ -214,6 +227,7 @@ export default {
 						redis.sadd(`sync:leads:${org.orgId}:${dateStr}`, `${email.toLowerCase()}:::${code}`),
 					]),
 				);
+
 				return new Response(JSON.stringify({ success: true }), {
 					headers: {
 						...credentialedCorsHeaders,
@@ -222,7 +236,7 @@ export default {
 					},
 				});
 			} catch (e) {
-				return new Response('Error', { status: 500, headers: credentialedCorsHeaders });
+				return new Response('Error processing signup', { status: 500, headers: credentialedCorsHeaders });
 			}
 		}
 		if (url.pathname === '/health') {
