@@ -48,14 +48,17 @@ export default {
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
 		}
-		const origin = request.headers.get('Origin') || '*';
+
 		const corsHeaders = {
-			'Access-Control-Allow-Origin': origin,
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+			'Access-Control-Allow-Headers': 'Content-Type',
+		};
+		const credentialedCorsHeaders = {
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 			'Access-Control-Allow-Headers': 'Content-Type',
 			'Access-Control-Allow-Credentials': 'true',
 		};
-
 		if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
@@ -209,7 +212,7 @@ export default {
 				);
 				return new Response(JSON.stringify({ success: true }), {
 					headers: {
-						...corsHeaders,
+						...credentialedCorsHeaders,
 						'Content-Type': 'application/json',
 						'Set-Cookie': `${cookieName}=${encodeURIComponent(JSON.stringify(updatedCookieData))}; Path=/; HttpOnly; Secure; SameSite=Lax`,
 					},
