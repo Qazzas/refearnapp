@@ -21,65 +21,68 @@ export default function SignupTrackingInstructions() {
     () => [
       {
         name: "React / Next.js",
-        description: "Install the SDK and use it in your signup components.",
+        description: "Install via npm and use in your signup components.",
         language: "tsx",
-        code: `// 1. Install the SDK
-// npm install @refearnapp/sdk
+        code: `// 1. Install the package
+// npm install @refearnapp/js
 
-import { initRefearnapp, trackSignup } from "@refearnapp/sdk";
+import { initRefearnapp, trackSignup } from "@refearnapp/js";
 
 // 2. Initialize (Only once, e.g., in layout.tsx or _app.tsx)
 initRefearnapp("${origin}");
 
 // 3. Track signup in your form handler
 const onSuccess = async (email: string) => {
-  await trackSignup(email);
+  const result = await trackSignup(email);
+  if (result.success) console.log("Lead tracked!");
 };`,
       },
       {
         name: "Vue",
-        description: "Initialize in your main.js and use in your components.",
+        description: "Import the tracking functions into your Vue components.",
         language: "javascript",
-        code: `// npm install @refearnapp/sdk
+        code: `// npm install @refearnapp/js
 
-import { initRefearnapp, trackSignup } from "@refearnapp/sdk";
+import { initRefearnapp, trackSignup } from "@refearnapp/js";
 
 // Initialize in main.js
 initRefearnapp("${origin}");
 
-// In your component
+// In your signup component
 const handleSignup = async (email) => {
   await trackSignup(email);
 };`,
       },
       {
         name: "Svelte",
-        description: "Add tracking to your SvelteKit or Svelte app.",
+        description: "Import directly into your Svelte script tags.",
         language: "javascript",
-        code: `// npm install @refearnapp/sdk
+        code: `// npm install @refearnapp/js
 
 <script>
-  import { initRefearnapp, trackSignup } from "@refearnapp/sdk";
+  import { initRefearnapp, trackSignup } from "@refearnapp/js";
   
   initRefearnapp("${origin}");
 
   async function onSignup(email) {
-    await trackSignup(email);
+    const res = await trackSignup(email);
   }
 </script>`,
       },
       {
         name: "Plain JS",
-        description: "Access the SDK directly via the window object.",
+        description:
+          "Use the global functions if using the script tag directly.",
         language: "html",
         code: `<script src="${origin}/affiliateTrackingJavascript.js"></script>
 
 <script>
-  // 2. Access via the global window object
-  window.refearnapp.initRefearnapp("${origin}");
+  // 2. Initialize with your domain
+  // Note: Depending on your build, these may be on window.refearnapp
+  initRefearnapp("${origin}");
 
   async function handleSignup(email) {
-    await window.refearnapp.trackSignup(email);
+    await trackSignup(email);
   }
 </script>`,
       },
@@ -92,7 +95,7 @@ const handleSignup = async (email) => {
       <div className="space-y-2">
         <h4 className="text-lg font-semibold">Track Leads (Signups)</h4>
         <p className="text-muted-foreground">
-          {`Install our SDK to link a user's email address to the affiliate who referred them. This is required to calculate commissions when they eventually pay.`}
+          {`Use our official JavaScript library to link a user's email address to the affiliate who referred them. This allows us to attribute conversions to the correct partner.`}
         </p>
       </div>
 
