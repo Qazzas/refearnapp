@@ -48,10 +48,12 @@ export default {
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
 		}
+		const origin = request.headers.get('Origin') || '*';
 		const corsHeaders = {
-			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Origin': origin,
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 			'Access-Control-Allow-Headers': 'Content-Type',
+			'Access-Control-Allow-Credentials': 'true',
 		};
 
 		if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
