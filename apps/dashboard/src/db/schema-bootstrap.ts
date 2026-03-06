@@ -420,6 +420,7 @@ export const BOOTSTRAP_QUERIES = [
       CREATE INDEX IF NOT EXISTS "user_created_at_idx" ON "user" ("created_at");
       CREATE INDEX IF NOT EXISTS "website_domain_org_id_created_at_idx" ON "website_domain" ("org_id","created_at");
       CREATE INDEX IF NOT EXISTS "website_domain_created_at_idx" ON "website_domain" ("created_at");
+      CREATE INDEX IF NOT EXISTS "referrals_email_link_idx" ON "referrals" ("signup_email", "referral_link_id");
     `,
   },
 

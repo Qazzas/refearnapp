@@ -628,30 +628,41 @@ export const promotionCodes = pgTable(
     ),
   ]
 )
-export const referrals = pgTable("referrals", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  affiliateId: uuid("affiliate_id").references(() => affiliate.id, {
-    onDelete: "cascade",
-  }),
-  organizationId: text("organization_id").notNull(),
-  signupEmail: varchar("signup_email", { length: 255 }),
-  promotionCodeId: uuid("promotion_code_id").references(
-    () => promotionCodes.id
-  ),
-  affiliateLinkId: text("referral_link_id").references(() => affiliateLink.id),
-  signedAt: timestamp("signed_at").defaultNow().notNull(),
-  convertedAt: timestamp("converted_at"),
-  totalRevenue: numeric("total_revenue", { precision: 15, scale: 2 }).default(
-    "0.00"
-  ),
-  commissionEarned: numeric("commission_earned", {
-    precision: 15,
-    scale: 2,
-  }).default("0.00"),
-  isSeenByAffiliate: boolean("is_seen_by_affiliate").default(false).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-})
+export const referrals = pgTable(
+  "referrals",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    affiliateId: uuid("affiliate_id").references(() => affiliate.id, {
+      onDelete: "cascade",
+    }),
+    organizationId: text("organization_id").notNull(),
+    signupEmail: varchar("signup_email", { length: 255 }),
+    promotionCodeId: uuid("promotion_code_id").references(
+      () => promotionCodes.id
+    ),
+    affiliateLinkId: text("referral_link_id").references(
+      () => affiliateLink.id
+    ),
+    signedAt: timestamp("signed_at").defaultNow().notNull(),
+    convertedAt: timestamp("converted_at"),
+    totalRevenue: numeric("total_revenue", { precision: 15, scale: 2 }).default(
+      "0.00"
+    ),
+    commissionEarned: numeric("commission_earned", {
+      precision: 15,
+      scale: 2,
+    }).default("0.00"),
+    isSeenByAffiliate: boolean("is_seen_by_affiliate").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("referrals_email_link_idx").on(
+      table.signupEmail,
+      table.affiliateLinkId
+    ),
+  ]
+)
 export const subscriptionExpiration = pgTable(
   "subscription_expiration",
   {
