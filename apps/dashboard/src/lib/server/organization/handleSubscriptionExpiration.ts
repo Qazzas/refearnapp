@@ -7,15 +7,21 @@ import { eq } from "drizzle-orm"
 export async function handleSubscriptionExpiration(
   subscriptionId: string,
   organizationRecord: any,
+  promoRecord: any | null,
   trialDays: number = 0
 ) {
   const existing = await getSubscriptionExpiration(subscriptionId)
-
+  const durationValue =
+    promoRecord?.commissionDurationValue ??
+    organizationRecord.commissionDurationValue
+  const durationUnit =
+    promoRecord?.commissionDurationUnit ??
+    organizationRecord.commissionDurationUnit
   // Calculate the base window (e.g., 2 months)
   let expirationDate = calculateExpirationDate(
     new Date(),
-    organizationRecord.commissionDurationValue,
-    organizationRecord.commissionDurationUnit
+    durationValue,
+    durationUnit
   )
 
   // Add the trial overhead

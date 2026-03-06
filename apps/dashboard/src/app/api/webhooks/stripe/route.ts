@@ -37,20 +37,56 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session
-      const metadata = session.metadata || {}
+      const discounts = session.discounts || []
 
-      const refDataRaw = metadata.refearnapp_affiliate_code
-      if (!refDataRaw) break
+      let affiliateLinkRecord = null
+      let promoRecord = null
 
-      const { code, commissionType, commissionValue } = JSON.parse(refDataRaw)
-      const affiliateLinkRecord = await getAffiliateLinkRecord(code)
-      if (!affiliateLinkRecord) break
+      // Commission settings (defaulting to null, will resolve later)
+      let commissionType = null
+      let commissionValue = null
+
+      // 1. TRY PROMO CODE FIRST
+      if (discounts.length > 0) {
+        // Note: Stripe SDK types might need casting depending on your version
+        const stripePromoId = discounts[0].promotion_code as string
+        promoRecord = await db.query.promotionCodes.findFirst({
+          where: (t, { eq }) => eq(t.externalId, stripePromoId),
+        })
+
+        if (promoRecord?.affiliateId) {
+          affiliateLinkRecord = await db.query.affiliateLink.findFirst({
+            where: (t, { eq }) => eq(t.affiliateId, promoRecord!.affiliateId!),
+          })
+          commissionType = promoRecord.commissionType?.toLowerCase()
+          commissionValue = promoRecord.commissionValue
+        }
+      }
+
+      // 2. FALLBACK TO METADATA
+      if (!affiliateLinkRecord) {
+        const refDataRaw = session.metadata?.refearnapp_affiliate_code
+        if (refDataRaw) {
+          const {
+            code,
+            commissionType: metaType,
+            commissionValue: metaValue,
+          } = JSON.parse(refDataRaw)
+          affiliateLinkRecord = await getAffiliateLinkRecord(code)
+          commissionType = metaType?.toLowerCase()
+          commissionValue = metaValue
+        }
+      }
+
+      // If no attribution found, exit
+      if (!affiliateLinkRecord || !commissionType || !commissionValue) break
 
       const organizationRecord = await getOrganizationById(
         affiliateLinkRecord.organizationId
       )
       if (!organizationRecord) break
 
+      // 3. REMAINING LOGIC (Using the resolved variables above)
       const mode = session.mode
       const isSubscription = mode === "subscription"
       const isTrial = isSubscription && session.amount_total === 0
@@ -66,14 +102,13 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
         ? (session.subscription as string)
         : null
 
-      const rawAmount = safeFormatAmount(session.amount_total)
+      // Calculate Commission
+      const rawAmount = safeFormatAmount(session.amount_total || 0)
       const rawCurrency = session.currency ?? "usd"
-      const decimals = getCurrencyDecimals(rawCurrency)
-
       const { amount } = await convertToUSD(
         parseFloat(rawAmount),
         rawCurrency,
-        decimals
+        getCurrencyDecimals(rawCurrency)
       )
 
       let commission = 0
@@ -140,9 +175,11 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
         if (sub.trial_end && sub.trial_start) {
           trialDays = Math.round((sub.trial_end - sub.trial_start) / 86400)
         }
+
         await handleSubscriptionExpiration(
           subscriptionId,
           organizationRecord,
+          promoRecord,
           trialDays
         )
       }
