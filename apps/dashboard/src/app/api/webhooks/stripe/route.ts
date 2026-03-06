@@ -278,6 +278,13 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
             String(invoice.total_excluding_tax ?? 0)
           )
         }
+        console.log("DEBUG: Commission Data", {
+          type:
+            promoRecord?.commissionType ?? organizationRecord.commissionType,
+          value:
+            promoRecord?.commissionValue ?? organizationRecord.commissionValue,
+          rawAmount: String(invoice.total_excluding_tax ?? 0),
+        })
         await invoicePaidUpdate(
           String(invoice.total_excluding_tax ?? 0),
           invoice.currency,
