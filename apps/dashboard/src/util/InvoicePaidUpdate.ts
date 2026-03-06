@@ -14,7 +14,8 @@ export const invoicePaidUpdate = async (
   affiliateLinkId: string | null,
   commissionType: string,
   commissionValue: string,
-  placeholderId?: string | null
+  placeholderId?: string | null,
+  promotionCodeId?: string | null
 ) => {
   const rawAmount = safeFormatAmount(total)
   const rawCurrency = currency ?? "usd"
@@ -47,6 +48,7 @@ export const invoicePaidUpdate = async (
     updatedAt: new Date(),
     subscriptionId,
     affiliateLinkId,
+    promotionCodeId,
   }
 
   if (placeholderId) {

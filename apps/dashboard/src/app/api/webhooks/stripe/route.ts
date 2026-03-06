@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { db } from "@/db/drizzle"
 import { affiliateInvoice, promotionCodes } from "@/db/schema"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { convertToUSD } from "@/util/CurrencyConvert"
 import { getCurrencyDecimals } from "@/util/CurrencyDecimal"
 import { safeFormatAmount } from "@/util/SafeParse"
@@ -10,9 +10,11 @@ import { invoicePaidUpdate } from "@/util/InvoicePaidUpdate"
 import { getAffiliateLinkRecord } from "@/services/getAffiliateLinkRecord"
 import { getOrganizationById } from "@/services/getOrganizationById"
 import { handleSubscriptionExpiration } from "@/lib/server/organization/handleSubscriptionExpiration"
-import { checkSubscriptionExpired } from "@/util/CheckSubscriptionExpired"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
+import { convertReferral } from "@/util/ConvertReferral"
+import { updatePromoStats } from "@/util/updatePromoStats"
+import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
 
 export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -127,7 +129,8 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           ),
         orderBy: (table, { desc }) => [desc(table.createdAt)],
       })
-
+      const affiliateLinkId = promoRecord ? null : affiliateLinkRecord?.id
+      const promotionCodeId = promoRecord?.id ?? null
       // 2. UPDATE OR INSERT
       if (placeholder) {
         await db
@@ -140,7 +143,8 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
             rawCurrency,
             commission: commission.toString(),
             unpaidAmount: commission.toFixed(2),
-            affiliateLinkId: affiliateLinkRecord.id,
+            affiliateLinkId: affiliateLinkId,
+            promotionCodeId: promotionCodeId,
             reason: finalReason,
             updatedAt: new Date(),
           })
@@ -157,9 +161,21 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           commission: commission.toString(),
           paidAmount: "0.00",
           unpaidAmount: commission.toFixed(2),
-          affiliateLinkId: affiliateLinkRecord.id,
+          affiliateLinkId: affiliateLinkId,
+          promotionCodeId: promotionCodeId,
           reason: finalReason,
         })
+      }
+      if (promoRecord) {
+        await updatePromoStats(promoRecord.id, amount)
+      }
+      if (affiliateLinkRecord && !promoRecord) {
+        await convertReferral(
+          session,
+          affiliateLinkRecord.id,
+          amount,
+          commission
+        )
       }
 
       // 3. EXPIRATION LOGIC
@@ -195,12 +211,23 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
       const reason = invoice.billing_reason
 
       if (reason === "subscription_update" || reason === "subscription_cycle") {
+        let promoRecord = null
         if (subscriptionId) {
-          const isExpired = await checkSubscriptionExpired(
-            subscriptionId,
-            invoiceCreatedDate
-          )
-          if (isExpired) break
+          const expirationRecord =
+            await getSubscriptionExpiration(subscriptionId)
+
+          // Check expiration
+          if (
+            expirationRecord &&
+            invoiceCreatedDate > expirationRecord.expirationDate
+          ) {
+            break
+          }
+          if (expirationRecord?.promotionCodeId) {
+            promoRecord = await db.query.promotionCodes.findFirst({
+              where: (t, { eq }) => eq(t.id, expirationRecord.promotionCodeId!),
+            })
+          }
         }
 
         const historicalRecord = await db.query.affiliateInvoice.findFirst({
@@ -234,16 +261,29 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           affiliateLinkRecord.organizationId
         )
         if (!organizationRecord) break
-
+        const affiliateLinkId = promoRecord
+          ? null
+          : historicalRecord?.affiliateLinkId
+        if (promoRecord) {
+          await updatePromoStats(
+            promoRecord.id,
+            String(invoice.total_excluding_tax ?? 0)
+          )
+        }
         await invoicePaidUpdate(
           String(invoice.total_excluding_tax ?? 0),
           invoice.currency,
           customerId,
           subscriptionId || "",
-          historicalRecord.affiliateLinkId,
-          organizationRecord.commissionType ?? "percentage",
-          organizationRecord.commissionValue ?? "0.00",
-          placeholder?.id || null
+          affiliateLinkId,
+          promoRecord?.commissionType ??
+            organizationRecord.commissionType ??
+            "percentage",
+          promoRecord?.commissionValue ??
+            organizationRecord.commissionValue ??
+            "0.00",
+          placeholder?.id || null,
+          promoRecord?.id || null
         )
       }
       break

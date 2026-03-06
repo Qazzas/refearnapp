@@ -32,12 +32,17 @@ export async function handleSubscriptionExpiration(
   if (existing) {
     await db
       .update(subscriptionExpiration)
-      .set({ expirationDate, updatedAt: new Date() })
+      .set({
+        expirationDate,
+        promotionCodeId: promoRecord?.id ?? null,
+        updatedAt: new Date(),
+      })
       .where(eq(subscriptionExpiration.subscriptionId, subscriptionId))
   } else {
     await db.insert(subscriptionExpiration).values({
       subscriptionId,
       expirationDate,
+      promotionCodeId: promoRecord?.id ?? null,
     })
   }
 }
