@@ -210,7 +210,13 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
         ?.subscription as string
       const customerId = invoice.customer as string
       const reason = invoice.billing_reason
-
+      const rawAmount = String(invoice.total_excluding_tax ?? 0)
+      const rawCurrency = invoice.currency
+      const { amount: convertedAmount } = await convertToUSD(
+        parseFloat(rawAmount),
+        rawCurrency,
+        getCurrencyDecimals(rawCurrency)
+      )
       if (reason === "subscription_update" || reason === "subscription_cycle") {
         let promoRecord = null
         if (subscriptionId) {
@@ -273,10 +279,7 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           ? null
           : (historicalRecord?.affiliateLinkId ?? null)
         if (promoRecord) {
-          await updatePromoStats(
-            promoRecord.id,
-            String(invoice.total_excluding_tax ?? 0)
-          )
+          await updatePromoStats(promoRecord.id, convertedAmount)
         }
         await invoicePaidUpdate(
           String(invoice.total_excluding_tax ?? 0),
