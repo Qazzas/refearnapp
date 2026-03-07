@@ -1,6 +1,5 @@
-// @/lib/server/affiliate/getAffiliateKpiStatsAction.ts
 import { db } from "@/db/drizzle"
-import { and, eq, or, sql } from "drizzle-orm"
+import { eq, sql, and, or } from "drizzle-orm"
 import {
   affiliate,
   affiliateClick,
@@ -17,61 +16,68 @@ export async function getAffiliateKpiStatsAction(
   year?: number,
   month?: number
 ) {
-  // 1. Aggregate Clicks for this specific affiliate
+  const getDateFilters = (table: any) => {
+    const filters = buildWhereWithDate([], table, year, month)
+    return Array.isArray(filters) ? filters : [filters]
+  }
+
+  // 1. Total Links count (Scoped by orgId and affiliateId)
+  const totalLinks = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(affiliateLink)
+    .innerJoin(affiliate, eq(affiliate.id, affiliateLink.affiliateId))
+    .where(
+      and(eq(affiliate.id, affiliateId), eq(affiliate.organizationId, orgId))
+    )
+    .then((res) => res[0]?.count ?? 0)
+
+  // 2. Clicks (Scoped)
   const clickSq = db
     .select({
-      affiliateId: affiliate.id,
-      clicks: sql`count(distinct ${affiliateClick.id})`.as("clicks"),
+      clicks: sql<number>`count(${affiliateClick.id})`.as("clicks"),
     })
-    .from(affiliate)
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(
-      affiliateClick,
-      buildWhereWithDate(
-        [eq(affiliateClick.affiliateLinkId, affiliateLink.id)],
-        affiliateClick,
-        year,
-        month
+    .from(affiliateClick)
+    .innerJoin(
+      affiliateLink,
+      eq(affiliateLink.id, affiliateClick.affiliateLinkId)
+    )
+    .innerJoin(affiliate, eq(affiliate.id, affiliateLink.affiliateId))
+    .where(
+      and(
+        eq(affiliate.id, affiliateId),
+        eq(affiliate.organizationId, orgId),
+        ...getDateFilters(affiliateClick)
       )
     )
-    .where(
-      and(eq(affiliate.organizationId, orgId), eq(affiliate.id, affiliateId))
-    )
-    .groupBy(affiliate.id)
     .as("click_sq")
 
-  // 2. Aggregate Referrals for this specific affiliate
+  // 3. Referrals (Scoped)
   const referralSq = db
     .select({
-      affiliateId: affiliate.id,
-      signups: sql`count(distinct ${referrals.id})`.as("signups"),
+      signups:
+        sql<number>`count(case when ${referrals.convertedAt} is null then 1 end)`.as(
+          "signups"
+        ),
       paidReferrals:
-        sql`count(distinct case when ${referrals.convertedAt} is not null then ${referrals.id} end)`.as(
+        sql<number>`count(case when ${referrals.convertedAt} is not null then 1 end)`.as(
           "paid_referrals"
         ),
     })
-    .from(affiliate)
-    .leftJoin(
-      referrals,
-      buildWhereWithDate(
-        [eq(referrals.affiliateId, affiliate.id)],
-        referrals,
-        year,
-        month
+    .from(referrals)
+    .where(
+      and(
+        eq(referrals.affiliateId, affiliateId),
+        eq(referrals.organizationId, orgId),
+        ...getDateFilters(referrals)
       )
     )
-    .where(
-      and(eq(affiliate.organizationId, orgId), eq(affiliate.id, affiliateId))
-    )
-    .groupBy(affiliate.id)
     .as("ref_sq")
 
-  // 3. Aggregate Invoices for this specific affiliate (Fixed)
+  // 4. Invoices (Scoped and Fan-out proof)
   const invoiceSq = db
     .select({
-      affiliateId: affiliate.id,
       salesCount:
-        sql<number>`count(distinct case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.id} end)`.as(
+        sql<number>`count(case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then 1 end)`.as(
           "sales_count"
         ),
       totalComm:
@@ -91,78 +97,60 @@ export async function getAffiliateKpiStatsAction(
           "total_amt"
         ),
     })
-    .from(affiliate)
-    // Join Links AND Promo Codes
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
+    .from(affiliateInvoice)
     .leftJoin(
-      affiliateInvoice,
-      buildWhereWithDate(
-        [
-          or(
-            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
-            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
-          ),
-        ],
-        affiliateInvoice,
-        year,
-        month
+      affiliateLink,
+      eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)
+    )
+    .leftJoin(
+      promotionCodes,
+      eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
+    )
+    // Scope the invoice by checking the affiliate's org
+    .leftJoin(affiliate, eq(affiliate.id, affiliateId))
+    .where(
+      and(
+        or(
+          eq(affiliateLink.affiliateId, affiliateId),
+          eq(promotionCodes.affiliateId, affiliateId)
+        ),
+        eq(affiliate.organizationId, orgId),
+        ...getDateFilters(affiliateInvoice)
       )
     )
-    .where(
-      and(eq(affiliate.organizationId, orgId), eq(affiliate.id, affiliateId))
-    )
-    .groupBy(affiliate.id)
     .as("inv_sq")
 
+  // 5. Final Join
   return db
     .select({
-      // We calculate totalLinks as a scalar count to avoid joining the table directly in the base
-      totalLinks:
-        sql<number>`(SELECT count(*) FROM ${affiliateLink} WHERE ${affiliateLink.affiliateId} = ${affiliate.id})`.mapWith(
-          Number
-        ),
-
-      totalVisitors: sql<number>`coalesce(sum(${clickSq.clicks}), 0)`.mapWith(
+      totalLinks: sql`${totalLinks}`.mapWith(Number),
+      totalVisitors: sql<number>`coalesce(${clickSq.clicks}, 0)`.mapWith(
         Number
       ),
-      totalSignups:
-        sql<number>`coalesce(sum(${referralSq.signups}), 0)`.mapWith(Number),
+      totalSignups: sql<number>`coalesce(${referralSq.signups}, 0)`.mapWith(
+        Number
+      ),
       totalPaidReferrals:
-        sql<number>`coalesce(sum(${referralSq.paidReferrals}), 0)`.mapWith(
+        sql<number>`coalesce(${referralSq.paidReferrals}, 0)`.mapWith(Number),
+      sales: sql<number>`coalesce(${invoiceSq.salesCount}, 0)`.mapWith(Number),
+      commission: sql<number>`coalesce(${invoiceSq.totalComm}, 0)`.mapWith(
+        Number
+      ),
+      paid: sql<number>`coalesce(${invoiceSq.totalPaid}, 0)`.mapWith(Number),
+      unpaid: sql<number>`coalesce(${invoiceSq.totalUnpaid}, 0)`.mapWith(
+        Number
+      ),
+      amount: sql<number>`coalesce(${invoiceSq.totalAmt}, 0)`.mapWith(Number),
+      clickToSignupRate:
+        sql<number>`coalesce(round(((${referralSq.signups})::float / nullif(${clickSq.clicks}, 0)::float) * 100, 2), 0)`.mapWith(
           Number
         ),
-
-      // Rates
-      clickToSignupRate: sql<number>`
-        coalesce((sum(${referralSq.signups})::float / nullif(sum(${clickSq.clicks}), 0)::float) * 100, 0)
-      `.mapWith(Number),
-      signupToPaidRate: sql<number>`
-        coalesce((sum(${referralSq.paidReferrals})::float / nullif(sum(${referralSq.signups}), 0)::float) * 100, 0)
-      `.mapWith(Number),
-
-      sales: sql<number>`coalesce(sum(${invoiceSq.salesCount}), 0)`.mapWith(
-        Number
-      ),
-      commission: sql<number>`coalesce(sum(${invoiceSq.totalComm}), 0)`.mapWith(
-        Number
-      ),
-      paid: sql<number>`coalesce(sum(${invoiceSq.totalPaid}), 0)`.mapWith(
-        Number
-      ),
-      unpaid: sql<number>`coalesce(sum(${invoiceSq.totalUnpaid}), 0)`.mapWith(
-        Number
-      ),
-      amount: sql<number>`coalesce(sum(${invoiceSq.totalAmt}), 0)`.mapWith(
-        Number
-      ),
+      signupToPaidRate:
+        sql<number>`coalesce(round(((${referralSq.paidReferrals})::float / nullif(${referralSq.signups}, 0)::float) * 100, 2), 0)`.mapWith(
+          Number
+        ),
     })
-    .from(affiliate)
-    .leftJoin(clickSq, eq(clickSq.affiliateId, affiliate.id))
-    .leftJoin(referralSq, eq(referralSq.affiliateId, affiliate.id))
-    .leftJoin(invoiceSq, eq(invoiceSq.affiliateId, affiliate.id))
-    .where(
-      and(eq(affiliate.organizationId, orgId), eq(affiliate.id, affiliateId))
-    )
-    .groupBy(affiliate.id)
+    .from(clickSq)
+    .leftJoin(referralSq, sql`1=1`)
+    .leftJoin(invoiceSq, sql`1=1`)
 }
