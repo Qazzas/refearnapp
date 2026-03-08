@@ -3,7 +3,7 @@ import type { NextConfig } from "next"
 const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
 // This is the specific host we want to catch and redirect FROM
-const redirectFromUrl = process.env.REDIRECTION_URL
+const redirectFromUrl = process.env.NEXT_PUBLIC_REDIRECTION_URL
 
 const getHostname = (url: string) => {
   try {
@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
           has: [
             {
               type: "host",
-              // Matches the specific host provided in REDIRECTION_URL
+              // Matches the specific host provided in NEXT_PUBLIC_REDIRECTION_URL
               value: redirectFromHost,
             },
           ],

@@ -46,7 +46,7 @@ const getSystemBaseDomains = (): string[] => {
   const domains = new Set<string>()
   const rawInputs = [
     process.env.NEXT_PUBLIC_BASE_URL,
-    process.env.REDIRECTION_URL,
+    process.env.NEXT_PUBLIC_REDIRECTION_URL,
     process.env.EMAIL_DOMAIN,
     process.env.NEXT_PUBLIC_APP_DOMAIN,
     process.env.R2_ACCESS_URL,

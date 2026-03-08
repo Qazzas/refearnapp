@@ -58,7 +58,7 @@
         "CURRENCY_API_KEY",
         "NEXT_PUBLIC_RESERVED_SUBDOMAINS",
         "NEXT_PUBLIC_SELF_HOSTED",
-        "REDIRECTION_URL"
+        "NEXT_PUBLIC_REDIRECTION_URL"
       ]
     },
     "lint": {

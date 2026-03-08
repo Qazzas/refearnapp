@@ -23,9 +23,10 @@ export default function PaddleIntegration({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const currentOrigin = window.location.origin
+      const baseOrigin =
+        process.env.NEXT_PUBLIC_REDIRECTION_URL || window.location.origin
 
-      setWebhookUrl(`${currentOrigin}/api/webhooks/paddle/${orgId}`)
+      setWebhookUrl(`${baseOrigin}/api/webhooks/paddle/${orgId}`)
     }
   }, [orgId])
   const handleCopy = () => {

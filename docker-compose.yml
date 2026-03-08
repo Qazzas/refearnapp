@@ -14,6 +14,6 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_RESERVED_SUBDOMAINS=${NEXT_PUBLIC_RESERVED_SUBDOMAINS}
-      - REDIRECTION_URL=${REDIRECTION_URL}
+      - NEXT_PUBLIC_REDIRECTION_URL=${NEXT_PUBLIC_REDIRECTION_URL}
     env_file: .env
     restart: always
