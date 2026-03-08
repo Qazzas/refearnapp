@@ -179,6 +179,12 @@ export default function Connect({
                 <li>
                   <code>adjustment.updated</code>
                 </li>
+                <li>
+                  <code>discount.created</code>
+                </li>
+                <li>
+                  <code>discount.updated</code>
+                </li>
               </ul>
               <p>
                 Then click <strong>Save</strong> to finish the setup.
