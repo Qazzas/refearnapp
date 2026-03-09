@@ -132,9 +132,10 @@ export async function getAffiliatesWithStatsAction(
   const salesSqBase = db
     .select({
       affiliateId: affiliate.id,
-      salesCount: sql<number>`count(distinct ${invoiceOwnerSq.invoiceId})`.as(
-        "sales_count"
-      ),
+      salesCount:
+        sql<number>`count(distinct ${invoiceOwnerSq.invoiceId}) FILTER (WHERE ${invoiceOwnerSq.reason} IN ('subscription_create', 'one_time'))`.as(
+          "sales_count"
+        ),
       totalComm: sql<number>`sum(${invoiceOwnerSq.commission})`.as(
         "total_comm"
       ),
@@ -146,7 +147,6 @@ export async function getAffiliatesWithStatsAction(
         [
           eq(invoiceOwnerSq.ownerAffiliateId, affiliate.id),
           isNull(invoiceOwnerSq.refundedAt),
-          sql`${invoiceOwnerSq.reason} in ('subscription_create', 'one_time')`,
         ],
         invoiceOwnerSq,
         year,
