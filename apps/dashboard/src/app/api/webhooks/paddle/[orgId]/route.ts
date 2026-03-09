@@ -5,6 +5,8 @@ import {
   affiliateInvoice,
   promotionCodes,
   subscriptionExpiration,
+  ValueType,
+  DurationUnit,
 } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { calculateTrialDays } from "@/util/CalculateTrialDays"
@@ -19,6 +21,8 @@ import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
 import { getPaddleAccount } from "@/lib/server/organization/getPaddleAccount"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
+import { updatePromoStats } from "@/util/updatePromoStats"
+import { convertPaddleReferral } from "@/util/convertPaddleReferral"
 
 type Params = { orgId: string }
 
@@ -81,117 +85,160 @@ export const POST = handleRoute<Params>(
     switch (payload.event_type) {
       case "transaction.completed": {
         const tx = payload.data
-        const isSubscription = Boolean(tx.subscription_id)
+        const subscriptionId = tx.subscription_id || null
         const transactionId = tx.id
         const customerId = tx.customer_id
-        const subscriptionId = tx.subscription_id || null
+
+        // 1. Setup Currencies
         const rawCurrency = tx.details?.totals?.currency_code || "USD"
         const rawAmount = safeFormatAmount(tx.details?.totals?.total)
         const decimals = getCurrencyDecimals(rawCurrency)
-
-        const { amount } = await convertToUSD(
+        const { amount: amountInUSD } = await convertToUSD(
           parseFloat(rawAmount),
           rawCurrency,
           decimals
         )
 
-        const customData = tx.custom_data || {}
-        const refDataRaw = customData.refearnapp_affiliate_code
-        if (!refDataRaw) break
+        // 2. Resolve Attribution (Initialize with undefined to satisfy TS)
+        let promoRecord = null
+        let affiliateLinkRecord
+        let email: string | undefined
+        // Use explicit types from your schema
+        let finalCommissionType: ValueType | undefined
+        let finalCommissionValue: string | undefined
+        let durationValue: number | undefined
+        let durationUnit: DurationUnit | undefined
 
-        const { code, commissionType, commissionValue } = JSON.parse(refDataRaw)
-        const transactionTime = new Date(tx.created_at)
-
-        let commission = 0
-        if (commissionType === "percentage") {
-          commission = (parseFloat(amount) * parseFloat(commissionValue)) / 100
-        } else if (commissionType === "fixed") {
-          commission = parseFloat(amount) < 0 ? 0 : parseFloat(commissionValue)
+        if (tx.discount_id) {
+          const promo = await db.query.promotionCodes.findFirst({
+            where: eq(promotionCodes.externalId, tx.discount_id),
+          })
+          if (promo && promo.affiliateId) {
+            promoRecord = promo
+            finalCommissionType = promo.commissionType
+            finalCommissionValue = promo.commissionValue
+            durationValue = promo.commissionDurationValue
+            durationUnit = promo.commissionDurationUnit
+          }
         }
 
-        const affiliateLinkRecord = await getAffiliateLinkRecord(code)
-        if (!affiliateLinkRecord) break
+        if (!promoRecord) {
+          const customData = tx.custom_data || {}
+          const refDataRaw = customData.refearnapp_affiliate_code
+          if (!refDataRaw) break
 
-        const organizationRecord = await getOrganizationById(
-          affiliateLinkRecord.organizationId
-        )
-        if (!organizationRecord) break
+          const parsedData = JSON.parse(refDataRaw)
+          email = parsedData.email
+          affiliateLinkRecord = await getAffiliateLinkRecord(parsedData.code)
+          if (!affiliateLinkRecord) break
 
-        if (isSubscription) {
-          const subscriptionExpirationRecord =
-            await getSubscriptionExpiration(subscriptionId)
+          const organizationRecord = await getOrganizationById(
+            affiliateLinkRecord.organizationId
+          )
+          if (!organizationRecord) break
+
+          finalCommissionType = parsedData.commissionType as ValueType
+          finalCommissionValue = String(parsedData.commissionValue)
+          durationValue = organizationRecord.commissionDurationValue ?? 1
+          durationUnit =
+            (organizationRecord.commissionDurationUnit as DurationUnit) ?? "day"
+        }
+
+        // 3. Final safety check (Guards against TS "not assigned" errors)
+        if (
+          !finalCommissionType ||
+          !finalCommissionValue ||
+          durationValue === undefined ||
+          !durationUnit
+        ) {
+          break
+        }
+
+        // 4. Calculate Commission
+        let commission = 0
+        if (finalCommissionType === "PERCENTAGE") {
+          commission =
+            (parseFloat(amountInUSD) * parseFloat(finalCommissionValue)) / 100
+        } else {
+          commission =
+            parseFloat(amountInUSD) < 0 ? 0 : parseFloat(finalCommissionValue)
+        }
+        if (email && affiliateLinkRecord?.affiliateId) {
+          await convertPaddleReferral({
+            email,
+            affiliateId: affiliateLinkRecord.affiliateId,
+            amount: amountInUSD.toString(),
+            commission: commission,
+          })
+        }
+        // 5. Handle Subscription Expiration
+        if (subscriptionId) {
+          const existingExp = await getSubscriptionExpiration(subscriptionId)
+          const baseDate = existingExp ? existingExp.expirationDate : new Date()
+
+          // Now these variables are guaranteed to be number/string, not null
+          const newExpirationDate = calculateExpirationDate(
+            baseDate,
+            durationValue,
+            durationUnit
+          )
+
+          if (!existingExp) {
+            await db.insert(subscriptionExpiration).values({
+              subscriptionId,
+              expirationDate: newExpirationDate,
+              promotionCodeId: promoRecord?.id || null,
+            })
+          } else {
+            await db
+              .update(subscriptionExpiration)
+              .set({
+                expirationDate: newExpirationDate,
+                promotionCodeId: promoRecord?.id || null,
+                updatedAt: new Date(),
+              })
+              .where(eq(subscriptionExpiration.subscriptionId, subscriptionId))
+          }
+        }
+
+        // 6. Reason & Insert
+        let reason: "one_time" | "subscription_create" | "subscription_update" =
+          "one_time"
+        if (subscriptionId) {
           const existingInvoice = await db.query.affiliateInvoice.findFirst({
             where: eq(affiliateInvoice.subscriptionId, subscriptionId),
           })
-
-          const reason = existingInvoice
+          reason = existingInvoice
             ? "subscription_update"
             : "subscription_create"
+        }
 
-          if (!subscriptionExpirationRecord) {
-            const expirationDate = calculateExpirationDate(
-              new Date(),
-              organizationRecord.commissionDurationValue,
-              organizationRecord.commissionDurationUnit
-            )
-
-            await db.insert(subscriptionExpiration).values({
-              subscriptionId,
-              expirationDate,
-            })
-          } else if (
-            transactionTime > subscriptionExpirationRecord.expirationDate
-          ) {
-            break
-          }
-
-          await db.insert(affiliateInvoice).values({
-            paymentProvider: "paddle",
-            transactionId,
-            subscriptionId,
-            customerId,
-            amount: amount.toString(),
-            currency: "USD",
-            commission: commission.toString(),
-            paidAmount: "0.00",
-            rawCurrency,
-            rawAmount,
-            unpaidAmount: commission.toFixed(2),
-            affiliateLinkId: affiliateLinkRecord.id,
-            reason,
-          })
-        } else {
-          await db.insert(affiliateInvoice).values({
-            paymentProvider: "paddle",
-            transactionId,
-            subscriptionId: null,
-            customerId,
-            amount: amount.toString(),
-            currency: "USD",
-            commission: commission.toString(),
-            paidAmount: "0.00",
-            unpaidAmount: commission.toFixed(2),
-            affiliateLinkId: affiliateLinkRecord.id,
-            reason: "one_time",
-          })
+        await db.insert(affiliateInvoice).values({
+          paymentProvider: "paddle",
+          transactionId,
+          subscriptionId,
+          customerId,
+          amount: amountInUSD.toString(),
+          currency: "USD",
+          commission: commission.toFixed(2),
+          paidAmount: "0.00",
+          unpaidAmount: commission.toFixed(2),
+          rawCurrency,
+          rawAmount,
+          promotionCodeId: promoRecord?.id || null,
+          affiliateLinkId: promoRecord ? null : affiliateLinkRecord?.id || null,
+          reason,
+        })
+        if (promoRecord) {
+          await updatePromoStats(promoRecord.id, amountInUSD)
         }
         break
       }
-
       case "subscription.created": {
         const sub = payload.data
+        const subscriptionId = sub.id
         const isTrial = sub.status === "trialing"
         if (!isTrial) break
-
-        const subscriptionId = sub.id
-        const customData = sub.custom_data || {}
-        const refDataRaw = customData.refearnapp_affiliate_code
-        if (!refDataRaw) break
-
-        const { code, commissionDurationValue, commissionDurationUnit } =
-          JSON.parse(refDataRaw)
-        const affiliateLinkRecord = await getAffiliateLinkRecord(code)
-        if (!affiliateLinkRecord) break
 
         const trialItem = sub.items?.[0]?.price?.trial_period
         const trialDays = calculateTrialDays(
@@ -199,25 +246,22 @@ export const POST = handleRoute<Params>(
           trialItem?.frequency || 0
         )
 
-        const baseDate = addDays(new Date(), trialDays)
-        const expirationDate = calculateExpirationDate(
-          baseDate,
-          commissionDurationValue,
-          commissionDurationUnit
-        )
-
         const existingExpiration =
           await getSubscriptionExpiration(subscriptionId)
 
         if (existingExpiration) {
+          const newExpiration = addDays(
+            existingExpiration.expirationDate,
+            trialDays
+          )
           await db
             .update(subscriptionExpiration)
-            .set({ expirationDate })
+            .set({ expirationDate: newExpiration })
             .where(eq(subscriptionExpiration.subscriptionId, subscriptionId))
         } else {
           await db.insert(subscriptionExpiration).values({
             subscriptionId,
-            expirationDate,
+            expirationDate: addDays(new Date(), trialDays),
           })
         }
         break
