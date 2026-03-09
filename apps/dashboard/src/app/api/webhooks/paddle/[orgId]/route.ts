@@ -175,8 +175,6 @@ export const POST = handleRoute<Params>(
         if (subscriptionId) {
           const existingExp = await getSubscriptionExpiration(subscriptionId)
           const baseDate = existingExp ? existingExp.expirationDate : new Date()
-
-          // Now these variables are guaranteed to be number/string, not null
           const newExpirationDate = calculateExpirationDate(
             baseDate,
             durationValue,
