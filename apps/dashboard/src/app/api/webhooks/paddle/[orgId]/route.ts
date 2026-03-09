@@ -153,7 +153,49 @@ export const POST = handleRoute<Params>(
         ) {
           break
         }
+        if (subscriptionId) {
+          const existingExp = await getSubscriptionExpiration(subscriptionId)
+          if (existingExp && new Date() > existingExp.expirationDate) {
+            console.log(
+              `Skipping commission for expired subscription: ${subscriptionId}`
+            )
+            return NextResponse.json(
+              { received: true, status: "expired" },
+              { status: 200 }
+            )
+          }
 
+          // Only update expiration for non-recurring events
+          if (tx.origin !== "subscription_recurring") {
+            const baseDate = existingExp
+              ? existingExp.expirationDate
+              : new Date()
+            const newExpirationDate = calculateExpirationDate(
+              baseDate,
+              durationValue,
+              durationUnit
+            )
+
+            if (!existingExp) {
+              await db.insert(subscriptionExpiration).values({
+                subscriptionId,
+                expirationDate: newExpirationDate,
+                promotionCodeId: promoRecord?.id || null,
+              })
+            } else {
+              await db
+                .update(subscriptionExpiration)
+                .set({
+                  expirationDate: newExpirationDate,
+                  promotionCodeId: promoRecord?.id || null,
+                  updatedAt: new Date(),
+                })
+                .where(
+                  eq(subscriptionExpiration.subscriptionId, subscriptionId)
+                )
+            }
+          }
+        }
         // 4. Calculate Commission
         let commission = 0
         if (finalCommissionType === "PERCENTAGE") {
@@ -170,33 +212,6 @@ export const POST = handleRoute<Params>(
             amount: amountInUSD.toString(),
             commission: commission,
           })
-        }
-        // 5. Handle Subscription Expiration
-        if (subscriptionId && tx.origin !== "subscription_recurring") {
-          const existingExp = await getSubscriptionExpiration(subscriptionId)
-          const baseDate = existingExp ? existingExp.expirationDate : new Date()
-          const newExpirationDate = calculateExpirationDate(
-            baseDate,
-            durationValue,
-            durationUnit
-          )
-
-          if (!existingExp) {
-            await db.insert(subscriptionExpiration).values({
-              subscriptionId,
-              expirationDate: newExpirationDate,
-              promotionCodeId: promoRecord?.id || null,
-            })
-          } else {
-            await db
-              .update(subscriptionExpiration)
-              .set({
-                expirationDate: newExpirationDate,
-                promotionCodeId: promoRecord?.id || null,
-                updatedAt: new Date(),
-              })
-              .where(eq(subscriptionExpiration.subscriptionId, subscriptionId))
-          }
         }
 
         // 6. Reason & Insert
