@@ -172,7 +172,7 @@ export const POST = handleRoute<Params>(
           })
         }
         // 5. Handle Subscription Expiration
-        if (subscriptionId) {
+        if (subscriptionId && tx.origin !== "subscription_recurring") {
           const existingExp = await getSubscriptionExpiration(subscriptionId)
           const baseDate = existingExp ? existingExp.expirationDate : new Date()
           const newExpirationDate = calculateExpirationDate(
