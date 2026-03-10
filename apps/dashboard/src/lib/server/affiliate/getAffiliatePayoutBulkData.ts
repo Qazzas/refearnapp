@@ -16,7 +16,8 @@ export async function getAffiliatePayoutBulkData(
   orderBy?: PayoutSortKeys,
   orderDir?: OrderDir,
   offset?: number,
-  email?: string
+  email?: string,
+  pendingOnly?: boolean
 ): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
   const PAGE_SIZE = 10
   const isExport = mode === "EXPORT"
@@ -41,7 +42,6 @@ export async function getAffiliatePayoutBulkData(
         toast: "No unpaid commissions with PayPal email found",
       })
     }
-
     return {
       ok: true,
       data: {
@@ -50,13 +50,17 @@ export async function getAffiliatePayoutBulkData(
       },
     }
   }
+  let tableRows = converted
 
+  if (pendingOnly) {
+    tableRows = tableRows.filter((r) => r.unpaid > 0)
+  }
   return {
     ok: true,
     data: {
       mode: "TABLE",
-      rows: converted.slice(0, PAGE_SIZE),
-      hasNext: converted.length > PAGE_SIZE,
+      rows: tableRows.slice(0, PAGE_SIZE),
+      hasNext: tableRows.length > PAGE_SIZE,
     },
   }
 }

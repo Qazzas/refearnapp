@@ -107,6 +107,7 @@ export default function PayoutTable({
       filters.orderDir,
       filters.offset,
       filters.email,
+      filters.pendingOnly,
     ],
     (id, query) =>
       isTeam
@@ -124,6 +125,7 @@ export default function PayoutTable({
         orderDir: filters.orderDir,
         offset: filters.offset,
         email: filters.email,
+        pendingOnly: filters.pendingOnly,
       },
     ] as const,
     {
@@ -136,7 +138,8 @@ export default function PayoutTable({
           filters.orderBy ||
           filters.orderDir ||
           filters.offset ||
-          filters.email)
+          filters.email ||
+          filters.pendingOnly)
       ),
     }
   )

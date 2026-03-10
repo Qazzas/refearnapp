@@ -20,7 +20,7 @@ export const GET = handleRoute(
     // Expecting a JSON string like: ?months=[{"month":1,"year":2024}]
     const monthsRaw = searchParams.get("months")
     const months = monthsRaw ? JSON.parse(monthsRaw) : []
-
+    const pendingOnly = searchParams.get("pendingOnly") === "true"
     const org = await getOrgAuth(orgId)
 
     const result = await getAffiliatePayoutBulkData(
@@ -31,7 +31,8 @@ export const GET = handleRoute(
       orderBy,
       orderDir,
       offset,
-      email
+      email,
+      pendingOnly
     )
 
     return NextResponse.json(result)
