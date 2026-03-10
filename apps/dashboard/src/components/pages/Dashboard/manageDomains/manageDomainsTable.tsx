@@ -43,6 +43,7 @@ import {
 import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
 import { api } from "@/lib/apiClient"
 import { useAppTable } from "@/hooks/useAppTable"
+import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 interface AffiliatesTableManageDomainsProps {
   orgId: string
   affiliate: boolean
@@ -58,6 +59,9 @@ export function ManageDomainsTable({
     .split("/")[0]
     .toLowerCase()
   useVerifyTeamSession(orgId, isTeam)
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+
+  const { showCustomToast } = useCustomToast()
   const [domainType, setDomainType] = useState<DomainInputType | null>(null)
   const [open, setOpen] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
@@ -168,6 +172,8 @@ export function ManageDomainsTable({
   const createDomainMutation = useAppMutation(createManageDomains, {
     affiliate,
   })
+  const isSubmitDisabled =
+    isSelfHosted && domainType !== "platform" && domainType !== null
   const copyToClipboard = (text: string) => {
     navigator.clipboard
       .writeText(text)
@@ -265,6 +271,7 @@ export function ManageDomainsTable({
                 onConfirm={() => formRef.current?.requestSubmit()}
                 affiliate={affiliate}
                 confirmLoading={createDomainMutation.isPending}
+                confirmDisabled={isSubmitDisabled}
               >
                 {/* 👇 reuse your existing component */}
                 <Form {...domainForm}>
@@ -272,7 +279,16 @@ export function ManageDomainsTable({
                     ref={formRef}
                     onSubmit={domainForm.handleSubmit((data) => {
                       if (!domainType) return
-
+                      if (isSelfHosted && domainType !== "platform") {
+                        showCustomToast({
+                          type: "error",
+                          title: "Custom domains not supported",
+                          description:
+                            "In self-hosted mode, please use your primary domain subdomains. Custom domain support is coming soon.",
+                          affiliate: false,
+                        })
+                        return
+                      }
                       createDomainMutation.mutate(
                         {
                           orgId,

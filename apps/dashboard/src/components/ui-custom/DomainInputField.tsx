@@ -98,6 +98,14 @@ export function DomainInputField({
                 ? `This will be your custom subdomain: https://${displayDomain}`
                 : ""}
       </p>
+      {/* ⚠️ Add the warning right here */}
+      {process.env.NEXT_PUBLIC_SELF_HOSTED === "true" &&
+        domainType !== "platform" &&
+        domainValue !== "" && (
+          <p className="text-sm mt-1 text-red-600 font-medium">
+            ⚠️ Custom domains are not supported in self-hosted mode.
+          </p>
+        )}
     </div>
   )
 }

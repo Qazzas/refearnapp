@@ -29,6 +29,7 @@ interface AppDialogProps {
   showFooter?: boolean
   hideCloseIcon?: boolean
   confirmColor?: string
+  confirmDisabled?: boolean
 }
 
 export function AppDialog({
@@ -45,6 +46,7 @@ export function AppDialog({
   showFooter = true,
   hideCloseIcon = false,
   confirmColor,
+  confirmDisabled = false,
 }: AppDialogProps) {
   const {
     buttonDisabledTextColor,
@@ -82,7 +84,7 @@ export function AppDialog({
                 onClick={() => {
                   onConfirm?.()
                 }}
-                disabled={confirmLoading}
+                disabled={confirmLoading || confirmDisabled}
                 style={{
                   backgroundColor: confirmLoading
                     ? confirmColor ||
