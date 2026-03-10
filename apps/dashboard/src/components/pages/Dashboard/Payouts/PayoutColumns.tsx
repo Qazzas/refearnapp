@@ -40,7 +40,7 @@ export const PayoutColumns = (): ColumnDef<AffiliatePayout>[] => {
 
         return (
           <span
-            className={`px-2 py-1 rounded-full text-xs font-medium uppercase ${colorClass}`}
+            className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}
           >
             {status}
           </span>
