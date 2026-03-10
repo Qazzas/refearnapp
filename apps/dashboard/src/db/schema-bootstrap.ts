@@ -51,6 +51,20 @@ export const BOOTSTRAP_QUERIES = [
     );`,
   },
   {
+    name: "license_keys",
+    sql: `CREATE TABLE IF NOT EXISTS "license_keys" (
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+        "user_id" uuid NOT NULL,
+        "key" text NOT NULL,
+        "status" text DEFAULT 'active' NOT NULL,
+        "tier" text DEFAULT 'PRO' NOT NULL,
+        "expires_at" timestamp with time zone NOT NULL,
+        "last_validated_at" timestamp with time zone,
+        "created_at" timestamp DEFAULT now() NOT NULL,
+        CONSTRAINT "license_keys_key_unique" UNIQUE("key")
+    );`,
+  },
+  {
     name: "affiliate",
     sql: `CREATE TABLE IF NOT EXISTS "affiliate" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -423,6 +437,8 @@ export const BOOTSTRAP_QUERIES = [
       CREATE INDEX IF NOT EXISTS "website_domain_org_id_created_at_idx" ON "website_domain" ("org_id","created_at");
       CREATE INDEX IF NOT EXISTS "website_domain_created_at_idx" ON "website_domain" ("created_at");
       CREATE INDEX IF NOT EXISTS "referrals_email_link_idx" ON "referrals" ("signup_email", "referral_link_id");
+      CREATE INDEX IF NOT EXISTS "license_keys_user_id_idx" ON "license_keys" ("user_id");
+      CREATE INDEX IF NOT EXISTS "license_keys_key_idx" ON "license_keys" ("key");
     `,
   },
 
@@ -565,7 +581,10 @@ export const BOOTSTRAP_QUERIES = [
       IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'team_account_team_id_team_id_fk') THEN
         ALTER TABLE "team_account" ADD CONSTRAINT "team_account_team_id_team_id_fk" FOREIGN KEY ("team_id") REFERENCES "team"("id") ON DELETE cascade ON UPDATE no action;
       END IF;
-
+     -- license_keys -> user
+      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_user_id_user_id_fk') THEN
+        ALTER TABLE "license_keys" ADD CONSTRAINT "license_keys_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE cascade ON UPDATE no action;
+      END IF;
       -- website_domain -> organization
       IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'website_domain_org_id_organization_id_fk') THEN
         ALTER TABLE "website_domain" ADD CONSTRAINT "website_domain_org_id_organization_id_fk" FOREIGN KEY ("org_id") REFERENCES "organization"("id") ON DELETE cascade ON UPDATE no action;
