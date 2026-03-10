@@ -54,6 +54,8 @@ export type PurchaseTier = (typeof PURCHASE_TIERS)[number]
 export const CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD"] as const
 export type Currency = (typeof CURRENCIES)[number]
 
+export const LICENSE_STATUSES = ["active", "expired", "revoked"] as const
+export type LicenseStatus = (typeof LICENSE_STATUSES)[number]
 // --- 3. AFFILIATE SPECIFIC ---
 export const REFERRAL_PARAMS = ["ref", "via", "aff"] as const
 export type ReferralParam = (typeof REFERRAL_PARAMS)[number]
@@ -717,8 +719,8 @@ export const licenseKeys = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     key: text("key").notNull().unique(),
-    status: text("status").notNull().default("active"),
-    tier: text("tier").$type<"PRO" | "ULTIMATE">().notNull().default("PRO"),
+    status: text("status").$type<LicenseStatus>().notNull().default("active"),
+    tier: text("tier").$type<PurchaseTier>().notNull().default("PRO"),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     lastValidatedAt: timestamp("last_validated_at", { withTimezone: true }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
