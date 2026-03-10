@@ -709,6 +709,25 @@ export const invitation = pgTable(
   },
   (table) => [index("invitation_created_at_idx").on(table.createdAt)]
 )
+export const licenseKeys = pgTable(
+  "license_keys",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    key: text("key").notNull().unique(),
+    status: text("status").notNull().default("active"),
+    tier: text("tier").$type<"PRO" | "ULTIMATE">().notNull().default("PRO"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    lastValidatedAt: timestamp("last_validated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("license_keys_user_id_idx").on(table.userId),
+    index("license_keys_key_idx").on(table.key),
+  ]
+)
 export const systemSettings = pgTable("system_settings", {
   id: integer("id").primaryKey().default(1),
   installedVersion: text("installed_version").notNull().default("0.1.0"),
