@@ -25,14 +25,22 @@ export const PayoutColumns = (): ColumnDef<AffiliatePayout>[] => {
       header: "Status",
       cell: ({ row }) => {
         const unpaid = row.original.unpaid
-        const status = unpaid > 0 ? "pending" : "paid"
+        const totalCommission = row.original.commission
+
+        let status = "paid"
+        let colorClass = "bg-green-100 text-green-800"
+
+        if (unpaid > 0) {
+          status = "pending"
+          colorClass = "bg-yellow-100 text-yellow-800"
+        } else if (totalCommission === 0) {
+          status = "no earnings"
+          colorClass = "bg-gray-100 text-gray-600"
+        }
+
         return (
           <span
-            className={`px-2 py-1 rounded-full text-xs ${
-              status === "paid"
-                ? "bg-green-100 text-green-800"
-                : "bg-yellow-100 text-yellow-800"
-            }`}
+            className={`px-2 py-1 rounded-full text-xs font-medium uppercase ${colorClass}`}
           >
             {status}
           </span>
