@@ -17,7 +17,8 @@ export async function getAffiliatePayoutData(
   orderBy?: PayoutSortKeys,
   orderDir?: OrderDir,
   offset?: number,
-  email?: string
+  email?: string,
+  pendingOnly?: boolean
 ): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
   const PAGE_SIZE = 10
   const isExport = mode === "EXPORT"
@@ -52,13 +53,16 @@ export async function getAffiliatePayoutData(
       },
     }
   }
-
+  let tableRows = converted
+  if (!isExport && pendingOnly) {
+    tableRows = tableRows.filter((r) => r.unpaid > 0)
+  }
   return {
     ok: true,
     data: {
       mode: "TABLE",
-      rows: converted.slice(0, PAGE_SIZE),
-      hasNext: converted.length > PAGE_SIZE,
+      rows: tableRows.slice(0, PAGE_SIZE),
+      hasNext: tableRows.length > PAGE_SIZE,
     },
   }
 }

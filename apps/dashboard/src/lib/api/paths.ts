@@ -142,6 +142,7 @@ export const GET_ORG_PAYOUTS_PATH = (
     email?: string
     orderBy?: OrderBy
     orderDir?: OrderDir
+    pendingOnly?: boolean
   }
 ) =>
   withQuery(
@@ -249,6 +250,7 @@ export const GET_TEAM_PAYOUTS_PATH = (
     email?: string
     orderBy?: OrderBy
     orderDir?: OrderDir
+    pendingOnly?: boolean
   }
 ) =>
   withQuery(

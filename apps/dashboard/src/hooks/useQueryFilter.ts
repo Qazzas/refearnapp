@@ -12,6 +12,7 @@ export function useQueryFilter<TOrderBy extends string = OrderBy>(
     orderDirKey?: string
     offsetKey?: string
     emailKey?: string
+    pendingOnlyKey?: string
   } = {},
   options: { debounceMs?: number } = {}
 ) {
@@ -22,6 +23,7 @@ export function useQueryFilter<TOrderBy extends string = OrderBy>(
     orderDirKey = "orderDir",
     offsetKey = "page",
     emailKey = "email",
+    pendingOnlyKey = "pendingOnly",
   } = keys
 
   const { debounceMs = 3000 } = options
@@ -38,6 +40,7 @@ export function useQueryFilter<TOrderBy extends string = OrderBy>(
       orderDir: (params[orderDirKey] as OrderDir) ?? undefined,
       offset: params[offsetKey] ? Number(params[offsetKey]) : undefined,
       email: params[emailKey] || undefined,
+      pendingOnly: params[pendingOnlyKey] === "true",
     }),
     [params, yearKey, monthKey, orderByKey, orderDirKey, offsetKey, emailKey]
   )
@@ -56,7 +59,11 @@ export function useQueryFilter<TOrderBy extends string = OrderBy>(
         setFiltersState(merged)
 
         const newParams = new URLSearchParams(searchParams.toString())
-
+        if (merged.pendingOnly !== undefined) {
+          newParams.set(pendingOnlyKey, String(merged.pendingOnly))
+        } else {
+          newParams.delete(pendingOnlyKey)
+        }
         if (merged.year !== undefined)
           newParams.set(yearKey, String(merged.year))
         else newParams.delete(yearKey)

@@ -22,7 +22,7 @@ export const GET = handleRoute(
       ? Number(searchParams.get("offset"))
       : 1
     const email = searchParams.get("email") || undefined
-
+    const pendingOnly = searchParams.get("pendingOnly") === "true"
     const org = await getOrgAuth(orgId)
 
     const result = await getAffiliatePayoutData(
@@ -34,7 +34,8 @@ export const GET = handleRoute(
       orderBy,
       orderDir,
       offset,
-      email
+      email,
+      pendingOnly
     )
 
     return NextResponse.json(result)

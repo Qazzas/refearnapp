@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import {
   createAffiliatePayouts,
@@ -40,6 +41,7 @@ import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
 import { api } from "@/lib/apiClient"
 import { useAppTable } from "@/hooks/useAppTable"
 import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface AffiliatesTablePayoutProps {
   orgId: string
@@ -298,6 +300,7 @@ export default function PayoutTable({
       filters.orderDir,
       filters.offset,
       filters.email,
+      filters.pendingOnly,
     ],
     (id, query) =>
       isTeam
@@ -313,6 +316,7 @@ export default function PayoutTable({
         orderDir: filters.orderDir,
         offset: filters.offset,
         email: filters.email,
+        pendingOnly: filters.pendingOnly,
       },
     ] as const,
     { enabled: !!(!affiliate && orgId) && !isUnpaidMode }
@@ -418,6 +422,23 @@ export default function PayoutTable({
             }}
             onOrderChange={(orderBy, orderDir) =>
               setFilters({ orderBy, orderDir })
+            }
+            rightActions={
+              <div className="flex items-center gap-2 border rounded-md px-3 py-2 bg-background h-10">
+                <Checkbox
+                  id="pending-only"
+                  checked={filters.pendingOnly}
+                  onCheckedChange={(checked) =>
+                    setFilters({ pendingOnly: checked === true })
+                  }
+                />
+                <Label
+                  htmlFor="pending-only"
+                  className="text-sm font-medium leading-none cursor-pointer"
+                >
+                  Pending Only
+                </Label>
+              </div>
             }
             onEmailChange={(email) => setFilters({ email: email || undefined })}
             affiliate={false}

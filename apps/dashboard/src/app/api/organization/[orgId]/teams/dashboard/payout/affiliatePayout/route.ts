@@ -25,7 +25,7 @@ export const GET = handleRoute(
     const email = searchParams.get("email") || undefined
 
     const org = await getTeamAuthAction(orgId)
-
+    const pendingOnly = searchParams.get("pendingOnly") === "true"
     const result = await getAffiliatePayoutData(
       mode,
       org,
@@ -35,7 +35,8 @@ export const GET = handleRoute(
       orderBy,
       orderDir,
       offset,
-      email
+      email,
+      pendingOnly
     )
 
     return NextResponse.json(result)
