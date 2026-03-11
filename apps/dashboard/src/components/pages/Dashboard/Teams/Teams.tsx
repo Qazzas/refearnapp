@@ -27,6 +27,9 @@ import { useRouter } from "next/navigation"
 import { handlePlanRedirect } from "@/util/HandlePlanRedirect"
 import { api } from "@/lib/apiClient"
 import { useAppTable } from "@/hooks/useAppTable"
+import { LicenseRequiredState } from "@/components/ui-custom/LicenseRequiredState"
+import { UserLicense } from "@/lib/server/organization/getLicense"
+import { useAccess } from "@/hooks/useAccess"
 
 const inviteSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -38,10 +41,12 @@ export default function Teams({
   orgId,
   affiliate = false,
   plan,
+  license,
 }: {
   orgId: string
   affiliate: boolean
   plan: PlanInfo
+  license: UserLicense
 }) {
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean
@@ -60,6 +65,7 @@ export default function Teams({
   const queryClient = useQueryClient()
   const { filters, setFilters } = useQueryFilter()
   const router = useRouter()
+  const { canAccessUltimate, isExpired } = useAccess(license)
   // Fetch teams
   const {
     data: searchData,
@@ -69,7 +75,7 @@ export default function Teams({
     ["org-teams", orgId, filters.offset, filters.email],
     (id, query) => api.organization.dashboard.teams([id, query]),
     [orgId, { offset: filters.offset, email: filters.email }] as const,
-    { enabled: !!orgId }
+    { enabled: !!orgId && canAccessUltimate }
   )
   // Invite mutation
   const inviteMutation = useAppMutation(inviteTeamMember, {
@@ -164,7 +170,15 @@ export default function Teams({
     // ✅ Otherwise open the invite dialog
     setOpenInvite(true)
   }
-
+  if (!canAccessUltimate) {
+    return (
+      <LicenseRequiredState
+        featureName="Teams Management"
+        requiredTier="ULTIMATE"
+        isExpired={isExpired}
+      />
+    )
+  }
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
