@@ -41,12 +41,10 @@ export default function Teams({
   orgId,
   affiliate = false,
   plan,
-  license,
 }: {
   orgId: string
   affiliate: boolean
   plan: PlanInfo
-  license: UserLicense
 }) {
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean
@@ -65,7 +63,6 @@ export default function Teams({
   const queryClient = useQueryClient()
   const { filters, setFilters } = useQueryFilter()
   const router = useRouter()
-  const { canAccessUltimate, isExpired } = useAccess(license)
   // Fetch teams
   const {
     data: searchData,
@@ -75,7 +72,7 @@ export default function Teams({
     ["org-teams", orgId, filters.offset, filters.email],
     (id, query) => api.organization.dashboard.teams([id, query]),
     [orgId, { offset: filters.offset, email: filters.email }] as const,
-    { enabled: !!orgId && canAccessUltimate }
+    { enabled: !!orgId }
   )
   // Invite mutation
   const inviteMutation = useAppMutation(inviteTeamMember, {
@@ -169,15 +166,6 @@ export default function Teams({
 
     // ✅ Otherwise open the invite dialog
     setOpenInvite(true)
-  }
-  if (!canAccessUltimate) {
-    return (
-      <LicenseRequiredState
-        featureName="Teams Management"
-        requiredTier="ULTIMATE"
-        isExpired={isExpired}
-      />
-    )
   }
   return (
     <div className="flex flex-col gap-6">

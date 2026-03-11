@@ -34,12 +34,15 @@ import { useCachedValidation } from "@/hooks/useCachedValidation"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { SignupTeamServer } from "@/app/(organization)/organization/[orgId]/teams/(auth)/signup/action"
+import { useContrastColor } from "@/hooks/useContrastColor"
+import { PoweredByBranding } from "@/components/ui-custom/PoweredByBranding"
 type Props = {
   orgId?: string
   isPreview?: boolean
   setTab?: (tab: string) => void
   affiliate: boolean
   isTeam?: boolean
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }
 const Signup = ({
   orgId,
@@ -47,6 +50,7 @@ const Signup = ({
   setTab,
   affiliate,
   isTeam = false,
+  plan,
 }: Props) => {
   const [previewLoading, setPreviewLoading] = useState(false)
   const { customNotesSignup } = useAtomValue(notesCustomizationAtom)
@@ -74,6 +78,7 @@ const Signup = ({
     buttonTextColor,
   } = useAtomValue(buttonCustomizationAtom)
   const authCardStyle = useAuthCard(affiliate)
+  const textColor = useContrastColor(backgroundColor)
   const { showCustomToast } = useCustomToast()
   const { getPath } = useAffiliatePath(orgId)
   const emailCache = useCachedValidation({
@@ -404,6 +409,9 @@ const Signup = ({
             </div>
           )}
         </Card>
+        {plan !== "ULTIMATE" && affiliate && (
+          <PoweredByBranding color={textColor} />
+        )}
       </div>
       {isPreview && (
         <div className="absolute bottom-0 left-0 z-50">

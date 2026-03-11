@@ -10,10 +10,16 @@ export function useAccess(license: UserLicense) {
       isExpired: false,
     }
   }
-
+  if (!license) {
+    return {
+      canAccessPro: false,
+      canAccessUltimate: false,
+      isExpired: true,
+    }
+  }
   return {
-    canAccessPro: !!license?.isActive && license.isPro,
-    canAccessUltimate: !!license?.isActive && license.isUltimate,
-    isExpired: !license?.isActive,
+    canAccessPro: license.isActive && (license.isPro || license.isUltimate),
+    canAccessUltimate: license.isActive && license.isUltimate,
+    isExpired: !license.isActive,
   }
 }

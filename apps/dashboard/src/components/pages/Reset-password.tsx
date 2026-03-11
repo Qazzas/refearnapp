@@ -36,6 +36,8 @@ import { useAffiliatePath } from "@/hooks/useUrl"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { resetTeamPasswordServer } from "@/app/(organization)/organization/[orgId]/teams/(auth)/reset-password/action"
+import { PoweredByBranding } from "@/components/ui-custom/PoweredByBranding"
+import { useContrastColor } from "@/hooks/useContrastColor"
 type Props = {
   userId: string
   orgId?: string
@@ -43,6 +45,7 @@ type Props = {
   setTab?: (tab: string) => void
   affiliate: boolean
   isTeam?: boolean
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }
 const ResetPassword = ({
   userId,
@@ -51,6 +54,7 @@ const ResetPassword = ({
   setTab,
   affiliate,
   isTeam = false,
+  plan,
 }: Props) => {
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(passwordSchema),
@@ -77,6 +81,7 @@ const ResetPassword = ({
     buttonTextColor,
   } = useAtomValue(buttonCustomizationAtom)
   const authCardStyle = useAuthCard(affiliate)
+  const textColor = useContrastColor(backgroundColor)
   const affiliateMutation = useAppMutation(resetAffiliatePasswordServer, {
     affiliate,
     disableSuccessToast: true,
@@ -330,6 +335,9 @@ const ResetPassword = ({
             </div>
           )}
         </Card>
+        {plan !== "ULTIMATE" && affiliate && (
+          <PoweredByBranding color={textColor} />
+        )}
       </div>
       {isPreview && (
         <div className="absolute bottom-0 left-0 z-50">
