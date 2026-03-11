@@ -24,15 +24,18 @@ import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { SimulationInfoCard } from "@/components/ui-custom/SimulationInfoCard"
 import { showNotificationAtom } from "@/store/ShowNotificationAtom"
+import { UserLicense } from "@/lib/server/organization/getLicense"
 
 export default function CustomizationPage({
   orgId,
   isTeam = false,
   plan,
+  license,
 }: {
   orgId: string
   isTeam?: boolean
   plan: "FREE" | "PRO" | "ULTIMATE"
+  license: UserLicense
 }) {
   const [mainTab, setMainTab] = useState("sidebar")
   const [selectedPage, setSelectedPage] = useState("dashboard")
@@ -341,6 +344,7 @@ export default function CustomizationPage({
                   domain={domainName}
                   selectedPage={selectedPage}
                   setSelectedPage={setSelectedPage}
+                  license={license}
                 />
               </div>
             </SidebarProvider>

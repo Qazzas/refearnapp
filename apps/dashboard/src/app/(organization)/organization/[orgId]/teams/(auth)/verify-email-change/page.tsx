@@ -29,6 +29,7 @@ export default async function VerifyLoginPage({ searchParams }: Props) {
       <InvalidToken
         affiliate={false}
         message="The login link is invalid or expired."
+        plan={"ULTIMATE"}
       />
     )
   }

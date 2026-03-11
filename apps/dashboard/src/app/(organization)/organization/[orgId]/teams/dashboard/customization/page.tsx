@@ -5,6 +5,8 @@ import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getLicense } from "@/lib/server/organization/getLicense"
+import { getUnifiedPlan } from "@/lib/server/organization/getUnifiedPlan"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -20,9 +22,11 @@ export async function generateMetadata({
 export default async function CustomizationServerPage({ params }: OrgIdProps) {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireTeamWithOrg(orgId)
+  const license = await getLicense(orgId)
+  const plan = await getUnifiedPlan(orgId)
   return (
     <div className="overflow-auto">
-      <CustomizationPage orgId={orgId} isTeam />
+      <CustomizationPage orgId={orgId} isTeam plan={plan} license={license} />
     </div>
   )
 }

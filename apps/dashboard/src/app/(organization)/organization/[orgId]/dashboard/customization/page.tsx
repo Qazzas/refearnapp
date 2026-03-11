@@ -43,7 +43,7 @@ export default async function CustomizationServerPage({ params }: OrgIdProps) {
   }
   return (
     <div className="overflow-auto">
-      <CustomizationPage orgId={orgId} plan={plan} />
+      <CustomizationPage orgId={orgId} plan={plan} license={license} />
     </div>
   )
 }

@@ -8,7 +8,7 @@ export const metadata: Metadata = buildMetadata({
   indexable: false,
 })
 const UnknownPage = async () => {
-  return <InvalidToken affiliate />
+  return <InvalidToken affiliate plan={"ULTIMATE"} />
 }
 
 export default UnknownPage

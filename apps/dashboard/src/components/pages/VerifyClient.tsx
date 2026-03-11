@@ -86,6 +86,7 @@ export default function VerifyClient({
         orgId={data.activeOrgId}
         mode={data.mode}
         customMessages={customMessages}
+        plan={"ULTIMATE"}
       />
     )
   }
