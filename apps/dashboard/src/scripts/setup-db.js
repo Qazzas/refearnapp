@@ -15,14 +15,12 @@ async function run() {
 
   let envContent = fs.readFileSync(envPath, "utf8")
 
-  // Look for SUPABASE_DATABASE_URL specifically
-  const dbUrlMatch = envContent.match(
-    /^SUPABASE_DATABASE_URL=["']?(.*?)["']?$/m
-  )
+  // Look for DATABASE_URL specifically
+  const dbUrlMatch = envContent.match(/^DATABASE_URL=["']?(.*?)["']?$/m)
   let dbUrl = dbUrlMatch ? dbUrlMatch[1] : ""
 
   if (!dbUrl || dbUrl.trim() === "") {
-    console.log("⚠️  SUPABASE_DATABASE_URL is missing.")
+    console.log("⚠️  DATABASE_URL is missing.")
     const inputUrl = prompt(
       "👉 Paste your Supabase Connection String (Transaction mode preferred):"
     )
@@ -37,20 +35,20 @@ async function run() {
     // Replace existing key or append new one
     if (dbUrlMatch) {
       envContent = envContent.replace(
-        /^SUPABASE_DATABASE_URL=.*$/m,
-        `SUPABASE_DATABASE_URL="${dbUrl}"`
+        /^DATABASE_URL=.*$/m,
+        `DATABASE_URL="${dbUrl}"`
       )
     } else {
       // Ensure we don't bunch up lines if the file already has content
       const prefix =
         envContent.length > 0 && !envContent.endsWith("\n") ? "\n" : ""
-      envContent += `${prefix}SUPABASE_DATABASE_URL="${dbUrl}"\n`
+      envContent += `${prefix}DATABASE_URL="${dbUrl}"\n`
     }
 
     fs.writeFileSync(envPath, envContent.trim() + "\n")
-    console.log("✅ .env updated with SUPABASE_DATABASE_URL.")
+    console.log("✅ .env updated with DATABASE_URL.")
   } else {
-    console.log("✅ SUPABASE_DATABASE_URL found in .env")
+    console.log("✅ DATABASE_URL found in .env")
   }
 
   // --- STEP 2: BOOTSTRAP ---

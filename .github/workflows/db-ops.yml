@@ -38,14 +38,14 @@ jobs:
 
       - name: Auto Migrate Schema
         env:
-          SUPABASE_DATABASE_URL: ${{ (github.ref == 'refs/heads/main' || github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+          DATABASE_URL: ${{ (github.ref == 'refs/heads/main' || github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
         # ✅ Navigate into the app folder ONLY for the command
         run: cd apps/dashboard && bun run db:migrate
 
       - name: Manual Reset and Seed
         if: github.event_name == 'workflow_dispatch'
         env:
-          SUPABASE_DATABASE_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+          DATABASE_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
           UPSTASH_REDIS_REST_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_REDIS_URL || secrets.DEV_REDIS_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_REDIS_TOKEN || secrets.DEV_REDIS_TOKEN }}
           CURRENCY_API_KEY: ${{ secrets.CURRENCY_API_KEY }}
