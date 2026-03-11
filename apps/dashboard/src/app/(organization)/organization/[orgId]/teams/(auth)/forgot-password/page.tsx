@@ -22,7 +22,12 @@ const forgetPasswordPage = async ({ params }: OrgIdProps) => {
   await redirectTeamIfAuthed(orgId)
   return (
     <>
-      <ForgotPassword affiliate={false} isTeam orgId={orgId} />
+      <ForgotPassword
+        affiliate={false}
+        isTeam
+        orgId={orgId}
+        plan={"ULTIMATE"}
+      />
     </>
   )
 }

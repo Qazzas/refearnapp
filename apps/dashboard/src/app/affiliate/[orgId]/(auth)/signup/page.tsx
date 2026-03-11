@@ -7,6 +7,7 @@ import { Metadata } from "next"
 import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getUnifiedPlan } from "@/lib/server/organization/getUnifiedPlan"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -26,9 +27,10 @@ export async function generateMetadata({
 const AffiliateSignupPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await redirectIfAffiliateAuthed(orgId)
+  const plan = await getUnifiedPlan(orgId)
   return (
     <>
-      <Signup affiliate orgId={orgId} />
+      <Signup affiliate orgId={orgId} plan={plan} />
     </>
   )
 }

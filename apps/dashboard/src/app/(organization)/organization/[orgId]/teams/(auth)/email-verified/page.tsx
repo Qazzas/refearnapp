@@ -19,5 +19,7 @@ export async function generateMetadata({
 export default async function EmailVerifiedPage({ params }: OrgIdProps) {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireTeamWithOrg(orgId)
-  return <EmailVerified isTeam orgId={orgId} affiliate={false} />
+  return (
+    <EmailVerified isTeam orgId={orgId} affiliate={false} plan={"ULTIMATE"} />
+  )
 }

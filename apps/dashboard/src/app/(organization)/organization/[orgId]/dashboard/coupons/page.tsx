@@ -5,6 +5,8 @@ import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
 import { buildMetadata } from "@/util/BuildMetadata"
 import { Metadata } from "next"
 import PromotionCodesTable from "@/components/pages/Dashboard/Coupons/PromotionCodesTable"
+import { getLicense } from "@/lib/server/organization/getLicense"
+import { LicenseRequiredState } from "@/components/ui-custom/LicenseRequiredState"
 
 export async function generateMetadata({
   params,
@@ -21,6 +23,19 @@ export async function generateMetadata({
 const couponsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
+  const license = await getLicense(orgId)
+  if (license) {
+    const hasAccess = license.isActive && license.isUltimate
+    if (!hasAccess) {
+      return (
+        <LicenseRequiredState
+          featureName="Coupons"
+          requiredTier="ULTIMATE"
+          isExpired={!license.isActive}
+        />
+      )
+    }
+  }
   return (
     <>
       <PromotionCodesTable orgId={orgId} isTeam={false} />

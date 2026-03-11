@@ -8,6 +8,8 @@ import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
 import AffiliateCouponsTable from "@/components/pages/AffiliateDashboard/AffiliateCoupon/affiliateCouponTable"
+import { getLicense } from "@/lib/server/organization/getLicense"
+import { LicenseRequiredState } from "@/components/ui-custom/LicenseRequiredState"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -27,6 +29,19 @@ export async function generateMetadata({
 const couponsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireAffiliateWithOrg(orgId)
+  const license = await getLicense(orgId)
+  if (license) {
+    const hasAccess = license.isActive && license.isUltimate
+    if (!hasAccess) {
+      return (
+        <LicenseRequiredState
+          featureName="Affiliate Coupons"
+          requiredTier="ULTIMATE"
+          isExpired={!license.isActive}
+        />
+      )
+    }
+  }
   return (
     <div className="space-y-6">
       <MissingPaypalEmailCard affiliate orgId={orgId} />

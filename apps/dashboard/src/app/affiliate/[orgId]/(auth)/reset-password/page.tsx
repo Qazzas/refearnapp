@@ -9,6 +9,7 @@ import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { getOrgBaseUrl } from "@/lib/server/organization/getOrgBaseUrl"
 import { buildMetadata } from "@/util/BuildMetadata"
 import { OrgIdProps } from "@/lib/types/organization/orgId"
+import { getUnifiedPlan } from "@/lib/server/organization/getUnifiedPlan"
 
 type Props = {
   searchParams: Promise<{ affiliateToken?: string }>
@@ -34,12 +35,14 @@ const ResetPasswordPage = async ({ searchParams, params }: Props) => {
   const { affiliateToken } = await searchParams
   const orgId = await getValidatedOrgFromParams({ params })
   await redirectIfAffiliateAuthed(orgId)
+  const plan = await getUnifiedPlan(orgId)
   if (!affiliateToken) {
     return (
       <InvalidToken
         affiliate
         message="The reset link is invalid or expired."
         orgId={orgId}
+        plan={plan}
       />
     )
   }
@@ -55,12 +58,18 @@ const ResetPasswordPage = async ({ searchParams, params }: Props) => {
         affiliate
         message="The reset link is invalid or expired."
         orgId={orgId}
+        plan={plan}
       />
     )
   }
 
   return (
-    <ResetPassword orgId={orgId} affiliate userId={sessionPayload.data.id} />
+    <ResetPassword
+      orgId={orgId}
+      affiliate
+      userId={sessionPayload.data.id}
+      plan={plan}
+    />
   )
 }
 

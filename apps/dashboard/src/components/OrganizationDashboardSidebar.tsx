@@ -14,6 +14,7 @@ import {
   MailQuestion,
   TicketPercent,
   MousePointerClick,
+  Lock,
 } from "lucide-react"
 import {
   Sidebar,
@@ -40,6 +41,8 @@ import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
 import { SystemUpdate } from "@/components/ui-custom/SystemUpdate"
 import { SidebarHelp } from "@/components/ui-custom/SidebarHelp"
+import { UserLicense } from "@/lib/server/organization/getLicense"
+import { useAccess } from "@/hooks/useAccess"
 
 // Menu items for the sidebar
 
@@ -49,6 +52,7 @@ type Props = {
   orgs: { id: string; name: string }[]
   UserData: OrganizationData | null
   updateInfo?: { isNewer: boolean; latestVersion: string; url: string } | null
+  license: UserLicense
 }
 const OrganizationDashboardSidebar = ({
   orgId,
@@ -56,10 +60,20 @@ const OrganizationDashboardSidebar = ({
   orgs,
   UserData,
   updateInfo,
+  license,
 }: Props) => {
   const pathname = usePathname()
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   useCloseSidebarOnNavigation()
+  const { canAccessPro, canAccessUltimate } = useAccess(license)
+  const isLocked = (itemTitle: string) => {
+    if (isSelfHosted) {
+      if (["Teams", "Coupons"].includes(itemTitle)) return !canAccessUltimate
+      if (["Customization", "Dashboard"].includes(itemTitle))
+        return !canAccessPro
+    }
+    return false
+  }
   const { mutate: switchOrg, isPending } = useSwitchOrg()
   const items = [
     {
@@ -252,20 +266,33 @@ const OrganizationDashboardSidebar = ({
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.url}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
-                      <item.icon className="w-5 h-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const locked = isLocked(item.title)
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.url}
+                      tooltip={item.title}
+                    >
+                      {locked ? (
+                        <div className="flex items-center w-full justify-between opacity-50 cursor-not-allowed">
+                          <div className="flex items-center gap-2">
+                            <item.icon className="w-5 h-5" />
+                            <span>{item.title}</span>
+                          </div>
+                          <Lock className="w-3 h-3" />
+                        </div>
+                      ) : (
+                        <Link href={item.url}>
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </Link>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -29,6 +29,7 @@ const TeamSignupPage = async ({ params, searchParams }: TeamSignupProps) => {
       <InvalidToken
         affiliate={false}
         message="Missing team invitation token."
+        plan={"ULTIMATE"}
       />
     )
   }
@@ -39,13 +40,14 @@ const TeamSignupPage = async ({ params, searchParams }: TeamSignupProps) => {
       <InvalidToken
         affiliate={false}
         message="Invalid or expired team invitation token."
+        plan={"ULTIMATE"}
       />
     )
   }
 
   return (
     <>
-      <Signup affiliate={false} orgId={orgId} isTeam />
+      <Signup affiliate={false} orgId={orgId} isTeam plan={"ULTIMATE"} />
     </>
   )
 }

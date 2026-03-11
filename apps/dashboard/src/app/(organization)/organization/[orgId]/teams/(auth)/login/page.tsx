@@ -22,7 +22,7 @@ const loginPage = async ({ params }: OrgIdProps) => {
   await redirectTeamIfAuthed(orgId)
   return (
     <>
-      <Login affiliate={false} isTeam orgId={orgId} />
+      <Login affiliate={false} isTeam orgId={orgId} plan={"ULTIMATE"} />
     </>
   )
 }

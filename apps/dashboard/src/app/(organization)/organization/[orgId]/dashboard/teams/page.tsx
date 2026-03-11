@@ -7,6 +7,7 @@ import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 import { getLicense } from "@/lib/server/organization/getLicense"
+import { LicenseRequiredState } from "@/components/ui-custom/LicenseRequiredState"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -23,10 +24,23 @@ const TeamsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
   const plan = await getUserPlan()
-  const license = await getLicense()
+  const license = await getLicense(orgId)
+  if (license) {
+    const hasAccess = license.isActive && license.isUltimate
+
+    if (!hasAccess) {
+      return (
+        <LicenseRequiredState
+          featureName="Teams Management"
+          requiredTier="ULTIMATE"
+          isExpired={!license.isActive}
+        />
+      )
+    }
+  }
   return (
     <>
-      <Teams affiliate={false} orgId={orgId} plan={plan} license={license} />
+      <Teams affiliate={false} orgId={orgId} plan={plan} />
     </>
   )
 }

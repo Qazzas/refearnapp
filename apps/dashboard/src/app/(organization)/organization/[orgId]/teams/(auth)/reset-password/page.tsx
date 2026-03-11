@@ -34,6 +34,7 @@ const ResetPasswordPage = async ({ searchParams, params }: Props) => {
       <InvalidToken
         affiliate={false}
         message="The reset link is invalid or expired."
+        plan={"ULTIMATE"}
       />
     )
   }
@@ -47,6 +48,7 @@ const ResetPasswordPage = async ({ searchParams, params }: Props) => {
       <InvalidToken
         affiliate={false}
         message="The reset link is invalid or expired."
+        plan={"ULTIMATE"}
       />
     )
   }
@@ -57,6 +59,7 @@ const ResetPasswordPage = async ({ searchParams, params }: Props) => {
       userId={sessionPayload.data.id}
       orgId={sessionPayload.data.orgId}
       isTeam
+      plan={"ULTIMATE"}
     />
   )
 }

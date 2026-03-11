@@ -15,7 +15,7 @@ const signupPage = async () => {
   await restrictSelfHostedSignup()
   return (
     <>
-      <Signup affiliate={false} />
+      <Signup affiliate={false} plan={"ULTIMATE"} />
     </>
   )
 }

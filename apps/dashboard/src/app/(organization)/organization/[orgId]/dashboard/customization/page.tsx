@@ -5,6 +5,10 @@ import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getLicense } from "@/lib/server/organization/getLicense"
+import { LicenseRequiredState } from "@/components/ui-custom/LicenseRequiredState"
+import { getActiveDomain } from "@/lib/server/organization/getActiveDomain"
+import { getUnifiedPlan } from "@/lib/server/organization/getUnifiedPlan"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -20,9 +24,26 @@ export async function generateMetadata({
 export default async function CustomizationServerPage({ params }: OrgIdProps) {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
+  const license = await getLicense(orgId)
+  const plan = await getUnifiedPlan(orgId)
+  const domain = await getActiveDomain(orgId)
+  if (license) {
+    const hasAccess = license.isActive && license.isUltimate
+
+    if (!hasAccess) {
+      return (
+        <LicenseRequiredState
+          featureName="Customization Options"
+          requiredTier="PRO"
+          isExpired={!license.isActive}
+          domainName={domain?.domainName}
+        />
+      )
+    }
+  }
   return (
     <div className="overflow-auto">
-      <CustomizationPage orgId={orgId} />
+      <CustomizationPage orgId={orgId} plan={plan} />
     </div>
   )
 }
