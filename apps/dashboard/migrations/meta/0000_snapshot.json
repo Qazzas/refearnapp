@@ -1,5 +1,5 @@
 {
-  "id": "5c5cfa0b-e65a-423f-9b5b-63e44845eb99",
+  "id": "ab554ed4-4cda-4c21-a2de-6f0178f9768f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -575,6 +575,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "promotion_code_id": {
+          "name": "promotion_code_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "unpaid_amount": {
           "name": "unpaid_amount",
           "type": "numeric(10, 2)",
@@ -675,6 +681,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "affiliate_invoice_promotion_code_id_promotion_codes_id_fk": {
+          "name": "affiliate_invoice_promotion_code_id_promotion_codes_id_fk",
+          "tableFrom": "affiliate_invoice",
+          "tableTo": "promotion_codes",
+          "columnsFrom": [
+            "promotion_code_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1076,6 +1095,124 @@
           "nullsNotDistinct": false,
           "columns": [
             "token"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.license_keys": {
+      "name": "license_keys",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "tier": {
+          "name": "tier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PRO'"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_validated_at": {
+          "name": "last_validated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "license_keys_user_id_idx": {
+          "name": "license_keys_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "license_keys_key_idx": {
+          "name": "license_keys_key_idx",
+          "columns": [
+            {
+              "expression": "key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "license_keys_user_id_user_id_fk": {
+          "name": "license_keys_user_id_user_id_fk",
+          "tableFrom": "license_keys",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "license_keys_key_unique": {
+          "name": "license_keys_key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "key"
           ]
         }
       },
@@ -2212,7 +2349,29 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "referrals_email_link_idx": {
+          "name": "referrals_email_link_idx",
+          "columns": [
+            {
+              "expression": "signup_email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "referral_link_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "referrals_affiliate_id_affiliate_id_fk": {
           "name": "referrals_affiliate_id_affiliate_id_fk",
@@ -2410,6 +2569,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "promotion_code_id": {
+          "name": "promotion_code_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "expiration_date": {
           "name": "expiration_date",
           "type": "timestamp",
@@ -2448,7 +2613,21 @@
           "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "subscription_expiration_promotion_code_id_promotion_codes_id_fk": {
+          "name": "subscription_expiration_promotion_code_id_promotion_codes_id_fk",
+          "tableFrom": "subscription_expiration",
+          "tableTo": "promotion_codes",
+          "columnsFrom": [
+            "promotion_code_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "subscription_expiration_subscription_id_unique": {
