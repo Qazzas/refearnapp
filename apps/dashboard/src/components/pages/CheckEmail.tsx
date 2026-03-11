@@ -14,14 +14,17 @@ import { Button } from "@/components/ui/button"
 import { ButtonCustomizationOptions } from "@/components/ui-custom/Customization/AuthCustomization/ButtonCustomizationOptions"
 import { openEmailApp } from "@/util/OpenEmailApp"
 import { useSearchParams } from "next/navigation"
+import { PoweredByBranding } from "@/components/ui-custom/PoweredByBranding"
+import { useContrastColor } from "@/hooks/useContrastColor"
 
 type Props = {
   orgId?: string
   isPreview?: boolean
   affiliate: boolean
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }
 
-const CheckEmail = ({ isPreview, affiliate }: Props) => {
+const CheckEmail = ({ isPreview, affiliate, plan }: Props) => {
   const searchParams = useSearchParams()
   const encodedEmail = searchParams.get("email") || ""
   const email = decodeURIComponent(encodedEmail)
@@ -30,6 +33,7 @@ const CheckEmail = ({ isPreview, affiliate }: Props) => {
   const { buttonBackgroundColor, buttonTextColor } = useAtomValue(
     buttonCustomizationAtom
   )
+  const textColor = useContrastColor(backgroundColor)
   const authCardStyle = useAuthCard(affiliate)
 
   return (
@@ -126,6 +130,9 @@ const CheckEmail = ({ isPreview, affiliate }: Props) => {
             </div>
           )}
         </Card>
+        {plan !== "ULTIMATE" && affiliate && (
+          <PoweredByBranding color={textColor} />
+        )}
       </div>
 
       {isPreview && (

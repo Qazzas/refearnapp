@@ -31,6 +31,8 @@ import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { SidebarCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/SidebarCustomizationOptions"
 import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
 import { showNotificationAtom } from "@/store/ShowNotificationAtom"
+import { UserLicense } from "@/lib/server/organization/getLicense"
+import { useAccess } from "@/hooks/useAccess"
 
 type Props = {
   orgId: string
@@ -40,6 +42,7 @@ type Props = {
   affiliate: boolean
   AffiliateData?: AffiliateData | null
   unseenCouponsCount?: number
+  license: UserLicense
 }
 
 const AffiliateDashboardSidebar = ({
@@ -50,10 +53,12 @@ const AffiliateDashboardSidebar = ({
   affiliate,
   AffiliateData,
   unseenCouponsCount = 0,
+  license,
 }: Props) => {
   const pathname = usePathname()
   useCloseSidebarOnNavigation()
   const { getPath } = useAffiliatePath(orgId)
+  const { canAccessUltimate } = useAccess(license)
   const showNotification = useAtomValue(showNotificationAtom)
   const displayBadgeCount = isPreview
     ? showNotification
@@ -66,38 +71,38 @@ const AffiliateDashboardSidebar = ({
       url: getPath("dashboard/analytics"),
       icon: BarChart3,
     },
-    {
-      title: "Links",
-      url: getPath("dashboard/links"),
-      icon: LinkIcon,
-    },
+    { title: "Links", url: getPath("dashboard/links"), icon: LinkIcon },
     {
       title: "Referrals",
       url: getPath("dashboard/referrals"),
       icon: MousePointerClick,
     },
-    {
-      title: "Coupons",
-      url: getPath("dashboard/coupons"),
-      icon: Ticket,
-      badge: displayBadgeCount > 0 ? displayBadgeCount : null,
-    },
-    {
-      title: "Payment",
-      url: getPath("dashboard/payment"),
-      icon: Users,
-    },
+    ...(canAccessUltimate
+      ? [
+          {
+            title: "Coupons",
+            url: getPath("dashboard/coupons"),
+            icon: Ticket,
+            badge: displayBadgeCount > 0 ? displayBadgeCount : null,
+          },
+        ]
+      : []),
+    { title: "Payment", url: getPath("dashboard/payment"), icon: Users },
   ]
   const itemsPreview = [
     { title: "Dashboard", key: "dashboard", icon: BarChart3 },
     { title: "Links", key: "links", icon: LinkIcon },
     { title: "Referrals", key: "referrals", icon: MousePointerClick },
-    {
-      title: "Coupons",
-      key: "coupons",
-      icon: Ticket,
-      badge: displayBadgeCount > 0 ? displayBadgeCount : null,
-    },
+    ...(canAccessUltimate
+      ? [
+          {
+            title: "Coupons",
+            key: "coupons",
+            icon: Ticket,
+            badge: displayBadgeCount > 0 ? displayBadgeCount : null,
+          },
+        ]
+      : []),
     { title: "Payment", key: "payment", icon: Users },
   ]
   const [hoveredKey, setHoveredKey] = useState<string | null>(null)

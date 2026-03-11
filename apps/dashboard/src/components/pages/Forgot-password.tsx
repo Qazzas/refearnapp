@@ -37,12 +37,15 @@ import { useAffiliatePath } from "@/hooks/useUrl"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { ForgotPasswordTeamServer } from "@/app/(organization)/organization/[orgId]/teams/(auth)/forgot-password/action"
+import { PoweredByBranding } from "@/components/ui-custom/PoweredByBranding"
+import { useContrastColor } from "@/hooks/useContrastColor"
 type Props = {
   orgId?: string
   isPreview?: boolean
   setTab?: (tab: string) => void
   affiliate: boolean
   isTeam?: boolean
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }
 const ForgotPassword = ({
   orgId,
@@ -50,6 +53,7 @@ const ForgotPassword = ({
   setTab,
   affiliate,
   isTeam = false,
+  plan,
 }: Props) => {
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -74,6 +78,7 @@ const ForgotPassword = ({
     buttonTextColor,
   } = useAtomValue(buttonCustomizationAtom)
   const authCardStyle = useAuthCard(affiliate)
+  const textColor = useContrastColor(backgroundColor)
   const organizationMutation = useAppMutation(ForgotPasswordServer, {
     affiliate,
   })
@@ -296,6 +301,9 @@ const ForgotPassword = ({
             </div>
           )}
         </Card>
+        {plan !== "ULTIMATE" && affiliate && (
+          <PoweredByBranding color={textColor} />
+        )}
       </div>
       {isPreview && (
         <div className="absolute bottom-0 left-0 z-50">

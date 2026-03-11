@@ -28,9 +28,11 @@ import { showNotificationAtom } from "@/store/ShowNotificationAtom"
 export default function CustomizationPage({
   orgId,
   isTeam = false,
+  plan,
 }: {
   orgId: string
   isTeam?: boolean
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }) {
   const [mainTab, setMainTab] = useState("sidebar")
   const [selectedPage, setSelectedPage] = useState("dashboard")
@@ -357,6 +359,7 @@ export default function CustomizationPage({
                   setMainTab={setMainTab}
                   domain={domainName}
                   tab={tab}
+                  plan={plan}
                   setTab={setTab}
                 />
               </div>

@@ -17,6 +17,7 @@ import { DomainHeader } from "@/components/ui-custom/DomainHeader"
 interface AuthCustomizationProps {
   setMainTab?: (tab: string) => void
   orgId: string
+  plan: "FREE" | "PRO" | "ULTIMATE"
   domain?: string
   tab: string
   setTab: (tab: string) => void
@@ -24,6 +25,7 @@ interface AuthCustomizationProps {
 export const AuthCustomization = ({
   setMainTab,
   orgId,
+  plan,
   domain,
   tab,
   setTab,
@@ -63,13 +65,31 @@ export const AuthCustomization = ({
           <TabsTrigger value="splash-error">Splash Error</TabsTrigger>
         </TabsList>
         <TabsContent value="login">
-          <Login orgId={orgId} affiliate isPreview setTab={setTab} />
+          <Login
+            orgId={orgId}
+            affiliate
+            isPreview
+            setTab={setTab}
+            plan={plan}
+          />
         </TabsContent>
         <TabsContent value="signup">
-          <Signup orgId={orgId} affiliate isPreview setTab={setTab} />
+          <Signup
+            orgId={orgId}
+            affiliate
+            isPreview
+            setTab={setTab}
+            plan={plan}
+          />
         </TabsContent>
         <TabsContent value="forgot-password">
-          <ForgotPassword orgId={orgId} affiliate isPreview setTab={setTab} />
+          <ForgotPassword
+            orgId={orgId}
+            affiliate
+            isPreview
+            setTab={setTab}
+            plan={plan}
+          />
         </TabsContent>
         <TabsContent value="reset-password">
           <ResetPassword
@@ -78,10 +98,11 @@ export const AuthCustomization = ({
             isPreview
             setTab={setTab}
             userId="1234"
+            plan={plan}
           />
         </TabsContent>
         <TabsContent value="invalid-token">
-          <InvalidToken orgId={orgId} affiliate isPreview />
+          <InvalidToken orgId={orgId} affiliate isPreview plan={plan} />
         </TabsContent>{" "}
         <TabsContent value="email-verified">
           <EmailVerified
@@ -89,10 +110,11 @@ export const AuthCustomization = ({
             affiliate
             isPreview
             setMainTab={setMainTab}
+            plan={plan}
           />
         </TabsContent>
         <TabsContent value="check-email">
-          <CheckEmail affiliate isPreview orgId={orgId} />
+          <CheckEmail affiliate isPreview orgId={orgId} plan={plan} />
         </TabsContent>
         <TabsContent value="splash-loading">
           <PendingState affiliate isPreview />

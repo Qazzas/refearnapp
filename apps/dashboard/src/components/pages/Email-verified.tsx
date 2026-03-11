@@ -14,6 +14,8 @@ import {
   themeCustomizationAtom,
 } from "@/store/AuthCustomizationAtom"
 import { useAffiliatePath } from "@/hooks/useUrl"
+import { PoweredByBranding } from "@/components/ui-custom/PoweredByBranding"
+import { useContrastColor } from "@/hooks/useContrastColor"
 type CustomMessages = {
   signup?: string
   login?: string
@@ -27,6 +29,7 @@ type Props = {
   mode?: "signup" | "login" | "changeEmail"
   customMessages?: CustomMessages
   isTeam?: boolean
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }
 
 const EmailVerified = ({
@@ -37,6 +40,7 @@ const EmailVerified = ({
   mode,
   customMessages,
   isTeam,
+  plan,
 }: Props) => {
   const {
     backgroundColor,
@@ -47,6 +51,7 @@ const EmailVerified = ({
   const { buttonBackgroundColor, buttonTextColor } = useAtomValue(
     buttonCustomizationAtom
   )
+  const textColor = useContrastColor(backgroundColor)
   const authCardStyle = useAuthCard(affiliate)
   const message =
     (mode && customMessages?.[mode]) ||
@@ -156,7 +161,9 @@ const EmailVerified = ({
             </Button>
           </CardContent>
         </Card>
-
+        {plan !== "ULTIMATE" && affiliate && (
+          <PoweredByBranding color={textColor} />
+        )}
         {isPreview && (
           <div className="absolute bottom-0 right-0 p-2">
             <ButtonCustomizationOptions onlyShowEnabled size="w-6 h-6" />
