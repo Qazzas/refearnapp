@@ -5,12 +5,14 @@ interface LicenseRequiredProps {
   featureName: string
   requiredTier: "PRO" | "ULTIMATE"
   isExpired?: boolean
+  domainName?: string
 }
 
 export function LicenseRequiredState({
   featureName,
   requiredTier,
   isExpired = false,
+  domainName,
 }: LicenseRequiredProps) {
   // Dynamic content based on status
   const title = isExpired ? "License Expired" : "Upgrade Required"
@@ -29,7 +31,14 @@ export function LicenseRequiredState({
       >
         {icon}
       </div>
-
+      <div className="space-y-2">
+        <h2 className="text-3xl font-bold">Upgrade Required</h2>
+        <p className="text-muted-foreground max-w-sm mx-auto">
+          You need an active {requiredTier} license to customize
+          {domainName ? ` the portal at ${domainName}` : " your affiliate page"}
+          .
+        </p>
+      </div>
       <div className="space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
         <p className="text-muted-foreground max-w-sm mx-auto">{message}</p>

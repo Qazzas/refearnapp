@@ -3,6 +3,8 @@ import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getLicense } from "@/lib/server/organization/getLicense"
+import { LicenseRequiredState } from "@/components/ui-custom/LicenseRequiredState"
 
 interface AnalyticsLayoutProps {
   children: React.ReactNode
@@ -32,7 +34,20 @@ export default async function AnalyticsLayout({
   referrers,
   topAffiliates,
 }: AnalyticsLayoutProps) {
-  await getValidatedOrgFromParams({ params })
+  const orgId = await getValidatedOrgFromParams({ params })
+  const license = await getLicense(orgId)
+  if (license) {
+    const hasAccess = license.isActive && (license.isPro || license.isUltimate)
+    if (!hasAccess) {
+      return (
+        <LicenseRequiredState
+          featureName="Advanced Analytics"
+          requiredTier="PRO"
+          isExpired={!license.isActive}
+        />
+      )
+    }
+  }
   return (
     <div className="space-y-8">
       {children}

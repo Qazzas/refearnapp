@@ -1,24 +1,11 @@
 import { db } from "@/db/drizzle"
-import { subscription, purchase } from "@/db/schema"
+import { organization, subscription, purchase } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { getOrgAuthForPlan } from "@/lib/server/organization/getOrgAuthForPlan"
 import type { PlanInfo } from "@/lib/types/organization/planInfo"
 
-function isSubscriptionValid(sub: typeof subscription.$inferSelect | null) {
-  if (!sub) return false
-  if (!sub.expiresAt) return false
-  return sub.expiresAt.getTime() >= Date.now()
-}
-
-export async function getUserPlan(): Promise<PlanInfo> {
-  if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true") {
-    return {
-      plan: "ULTIMATE",
-      type: "PURCHASE",
-    }
-  }
-  const { userId } = await getOrgAuthForPlan()
-
+// 1. Core Logic: The only place where the plan calculation lives
+async function getPlanByUserId(userId: string): Promise<PlanInfo> {
   const [userSub, userPurchase] = await Promise.all([
     db.query.subscription.findFirst({ where: eq(subscription.userId, userId) }),
     db.query.purchase.findFirst({
@@ -27,30 +14,24 @@ export async function getUserPlan(): Promise<PlanInfo> {
     }),
   ])
 
-  // ✅ Check subscription first
+  // Helper for validity
+  const isValid = (sub: typeof subscription.$inferSelect | null) =>
+    sub?.expiresAt && sub.expiresAt.getTime() >= Date.now()
+
   if (userSub) {
-    if (isSubscriptionValid(userSub)) {
-      if (userPurchase && !userPurchase.isActive) {
-        return {
-          plan: userSub.plan as PlanInfo["plan"],
-          type: "SUBSCRIPTION",
-          cycle: userSub.billingInterval as PlanInfo["cycle"],
-          subscriptionId: userSub.id,
-          hasPendingPurchase: true,
-          pendingPurchaseTier: userPurchase.tier,
-          subscriptionChangeAt: userSub.subscriptionChangeAt,
-        }
-      }
+    if (isValid(userSub)) {
       return {
         plan: userSub.plan as PlanInfo["plan"],
         type: "SUBSCRIPTION",
         cycle: userSub.billingInterval as PlanInfo["cycle"],
         subscriptionId: userSub.id,
         subscriptionChangeAt: userSub.subscriptionChangeAt,
+        hasPendingPurchase: userPurchase && !userPurchase.isActive,
+        pendingPurchaseTier: userPurchase?.tier,
       }
     }
     return {
-      plan: userSub.plan as PlanInfo["plan"], // keep the original plan (e.g. PRO or ULTIMATE)
+      plan: userSub.plan as PlanInfo["plan"],
       type: "EXPIRED",
       cycle: userSub.billingInterval as PlanInfo["cycle"],
       subscriptionId: userSub.id,
@@ -58,14 +39,34 @@ export async function getUserPlan(): Promise<PlanInfo> {
     }
   }
 
-  // ✅ If user made one-time purchase
-  if (userPurchase && userPurchase.isActive) {
-    let mappedPlan: PlanInfo["plan"] = "PRO"
-    if (userPurchase.tier === "ULTIMATE") mappedPlan = "ULTIMATE"
-    if (userPurchase.tier === "PRO") mappedPlan = "PRO"
-
-    return { plan: mappedPlan, type: "PURCHASE" }
+  if (userPurchase?.isActive) {
+    return {
+      plan: userPurchase.tier === "ULTIMATE" ? "ULTIMATE" : "PRO",
+      type: "PURCHASE",
+    }
   }
-  // ✅ Default fallback (free plan)
+
   return { plan: "FREE", type: "FREE" }
+}
+
+// 2. Wrapper A: Get plan for current user session
+export async function getUserPlan(): Promise<PlanInfo> {
+  if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true")
+    return { plan: "ULTIMATE", type: "PURCHASE" }
+  const { userId } = await getOrgAuthForPlan()
+  return getPlanByUserId(userId)
+}
+
+// 3. Wrapper B: Get plan for specific orgId
+export async function getOrgPlan(orgId: string): Promise<PlanInfo> {
+  if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true")
+    return { plan: "ULTIMATE", type: "PURCHASE" }
+
+  const org = await db.query.organization.findFirst({
+    where: eq(organization.id, orgId),
+    columns: { userId: true },
+  })
+
+  if (!org) return { plan: "FREE", type: "FREE" }
+  return getPlanByUserId(org.userId)
 }

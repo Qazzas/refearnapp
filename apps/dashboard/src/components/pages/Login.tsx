@@ -33,12 +33,15 @@ import { useAffiliatePath } from "@/hooks/useUrl"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { LoginTeamServer } from "@/app/(organization)/organization/[orgId]/teams/(auth)/login/action"
+import { PoweredByBranding } from "@/components/ui-custom/PoweredByBranding"
+import { useContrastColor } from "@/hooks/useContrastColor"
 type Props = {
   orgId?: string
   isPreview?: boolean
   setTab?: (tab: string) => void
   affiliate: boolean
   isTeam?: boolean
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }
 const Login = ({
   orgId,
@@ -46,6 +49,7 @@ const Login = ({
   setTab,
   affiliate,
   isTeam = false,
+  plan,
 }: Props) => {
   const { showCustomToast } = useCustomToast()
   const [previewLoading, setPreviewLoading] = useState(false)
@@ -70,6 +74,7 @@ const Login = ({
     buttonDisabledBackgroundColor,
     buttonTextColor,
   } = useAtomValue(buttonCustomizationAtom)
+  const textColor = useContrastColor(backgroundColor)
   const authCardStyle = useAuthCard(affiliate)
   const { customNotesLogin } = useAtomValue(notesCustomizationAtom)
   const affiliateMutation = useAppMutation(LoginAffiliateServer, {
@@ -368,6 +373,9 @@ const Login = ({
             </div>
           )}
         </Card>
+        {plan !== "ULTIMATE" && affiliate && (
+          <PoweredByBranding color={textColor} />
+        )}
       </div>
       {isPreview && (
         <div className="absolute bottom-0 left-0 z-50">

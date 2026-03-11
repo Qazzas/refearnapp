@@ -1,26 +1,33 @@
 import { db } from "@/db/drizzle"
 import { licenseKeys } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { getOrgAuthForPlan } from "@/lib/server/organization/getOrgAuthForPlan"
+import { getOrgOwnerId } from "@/lib/server/organization/getOrgOwnerId"
 
-export async function getLicense() {
+// lib/server/organization/getLicense.ts
+
+export async function getLicense(orgId: string) {
   if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") return null
 
-  // Automatically fetch the user context
-  const { userId } = await getOrgAuthForPlan()
+  const ownerId = await getOrgOwnerId(orgId)
+  if (!ownerId) return null
 
   const license = await db.query.licenseKeys.findFirst({
-    where: eq(licenseKeys.userId, userId),
+    where: eq(licenseKeys.userId, ownerId),
   })
-
-  if (!license) return null
+  if (!license) {
+    return {
+      isCommunity: true,
+      isActive: true,
+      isPro: false,
+      isUltimate: false,
+    }
+  }
 
   const isExpired = new Date(license.expiresAt) < new Date()
 
-  // TODO: Implement Polar API validation (validateWithPolar(license.key))
-
   return {
     ...license,
+    isCommunity: false,
     isActive: license.status === "active" && !isExpired,
     isPro: license.tier === "PRO",
     isUltimate: license.tier === "ULTIMATE",

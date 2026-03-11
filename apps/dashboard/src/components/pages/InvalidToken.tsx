@@ -6,19 +6,23 @@ import { CardCustomizationOptions } from "@/components/ui-custom/Customization/A
 import { useAuthCard } from "@/hooks/useAuthCard"
 import { useAtomValue } from "jotai"
 import { themeCustomizationAtom } from "@/store/AuthCustomizationAtom"
+import { useContrastColor } from "@/hooks/useContrastColor"
+import { PoweredByBranding } from "@/components/ui-custom/PoweredByBranding"
 type Props = {
   orgId?: string
   isPreview?: boolean
   affiliate: boolean
   message?: string
+  plan: "FREE" | "PRO" | "ULTIMATE"
 }
-const InvalidToken = ({ isPreview, affiliate, message }: Props) => {
+const InvalidToken = ({ isPreview, affiliate, message, plan }: Props) => {
   const {
     backgroundColor,
     InvalidPrimaryCustomization,
     InvalidSecondaryCustomization,
   } = useAtomValue(themeCustomizationAtom)
   const authCardStyle = useAuthCard(affiliate)
+  const textColor = useContrastColor(backgroundColor)
   return (
     <div
       className={`relative min-h-screen flex items-center justify-center p-4 ${
@@ -84,6 +88,9 @@ const InvalidToken = ({ isPreview, affiliate, message }: Props) => {
             </div>
           )}
         </Card>
+        {plan !== "ULTIMATE" && affiliate && (
+          <PoweredByBranding color={textColor} />
+        )}
       </div>
       {isPreview && (
         <div className="absolute bottom-0 left-0 z-50">

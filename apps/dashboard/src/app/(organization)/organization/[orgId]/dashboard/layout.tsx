@@ -15,6 +15,7 @@ import { SubscriptionStatusBanner } from "@/components/ui-custom/SubscriptionSta
 import { getUserData } from "@/lib/server/organization/getUserProfile"
 import { checkVersion } from "@/lib/server/organization/check-update"
 import { SystemUpdate } from "@/components/ui-custom/SystemUpdate"
+import { getLicense } from "@/lib/server/organization/getLicense"
 interface OrganizationDashboardLayoutProps extends OrgIdProps {
   children: React.ReactNode
 }
@@ -31,6 +32,7 @@ export default async function DashboardLayout({
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   const updateResult = isSelfHosted ? await checkVersion() : null
   const updateInfo = updateResult?.ok ? updateResult.data : null
+  const license = await getLicense(orgId)
   return (
     <SidebarProvider affiliate={false} orgId={orgId}>
       <OrganizationDashboardSidebar
@@ -39,6 +41,7 @@ export default async function DashboardLayout({
         orgs={orgs}
         UserData={user}
         updateInfo={updateInfo}
+        license={license ?? null}
       />
       <SidebarInset className="relative flex w-full flex-1 flex-col bg-background overflow-auto">
         <div className="md:hidden px-6 pt-4">
