@@ -7,6 +7,9 @@ const PADDLE_IDS = {
   pro_one_time: import.meta.env.PUBLIC_PADDLE_PRO_ID,
   ult_one_time: import.meta.env.PUBLIC_PADDLE_ULT_ID,
 };
+
+const availableModes = ['SUBSCRIPTION'];
+
 const activePaddle = ref(null);
 onMounted(async () => {
   const paddleInstance = await initializePaddle({
@@ -30,7 +33,6 @@ const handleAction = (plan) => {
     const priceId =
       plan === 'pro' ? PADDLE_IDS.pro_one_time : PADDLE_IDS.ult_one_time;
 
-    // Safety check: ensure Paddle is ready
     if (!activePaddle.value) {
       console.error('Paddle is still loading...');
       return;
@@ -40,8 +42,6 @@ const handleAction = (plan) => {
       settings: {
         displayMode: 'overlay',
         theme: 'light',
-        // Optional: you can add a success URL here
-        // successUrl: 'https://your-site.com/success'
       },
       items: [{ priceId: priceId, quantity: 1 }],
     });
@@ -49,8 +49,8 @@ const handleAction = (plan) => {
     window.location.href = '/signup';
   }
 };
-const billingMode = ref('PURCHASE'); // 'PURCHASE' or 'SUBSCRIPTION'
-const cycle = ref('MONTHLY'); // 'MONTHLY' or 'YEARLY'
+const billingMode = ref(availableModes[0]);
+const cycle = ref('MONTHLY');
 
 const featuresList = [
   { name: 'Unlimited affiliates signup', pro: true, ultimate: true },
@@ -61,6 +61,8 @@ const featuresList = [
   { name: 'Integrate with Stripe and Paddle', pro: true, ultimate: true },
   { name: 'Cookie attribution customization', pro: true, ultimate: true },
   { name: 'Set commission durations', pro: true, ultimate: true },
+  { name: 'Coupon code tracking', pro: true, ultimate: true },
+  { name: 'Two-sided incentives', pro: true, ultimate: true },
   { name: '1 organization', pro: true, ultimate: false },
   { name: 'Unlimited organizations', pro: false, ultimate: true },
   { name: 'Up to 3 team member invitations', pro: true, ultimate: false },
@@ -72,18 +74,16 @@ const prices = computed(() => {
     return { pro: '199', ult: '299', cycle: 'one-time', saved: null };
   }
   if (cycle.value === 'MONTHLY') {
-    return { pro: '25', ult: '40', cycle: '/ month', saved: null };
+    return { pro: '40', ult: '60', cycle: '/ month', saved: null };
   }
-  // Yearly Logic
   return {
-    pro: '21',
-    ult: '33',
+    pro: '32',
+    ult: '48',
     cycle: '/ month',
-    saved: { pro: 48, ult: 84 },
+    saved: { pro: 96, ult: 144 },
   };
 });
 </script>
-
 <template>
   <section id="pricing" class="bg-secondary/30 overflow-hidden py-24">
     <div class="mx-auto max-w-5xl px-4 text-center md:px-6">
@@ -100,6 +100,7 @@ const prices = computed(() => {
 
       <div class="mb-12 flex w-full flex-col items-center gap-6 px-2">
         <div
+          v-if="availableModes.length > 1"
           class="border-border relative inline-flex w-full max-w-85 rounded-2xl border bg-gray-200/50 p-1 md:max-w-md md:p-1.5"
         >
           <div class="absolute -top-4 -left-2 z-10 md:-left-6">
@@ -135,7 +136,19 @@ const prices = computed(() => {
             Subscription
           </button>
         </div>
-
+        <div
+          v-if="
+            availableModes.includes('PURCHASE') &&
+            !availableModes.includes('SUBSCRIPTION')
+          "
+          class="mb-4"
+        >
+          <span
+            class="inline-block rounded-lg border-4 border-white bg-yellow-400 px-4 py-1.5 text-xl font-black tracking-widest text-black uppercase shadow-sm"
+          >
+            LIMITED TIME OFFER
+          </span>
+        </div>
         <div
           v-if="billingMode === 'SUBSCRIPTION'"
           class="animate-fade-in flex w-full justify-center"
