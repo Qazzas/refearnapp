@@ -68,7 +68,27 @@ const featuresList = [
   { name: 'Up to 3 team member invitations', pro: true, ultimate: false },
   { name: 'Unlimited team member invitations', pro: false, ultimate: true },
 ];
-
+const enterpriseFeatures = [
+  'Full-service data migration from existing platforms',
+  'White-glove VPS setup & technical deployment',
+  'Automated tax compliance & W-8 management for affiliate payouts',
+  'Priority maintenance, 24/7 support & emergency response',
+  'Custom integration & tailored API support',
+  'Dedicated account manager',
+];
+const communityFeatures = [
+  'Self-host on your own infrastructure',
+  'Unlimited affiliates',
+  'Unlimited revenue from affiliate',
+  'Basic tracking',
+  'PayPal mass payout',
+  'Customizable commission durations',
+  'Cookie attribution settings',
+  'Stripe and Paddle integration',
+  'Unlimited organizations',
+  'Community-driven support',
+  'Open-source codebase',
+];
 const prices = computed(() => {
   if (billingMode.value === 'PURCHASE') {
     return { pro: '199', ult: '299', cycle: 'one-time', saved: null };
@@ -191,7 +211,55 @@ const prices = computed(() => {
         </div>
       </div>
 
-      <div class="flex flex-wrap items-stretch justify-center gap-8 px-2">
+      <div
+        class="flex flex-wrap items-stretch justify-center gap-8 px-2 md:flex-nowrap"
+      >
+        <div
+          class="border-border flex w-full max-w-85 flex-col rounded-4xl border bg-slate-50 p-8 text-left shadow-sm transition-all hover:shadow-md"
+        >
+          <div class="mb-8">
+            <div class="mb-2 flex items-center gap-2">
+              <div class="rounded-lg bg-slate-100 p-2 text-slate-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v8" />
+                  <path d="M8 12h8" />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-slate-900">Community</h3>
+            </div>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-bold tracking-tight text-slate-900"
+                >Free</span
+              >
+            </div>
+          </div>
+          <ul class="mb-8 grow space-y-4 text-slate-600">
+            <li
+              v-for="feat in communityFeatures"
+              :key="feat"
+              class="flex items-start gap-2 text-sm"
+            >
+              <span>✔️</span> <span>{{ feat }}</span>
+            </li>
+          </ul>
+          <a
+            href="/docs"
+            class="block w-full rounded-2xl border border-slate-900 bg-transparent py-4 text-center font-bold text-slate-900 transition-all hover:bg-slate-900 hover:text-white active:scale-95"
+          >
+            View Documentation
+          </a>
+        </div>
         <div
           class="border-border flex w-full max-w-85 flex-col rounded-4xl border bg-white p-8 text-left shadow-sm transition-all hover:shadow-md"
         >
@@ -366,6 +434,36 @@ const prices = computed(() => {
                 ? 'Buy Ultimate Plan'
                 : 'Start 14-Day Trial'
             }}
+          </a>
+        </div>
+      </div>
+      <div
+        class="border-border mt-8 flex w-full flex-col rounded-4xl border bg-slate-900 p-8 text-left shadow-sm transition-all hover:shadow-md md:flex-row md:items-center md:justify-between md:gap-12"
+      >
+        <div class="flex-1">
+          <h3 class="mb-2 text-2xl font-bold text-white">Enterprise</h3>
+          <p class="mb-6 text-slate-400">
+            Scale with confidence. We handle everything from
+            <strong>data migration</strong> and infrastructure to tax compliance
+            and custom integrations.
+          </p>
+          <ul class="grid grid-cols-1 gap-x-6 gap-y-3 md:grid-cols-2">
+            <li
+              v-for="feat in enterpriseFeatures"
+              :key="feat"
+              class="flex items-center gap-2 text-sm text-slate-300"
+            >
+              <span class="text-primary font-bold">✓</span> {{ feat }}
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-8 shrink-0 md:mt-0">
+          <a
+            href="/contact"
+            class="block rounded-2xl bg-white px-12 py-4 text-center font-bold text-slate-900 transition-all hover:scale-[1.02] hover:bg-slate-100 active:scale-95"
+          >
+            Schedule a Discovery Call
           </a>
         </div>
       </div>
