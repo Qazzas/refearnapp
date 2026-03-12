@@ -34,6 +34,7 @@ export default {
 		const isHome = url.pathname === '/';
 		const isExplicitAsset = publicAssets.includes(url.pathname);
 		const isLegalPage = ['/terms', '/privacy-policy', '/refund-policy'].includes(url.pathname);
+		const isContactPage = url.pathname === '/contact';
 		const isToolPage = url.pathname.startsWith('/tools/');
 		const isComparePage = url.pathname.startsWith('/alternative/');
 		// Astro compiled files (JS/CSS) always live here.
@@ -41,7 +42,9 @@ export default {
 		const isCompiledAsset = url.pathname.startsWith('/_astro/');
 		const isDocsPage = url.pathname.startsWith('/docs');
 		const shouldServeAstro =
-			isExplicitAsset || isCompiledAsset || (!isSelfHosted && (isHome || isLegalPage || isToolPage || isComparePage || isDocsPage));
+			isExplicitAsset ||
+			isCompiledAsset ||
+			(!isSelfHosted && (isHome || isLegalPage || isContactPage || isToolPage || isComparePage || isDocsPage));
 		if (shouldServeAstro) {
 			const resp = await fetch(`${PAGES_URL}${url.pathname}${url.search}`);
 			const newResp = new Response(resp.body, resp);
