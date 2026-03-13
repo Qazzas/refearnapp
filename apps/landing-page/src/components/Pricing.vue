@@ -77,16 +77,16 @@ const enterpriseFeatures = [
   'Dedicated account manager',
 ];
 const communityFeatures = [
+  'Unlimited affiliate tracking',
   'Self-host on your own infrastructure',
   'Unlimited affiliates',
-  'Unlimited revenue from affiliate',
-  'Basic tracking',
+  'Unlimited revenue attribution',
   'PayPal mass payout',
   'Customizable commission durations',
   'Cookie attribution settings',
   'Stripe and Paddle integration',
   'Unlimited organizations',
-  'Community-driven support',
+  'Public Discord community access',
   'Open-source codebase',
 ];
 const prices = computed(() => {
