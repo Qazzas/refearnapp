@@ -140,6 +140,7 @@ const OrganizationDashboardSidebar = ({
   }
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
+  const [licenseModalOpen, setLicenseModalOpen] = useState(false)
   const [dialogMode, setDialogMode] = useState<
     "create" | "upgrade" | "expired"
   >("create")
@@ -303,10 +304,32 @@ const OrganizationDashboardSidebar = ({
         <SystemUpdate variant="badge" updateInfo={updateInfo} />
         {/* 🛡️ SELF-HOSTED: Show a "Pro License" badge instead of billing buttons */}
         {isSelfHosted ? (
-          <div className="px-3 py-2 mb-2 rounded-md bg-green-500/10 border border-green-500/20">
-            <p className="text-xs font-bold text-green-600 text-center uppercase tracking-wider">
-              Self-Hosted License
-            </p>
+          <div className="p-4 space-y-3">
+            {plan.plan === "FREE" && (
+              <Link href="/pricing" className="block w-full">
+                <Button className="w-full">Get License Key</Button>
+              </Link>
+            )}
+            {(plan.plan === "PRO" || plan.plan === "ULTIMATE") && (
+              <>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() =>
+                    window.open("https://polar.sh/your-portal-link", "_blank")
+                  }
+                >
+                  Manage Licenses
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="w-full text-xs"
+                  onClick={() => setLicenseModalOpen(true)}
+                >
+                  Enter New License Key
+                </Button>
+              </>
+            )}
           </div>
         ) : (
           <>
@@ -356,7 +379,26 @@ const OrganizationDashboardSidebar = ({
               )}
           </>
         )}
-
+        <AppDialog
+          open={licenseModalOpen}
+          onOpenChange={setLicenseModalOpen}
+          title="Activate License"
+          description="Enter your license key to activate or update your premium features."
+          confirmText="Activate"
+          affiliate={false}
+          onConfirm={() => {
+            // Trigger your license validation server action here
+            setLicenseModalOpen(false)
+          }}
+        >
+          <div className="py-4">
+            <input
+              type="text"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              className="w-full p-2 border rounded-md"
+            />
+          </div>
+        </AppDialog>
         <Link href={`/organization/${orgId}/dashboard/profile`}>
           <div className="flex items-center space-x-3 p-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors cursor-pointer">
             <div className="flex-1 min-w-0">
