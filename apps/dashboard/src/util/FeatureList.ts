@@ -8,6 +8,7 @@ const COMMON_FEATURES: FeatureList[] = [
   { name: "Custom domain", pro: true, ultimate: true },
   { name: "Affiliate page customization", pro: true, ultimate: true },
   { name: "Integrate with Stripe and Paddle", pro: true, ultimate: true },
+  { name: "Advanced analytics & reports", pro: true, ultimate: true },
   {
     name: "First-time & last-time cookie attribution customization",
     pro: true,

@@ -62,6 +62,7 @@ const featuresList = [
   { name: 'Cookie attribution customization', pro: true, ultimate: true },
   { name: 'Set commission durations', pro: true, ultimate: true },
   { name: 'Coupon code tracking', pro: true, ultimate: true },
+  { name: 'Advanced analytics & reports', pro: true, ultimate: true },
   { name: 'Two-sided incentives', pro: true, ultimate: true },
   { name: '1 organization', pro: true, ultimate: false },
   { name: 'Unlimited organizations', pro: false, ultimate: true },
