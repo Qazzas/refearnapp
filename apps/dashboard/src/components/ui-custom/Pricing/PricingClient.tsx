@@ -9,6 +9,7 @@ import { SubscriptionSection } from "@/components/ui-custom/Pricing/Subscription
 import { PricingGrid } from "@/components/ui-custom/Pricing/PricingGrid"
 import { getResponsiveTabSize } from "@/util/GetResponsiveTabSize"
 import { useParams, useRouter } from "next/navigation"
+import { PRICING_CONFIG } from "@/lib/types/organization/priceConfig"
 
 export type BillingType = "SUBSCRIPTION" | "PURCHASE"
 export type SubscriptionCycle = "MONTHLY" | "YEARLY"
@@ -26,22 +27,9 @@ export default function PricingClient({
   showPurchase = true,
 }: PricingClientProps) {
   const [activeTab, setActiveTab] = useState<BillingType>("PURCHASE")
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   const [subscriptionCycle, setSubscriptionCycle] =
     useState<SubscriptionCycle>("MONTHLY")
-  const router = useRouter()
-  const params = useParams()
-  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
-  useEffect(() => {
-    if (isSelfHosted && dashboard) {
-      const orgId = params?.orgId
-      if (orgId) {
-        router.replace(`/organization/${orgId}/dashboard/analytics`)
-      } else {
-        router.replace("/signup")
-      }
-    }
-  }, [isSelfHosted, dashboard, router, params])
-  if (isSelfHosted && dashboard) return null
   const getButtonText = (
     targetPlan: PlanInfo["plan"],
     billingType: BillingType
@@ -65,7 +53,10 @@ export default function PricingClient({
         }
         return "Upgrade Plan"
       }
-
+      if (isSelfHosted) {
+        if (plan?.plan === targetPlan) return "Current License"
+        return targetPlan === "PRO" ? "Get Pro License" : "Get Ultimate License"
+      }
       // 🧩 Pro / Ultimate Expired (subscription expired)
       if (billingType === "SUBSCRIPTION") {
         if (targetPlan === "PRO") return "Upgrade to Pro"

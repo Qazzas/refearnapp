@@ -10,17 +10,24 @@ interface PricingConfig {
   readonly PURCHASE: {
     readonly [K in PricingTier]: number
   }
+  readonly SELF_HOSTED: {
+    readonly [K in PricingTier]: number
+  }
   readonly MARKUP_PERCENT: number
 }
 
 export const PRICING_CONFIG: PricingConfig = {
   SUBSCRIPTION: {
-    PRO: { MONTHLY: 25, YEARLY: 252 },
-    ULTIMATE: { MONTHLY: 40, YEARLY: 396 },
+    PRO: { MONTHLY: 40, YEARLY: 384 },
+    ULTIMATE: { MONTHLY: 60, YEARLY: 576 },
   },
   PURCHASE: {
     PRO: 199,
     ULTIMATE: 299,
+  },
+  SELF_HOSTED: {
+    PRO: 399,
+    ULTIMATE: 799,
   },
   MARKUP_PERCENT: 1.43,
 } as const

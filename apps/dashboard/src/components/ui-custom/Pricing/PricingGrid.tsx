@@ -14,6 +14,7 @@ import { useAppMutation } from "@/hooks/useAppMutation"
 import { updateSubscriptionAction } from "@/app/(organization)/organization/[orgId]/dashboard/pricing/action"
 import { Loader2 } from "lucide-react"
 import { PRICING_CONFIG } from "@/lib/types/organization/priceConfig"
+import { EnterpriseCard } from "@/components/ui-custom/EnterpriseCard"
 
 export function PricingGrid({
   billingType,
@@ -32,6 +33,7 @@ export function PricingGrid({
 }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [_, setIsUpgrading] = useState(false)
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   const [pendingUpgrade, setPendingUpgrade] = useState<null | {
     subscriptionId: string
     targetPlan: Exclude<PlanInfo["plan"], "FREE">
@@ -164,6 +166,10 @@ export function PricingGrid({
   }
   const getPrice = (tier: PlanInfo["plan"]) => {
     if (tier === "FREE") return "$0"
+    if (isSelfHosted) {
+      const price = PRICING_CONFIG.SELF_HOSTED[tier]
+      return `$${price} / year`
+    }
     if (billingType === "SUBSCRIPTION") {
       const monthlyPrice =
         tier === "PRO"
@@ -265,7 +271,14 @@ Proceed?`
 
     return ""
   }
-
+  const enterpriseFeatures = [
+    "Full-service data migration from existing platforms",
+    "White-glove VPS setup & technical deployment",
+    "Automated tax compliance & W-8 management for affiliate payouts",
+    "Priority maintenance, 24/7 support & emergency response",
+    "Custom integration & tailored API support",
+    "Dedicated account manager",
+  ]
   const isDisabled = (targetPlan: PlanInfo["plan"]) => {
     // No plan → always enabled
     if (!plan) return false
@@ -316,44 +329,51 @@ Proceed?`
   return (
     <>
       <div className="flex flex-wrap justify-center w-full gap-6">
-        <PricingCard
-          title="Pro"
-          price={getPrice("PRO")}
-          features={featuresList.filter((f) => f.pro).map((f) => f.name)}
-          buttonText={
-            dashboard ? getButtonText("PRO", billingType) : "Start 14-Day Trial"
-          }
-          yearlySavings={getYearlySavings("PRO")}
-          disabled={isDisabled("PRO")}
-          pendingMessage={
-            plan?.hasPendingPurchase && plan.pendingPurchaseTier === "PRO"
-              ? "This one-time payment will be applied when your subscription ends."
-              : undefined
-          }
-          onClick={() => handlePlanClick("PRO")}
-        />
+        <div className="flex w-full flex-wrap justify-center gap-6">
+          <PricingCard
+            title="Pro"
+            price={getPrice("PRO")}
+            features={featuresList.filter((f) => f.pro).map((f) => f.name)}
+            buttonText={
+              dashboard
+                ? getButtonText("PRO", billingType)
+                : "Start 14-Day Trial"
+            }
+            yearlySavings={getYearlySavings("PRO")}
+            disabled={isDisabled("PRO")}
+            pendingMessage={
+              plan?.hasPendingPurchase && plan.pendingPurchaseTier === "PRO"
+                ? "This one-time payment will be applied when your subscription ends."
+                : undefined
+            }
+            onClick={() => handlePlanClick("PRO")}
+          />
 
-        <PricingCard
-          title="Ultimate"
-          price={getPrice("ULTIMATE")}
-          yearlySavings={getYearlySavings("ULTIMATE")}
-          pendingMessage={
-            plan?.hasPendingPurchase && plan.pendingPurchaseTier === "ULTIMATE"
-              ? "This one-time payment will be applied when your subscription ends."
-              : undefined
-          }
-          features={featuresList.filter((f) => f.ultimate).map((f) => f.name)}
-          buttonText={
-            dashboard
-              ? getButtonText("ULTIMATE", billingType)
-              : "Start 14-Day Trial"
-          }
-          disabled={isDisabled("ULTIMATE")}
-          highlight
-          onClick={() => handlePlanClick("ULTIMATE")}
-        />
+          <PricingCard
+            title="Ultimate"
+            price={getPrice("ULTIMATE")}
+            yearlySavings={getYearlySavings("ULTIMATE")}
+            pendingMessage={
+              plan?.hasPendingPurchase &&
+              plan.pendingPurchaseTier === "ULTIMATE"
+                ? "This one-time payment will be applied when your subscription ends."
+                : undefined
+            }
+            features={featuresList.filter((f) => f.ultimate).map((f) => f.name)}
+            buttonText={
+              dashboard
+                ? getButtonText("ULTIMATE", billingType)
+                : "Start 14-Day Trial"
+            }
+            disabled={isDisabled("ULTIMATE")}
+            highlight
+            onClick={() => handlePlanClick("ULTIMATE")}
+          />
+        </div>
       </div>
-
+      <section className="mt-12 w-full max-w-5xl mx-auto">
+        <EnterpriseCard features={enterpriseFeatures} />
+      </section>
       {/* ⚙️ AppDialog Integration */}
       <AppDialog
         open={dialogOpen}
