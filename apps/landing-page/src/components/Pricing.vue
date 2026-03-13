@@ -441,11 +441,11 @@ const prices = computed(() => {
         class="border-border mt-8 flex w-full flex-col rounded-4xl border bg-slate-900 p-8 text-left shadow-sm transition-all hover:shadow-md md:flex-row md:items-center md:justify-between md:gap-12"
       >
         <div class="flex-1">
-          <h3 class="mb-2 text-2xl font-bold text-white">Enterprise</h3>
+          <h3 class="mb-2 text-2xl font-bold text-white">Custom Solutions</h3>
           <p class="mb-6 text-slate-400">
-            Scale with confidence. We handle everything from
-            <strong>data migration</strong> and infrastructure to tax compliance
-            and custom integrations.
+            Need something tailored? We partner with organizations for
+            <strong>custom integrations</strong>, high-volume requirements, and
+            specialized infrastructure needs.
           </p>
           <ul class="grid grid-cols-1 gap-x-6 gap-y-3 md:grid-cols-2">
             <li
@@ -463,7 +463,7 @@ const prices = computed(() => {
             href="/contact"
             class="block rounded-2xl bg-white px-12 py-4 text-center font-bold text-slate-900 transition-all hover:scale-[1.02] hover:bg-slate-100 active:scale-95"
           >
-            Schedule a Discovery Call
+            Request a Custom Solution
           </a>
         </div>
       </div>
