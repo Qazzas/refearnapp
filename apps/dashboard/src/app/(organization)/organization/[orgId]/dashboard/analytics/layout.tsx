@@ -35,9 +35,21 @@ export default async function AnalyticsLayout({
   topAffiliates,
 }: AnalyticsLayoutProps) {
   const orgId = await getValidatedOrgFromParams({ params })
-  const license = await getLicense(orgId)
-  if (license) {
+  const licenseResult = await getLicense(orgId)
+  if (licenseResult !== null) {
+    if (!licenseResult.ok) {
+      return (
+        <LicenseRequiredState
+          featureName="Analytics"
+          requiredTier="PRO"
+          isExpired={true}
+        />
+      )
+    }
+
+    const license = licenseResult.data
     const hasAccess = license.isActive && (license.isPro || license.isUltimate)
+
     if (!hasAccess) {
       return (
         <LicenseRequiredState

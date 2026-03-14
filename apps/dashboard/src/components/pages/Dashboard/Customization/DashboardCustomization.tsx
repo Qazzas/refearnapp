@@ -26,7 +26,7 @@ export function DashboardCustomization({
   domain?: string
   selectedPage: string
   setSelectedPage: (selectedPage: string) => void
-  license: UserLicense
+  license: UserLicense | null
 }) {
   const { mainBackgroundColor } = useAtomValue(dashboardThemeCustomizationAtom)
   if (!orgId) {

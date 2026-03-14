@@ -24,10 +24,22 @@ export async function generateMetadata({
 export default async function CustomizationServerPage({ params }: OrgIdProps) {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
-  const license = await getLicense(orgId)
+  const licenseResult = await getLicense(orgId)
   const plan = await getUnifiedPlan(orgId)
   const domain = await getActiveDomain(orgId)
-  if (license) {
+  if (licenseResult !== null) {
+    if (!licenseResult.ok) {
+      return (
+        <LicenseRequiredState
+          featureName="Customization Options"
+          requiredTier="PRO"
+          isExpired={true}
+          domainName={domain?.domainName}
+        />
+      )
+    }
+
+    const license = licenseResult.data
     const hasAccess = license.isActive && license.isUltimate
 
     if (!hasAccess) {
@@ -43,7 +55,11 @@ export default async function CustomizationServerPage({ params }: OrgIdProps) {
   }
   return (
     <div className="overflow-auto">
-      <CustomizationPage orgId={orgId} plan={plan} license={license} />
+      <CustomizationPage
+        orgId={orgId}
+        plan={plan}
+        license={licenseResult?.data ?? null}
+      />
     </div>
   )
 }

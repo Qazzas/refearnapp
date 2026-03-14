@@ -24,8 +24,19 @@ const TeamsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
   const plan = await getUserPlan()
-  const license = await getLicense(orgId)
-  if (license) {
+  const licenseResult = await getLicense(orgId)
+  if (licenseResult !== null) {
+    if (!licenseResult.ok) {
+      return (
+        <LicenseRequiredState
+          featureName="Teams Management"
+          requiredTier="ULTIMATE"
+          isExpired={true}
+        />
+      )
+    }
+
+    const license = licenseResult.data
     const hasAccess = license.isActive && license.isUltimate
 
     if (!hasAccess) {

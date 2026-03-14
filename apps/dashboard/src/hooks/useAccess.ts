@@ -1,6 +1,6 @@
 import { UserLicense } from "@/lib/server/organization/getLicense"
 
-export function useAccess(license: UserLicense) {
+export function useAccess(license: UserLicense | null) {
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
 
   if (!isSelfHosted) {

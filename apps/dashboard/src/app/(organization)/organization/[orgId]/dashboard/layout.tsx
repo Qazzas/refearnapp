@@ -32,7 +32,8 @@ export default async function DashboardLayout({
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   const updateResult = isSelfHosted ? await checkVersion() : null
   const updateInfo = updateResult?.ok ? updateResult.data : null
-  const license = await getLicense(orgId)
+  const licenseResult = await getLicense(orgId)
+  const licenseData = licenseResult?.ok ? licenseResult.data : null
   return (
     <SidebarProvider affiliate={false} orgId={orgId}>
       <OrganizationDashboardSidebar
@@ -41,7 +42,7 @@ export default async function DashboardLayout({
         orgs={orgs}
         UserData={user}
         updateInfo={updateInfo}
-        license={license ?? null}
+        license={licenseData}
       />
       <SidebarInset className="relative flex w-full flex-1 flex-col bg-background overflow-auto">
         <div className="md:hidden px-6 pt-4">

@@ -7,6 +7,7 @@ import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 import { getLicense } from "@/lib/server/organization/getLicense"
 import { getUnifiedPlan } from "@/lib/server/organization/getUnifiedPlan"
+import { LicenseRequiredState } from "@/components/ui-custom/LicenseRequiredState"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -22,11 +23,43 @@ export async function generateMetadata({
 export default async function CustomizationServerPage({ params }: OrgIdProps) {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireTeamWithOrg(orgId)
-  const license = await getLicense(orgId)
+  const licenseResult = await getLicense(orgId)
   const plan = await getUnifiedPlan(orgId)
+  let licenseData = null
+
+  if (licenseResult !== null) {
+    if (!licenseResult.ok) {
+      return (
+        <LicenseRequiredState
+          featureName="Customization Options"
+          requiredTier="PRO"
+          isExpired={true}
+        />
+      )
+    }
+
+    const license = licenseResult.data
+    const hasAccess = license.isActive && (license.isPro || license.isUltimate)
+
+    if (!hasAccess) {
+      return (
+        <LicenseRequiredState
+          featureName="Customization Options"
+          requiredTier="PRO"
+          isExpired={!license.isActive}
+        />
+      )
+    }
+    licenseData = license
+  }
   return (
     <div className="overflow-auto">
-      <CustomizationPage orgId={orgId} isTeam plan={plan} license={license} />
+      <CustomizationPage
+        orgId={orgId}
+        isTeam
+        plan={plan}
+        license={licenseData}
+      />
     </div>
   )
 }

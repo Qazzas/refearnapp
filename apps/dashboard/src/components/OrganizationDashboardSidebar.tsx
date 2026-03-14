@@ -52,7 +52,7 @@ type Props = {
   orgs: { id: string; name: string }[]
   UserData: OrganizationData | null
   updateInfo?: { isNewer: boolean; latestVersion: string; url: string } | null
-  license: UserLicense
+  license: UserLicense | null
 }
 const OrganizationDashboardSidebar = ({
   orgId,

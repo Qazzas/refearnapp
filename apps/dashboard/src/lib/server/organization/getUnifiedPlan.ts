@@ -9,10 +9,14 @@ export type UnifiedPlan = "FREE" | "PRO" | "ULTIMATE"
  * Hides environment-specific logic (Cloud vs. Self-Hosted) from the caller.
  */
 export async function getUnifiedPlan(orgId: string): Promise<UnifiedPlan> {
-  const license = await getLicense(orgId)
-  if (license) {
-    if (license.isUltimate) return "ULTIMATE"
-    if (license.isPro) return "PRO"
+  const licenseResult = await getLicense(orgId)
+  if (licenseResult !== null) {
+    if (licenseResult.ok) {
+      const license = licenseResult.data
+      if (license.isUltimate) return "ULTIMATE"
+      if (license.isPro) return "PRO"
+      return "FREE"
+    }
     return "FREE"
   }
   const planInfo = await getOrgPlan(orgId)

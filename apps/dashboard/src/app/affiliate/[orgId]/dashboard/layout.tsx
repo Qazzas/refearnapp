@@ -34,7 +34,8 @@ export default async function DashboardLayout({
 
   const affiliate = affiliateResponse.data
   const unseenCouponsCount = await getUnseenCouponsCount(orgId, affiliate.id)
-  const license = await getLicense(orgId)
+  const licenseResult = await getLicense(orgId)
+  const licenseData = licenseResult?.ok ? licenseResult.data : null
   return (
     <CustomizationProvider affiliate orgId={orgId}>
       <SidebarProvider affiliate orgId={orgId}>
@@ -43,7 +44,7 @@ export default async function DashboardLayout({
           orgId={orgId}
           AffiliateData={affiliate}
           unseenCouponsCount={unseenCouponsCount}
-          license={license}
+          license={licenseData}
         />
         <SidebarInset
           affiliate

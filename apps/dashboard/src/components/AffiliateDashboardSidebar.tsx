@@ -42,7 +42,7 @@ type Props = {
   affiliate: boolean
   AffiliateData?: AffiliateData | null
   unseenCouponsCount?: number
-  license: UserLicense
+  license: UserLicense | null
 }
 
 const AffiliateDashboardSidebar = ({

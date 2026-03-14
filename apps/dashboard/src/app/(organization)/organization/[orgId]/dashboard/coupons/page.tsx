@@ -23,9 +23,21 @@ export async function generateMetadata({
 const couponsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
-  const license = await getLicense(orgId)
-  if (license) {
+  const licenseResult = await getLicense(orgId)
+  if (licenseResult !== null) {
+    if (!licenseResult.ok) {
+      return (
+        <LicenseRequiredState
+          featureName="Coupons"
+          requiredTier="ULTIMATE"
+          isExpired={true}
+        />
+      )
+    }
+
+    const license = licenseResult.data
     const hasAccess = license.isActive && license.isUltimate
+
     if (!hasAccess) {
       return (
         <LicenseRequiredState

@@ -35,7 +35,7 @@ export default function CustomizationPage({
   orgId: string
   isTeam?: boolean
   plan: "FREE" | "PRO" | "ULTIMATE"
-  license: UserLicense
+  license: UserLicense | null
 }) {
   const [mainTab, setMainTab] = useState("sidebar")
   const [selectedPage, setSelectedPage] = useState("dashboard")
@@ -88,7 +88,7 @@ export default function CustomizationPage({
     if (searchParams.size > 0) {
       router.replace("?", { scroll: false })
     }
-  }, [])
+  }, [router, searchParams.size])
   return (
     <GlobalCustomizationProvider affiliate orgId={orgId}>
       <div className="p-6 space-y-6">
