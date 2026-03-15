@@ -385,6 +385,16 @@ export const BOOTSTRAP_QUERIES = [
         CONSTRAINT "website_domain_domain_name_unique" UNIQUE("domain_name")
     );`,
   },
+  {
+    name: "license_activations",
+    sql: `CREATE TABLE IF NOT EXISTS "license_activations" (
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+        "license_id" uuid NOT NULL,
+        "activation_id" text NOT NULL,
+        "created_at" timestamp DEFAULT now() NOT NULL,
+        CONSTRAINT "unique_license_activation" UNIQUE("license_id","activation_id")
+    );`,
+  },
 
   // --- PHASE 2: INDEXES & UNIQUE INDEXES ---
   {
@@ -439,6 +449,7 @@ export const BOOTSTRAP_QUERIES = [
       CREATE INDEX IF NOT EXISTS "referrals_email_link_idx" ON "referrals" ("signup_email", "referral_link_id");
       CREATE INDEX IF NOT EXISTS "license_keys_user_id_idx" ON "license_keys" ("user_id");
       CREATE INDEX IF NOT EXISTS "license_keys_key_idx" ON "license_keys" ("key");
+      CREATE INDEX IF NOT EXISTS "license_activations_license_id_idx" ON "license_activations" USING btree ("license_id");
     `,
   },
 
@@ -591,6 +602,11 @@ export const BOOTSTRAP_QUERIES = [
       END IF;
 IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'affiliate_invoice_promotion_code_id_fk') THEN
         ALTER TABLE "affiliate_invoice" ADD CONSTRAINT "affiliate_invoice_promotion_code_id_fk" FOREIGN KEY ("promotion_code_id") REFERENCES "promotion_codes"("id") ON DELETE set null ON UPDATE no action;
+      END IF;
+      
+      -- license_activations -> license_keys
+      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_activations_license_id_license_keys_id_fk') THEN
+        ALTER TABLE "license_activations" ADD CONSTRAINT "license_activations_license_id_license_keys_id_fk" FOREIGN KEY ("license_id") REFERENCES "license_keys"("id") ON DELETE cascade ON UPDATE no action;
       END IF;
       
       IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'affiliate_invoice_promotion_code_id_fk') THEN

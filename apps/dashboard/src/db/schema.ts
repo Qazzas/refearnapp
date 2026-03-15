@@ -730,6 +730,21 @@ export const licenseKeys = pgTable(
     index("license_keys_key_idx").on(table.key),
   ]
 )
+export const licenseActivations = pgTable(
+  "license_activations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    licenseId: uuid("license_id")
+      .notNull()
+      .references(() => licenseKeys.id, { onDelete: "cascade" }),
+    activationId: text("activation_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("license_activations_license_id_idx").on(table.licenseId),
+    unique("unique_license_activation").on(table.licenseId, table.activationId),
+  ]
+)
 export const systemSettings = pgTable("system_settings", {
   id: integer("id").primaryKey().default(1),
   installedVersion: text("installed_version").notNull().default("0.1.0"),
