@@ -340,7 +340,7 @@ const OrganizationDashboardSidebar = ({
                 scroll={false}
                 className="block w-full"
               >
-                <Button className="w-full">Upgrade or Purchase</Button>
+                <Button className="w-full">Upgrade</Button>
               </Link>
             )}
 

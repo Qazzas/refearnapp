@@ -65,36 +65,16 @@ export async function getLicense(orgId: string) {
 
     // Logic: Calculation remains the same
     const expiresAt = new Date(license!.expiresAt)
-    const gracePeriodEndsAt = new Date(
-      expiresAt.getTime() + 3 * 24 * 60 * 60 * 1000
-    )
-
     const isExpired = expiresAt < now
-    const inGracePeriod = isExpired && now <= gracePeriodEndsAt
-    const isHardExpired = now > gracePeriodEndsAt
-
-    if (isHardExpired) {
-      return {
-        ok: true,
-        data: {
-          isCommunity: true,
-          isActive: true,
-          isPro: false,
-          isUltimate: false,
-          inGracePeriod: false,
-        },
-      }
-    }
 
     return {
       ok: true,
       data: {
         ...license!,
         isCommunity: false,
-        isActive: (license!.status === "active" && !isExpired) || inGracePeriod,
+        isActive: license!.status === "active" && !isExpired,
         isPro: license!.tier === "PRO",
         isUltimate: license!.tier === "ULTIMATE",
-        inGracePeriod,
       },
     }
   })
