@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { Form } from "@/components/ui/form"
 import {
   BarChart3,
   Link as LinkIcon,
@@ -43,6 +44,13 @@ import { SystemUpdate } from "@/components/ui-custom/SystemUpdate"
 import { SidebarHelp } from "@/components/ui-custom/SidebarHelp"
 import { UserLicense } from "@/lib/server/organization/getLicense"
 import { useAccess } from "@/hooks/useAccess"
+import { useForm } from "react-hook-form"
+import { licenseSchema } from "@/lib/schema/licenseSchema"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { useAppMutation } from "@/hooks/useAppMutation"
+import { activateLicense } from "@/app/(organization)/organization/[orgId]/dashboard/action"
+import { InputField } from "@/components/Auth/FormFields"
 
 // Menu items for the sidebar
 
@@ -65,6 +73,10 @@ const OrganizationDashboardSidebar = ({
   const pathname = usePathname()
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   useCloseSidebarOnNavigation()
+  const form = useForm<z.infer<typeof licenseSchema>>({
+    resolver: zodResolver(licenseSchema),
+    defaultValues: { licenseKey: "" },
+  })
   const { canAccessPro, canAccessUltimate } = useAccess(license)
   const isLocked = (itemTitle: string) => {
     if (isSelfHosted) {
@@ -146,6 +158,17 @@ const OrganizationDashboardSidebar = ({
   >("create")
   const router = useRouter()
   const { openPortal } = usePaddlePortal(orgId)
+  const activateMutation = useAppMutation(
+    (values: z.infer<typeof licenseSchema>) =>
+      activateLicense(orgId!, values.licenseKey),
+    {
+      onSuccess: () => {
+        setLicenseModalOpen(false)
+        form.reset()
+        router.refresh()
+      },
+    }
+  )
   const handleClick = () => {
     setSelectOpen(false)
 
@@ -384,20 +407,28 @@ const OrganizationDashboardSidebar = ({
           onOpenChange={setLicenseModalOpen}
           title="Activate License"
           description="Enter your license key to activate or update your premium features."
-          confirmText="Activate"
+          confirmText={
+            activateMutation.isPending ? "Activating..." : "Activate"
+          }
+          confirmLoading={activateMutation.isPending}
+          onConfirm={form.handleSubmit((values) =>
+            activateMutation.mutate(values)
+          )}
+          confirmDisabled={activateMutation.isPending}
           affiliate={false}
-          onConfirm={() => {
-            // Trigger your license validation server action here
-            setLicenseModalOpen(false)
-          }}
         >
-          <div className="py-4">
-            <input
-              type="text"
-              placeholder="XXXX-XXXX-XXXX-XXXX"
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
+          <Form {...form}>
+            <form className="space-y-4">
+              <InputField
+                control={form.control}
+                name="licenseKey"
+                label="License Key"
+                placeholder="XXXX-XXXX-XXXX-XXXX"
+                type="text"
+                affiliate={false}
+              />
+            </form>
+          </Form>
         </AppDialog>
         <Link href={`/organization/${orgId}/dashboard/profile`}>
           <div className="flex items-center space-x-3 p-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors cursor-pointer">
