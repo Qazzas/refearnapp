@@ -11,7 +11,10 @@ import { PricingCard } from "@/components/ui-custom/Pricing/PricingCard"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
 import usePaddleCheckout from "@/hooks/usePaddleCheckout"
 import { useAppMutation } from "@/hooks/useAppMutation"
-import { updateSubscriptionAction } from "@/app/(organization)/organization/[orgId]/dashboard/pricing/action"
+import {
+  createSelfHostedCheckoutAction,
+  updateSubscriptionAction,
+} from "@/app/(organization)/organization/[orgId]/dashboard/pricing/action"
 import { Loader2 } from "lucide-react"
 import { PRICING_CONFIG } from "@/lib/types/organization/priceConfig"
 import { EnterpriseCard } from "@/components/ui-custom/EnterpriseCard"
@@ -41,6 +44,14 @@ export function PricingGrid({
     mode: "PRORATE" | "DO_NOT_BILL"
     modeType: "SUB_TO_SUB" | "SUB_TO_ONE_TIME"
   }>(null)
+  const checkoutMutation = useAppMutation(createSelfHostedCheckoutAction, {
+    enableRedirect: false,
+    onSuccess: (res) => {
+      if (res.redirectUrl) {
+        window.open(res.redirectUrl, "_blank", "noopener,noreferrer")
+      }
+    },
+  })
   const isLoggedIn = !!plan
   const { openCheckout, showApplyingDialog, setShowApplyingDialog } =
     usePaddleCheckout()
@@ -67,7 +78,14 @@ export function PricingGrid({
       // No checkout needed for Free tier
       return
     }
-
+    if (isSelfHosted) {
+      const isUpgrade = plan?.plan === "PRO" && targetPlan === "ULTIMATE"
+      checkoutMutation.mutate({
+        targetPlan,
+        upgrade: isUpgrade,
+      })
+      return
+    }
     const isSubscriptionMode = billingType === "SUBSCRIPTION"
     const isPurchaseMode = billingType === "PURCHASE"
     if (plan?.type === "EXPIRED") {

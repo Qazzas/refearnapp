@@ -6,23 +6,23 @@ import { eq, and } from "drizzle-orm"
 import { CENTRAL_API_URL } from "@/lib/constants/centralDomain"
 import { handleAction } from "@/lib/handleAction"
 import { getOrgOwnerId } from "@/lib/server/organization/getOrgOwnerId"
+import { AppError } from "@/lib/exceptions"
 
 export async function activateLicense(orgId: string, key: string) {
-  if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") {
-    return { ok: true, data: "Not self-hosted, skipping sync" }
-  }
-
-  // 1. Resolve the ownerId for local database operations
-  const ownerId = await getOrgOwnerId(orgId)
-  if (!ownerId) {
-    return {
-      ok: false,
-      status: 403,
-      error: "Unauthorized: Org owner not found",
-    }
-  }
-
   return await handleAction("ActivateLicense", async () => {
+    if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") {
+      return { ok: true, data: "Not self-hosted, skipping sync" }
+    }
+
+    // 1. Resolve the ownerId for local database operations
+    const ownerId = await getOrgOwnerId(orgId)
+    if (!ownerId) {
+      throw new AppError({
+        status: 403,
+        error: "UNAUTHORIZED",
+        toast: "Organization owner not found.",
+      })
+    }
     // 2. Local State Retrieval (using ownerId)
     const existingKeys = await db
       .select()
@@ -43,8 +43,11 @@ export async function activateLicense(orgId: string, key: string) {
     })
 
     if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || "Central API activation failed")
+      throw new AppError({
+        status: response.status || 500,
+        error: "ACTIVATION_FAILED",
+        toast: "Central API activation failed",
+      })
     }
 
     const { data } = await response.json()

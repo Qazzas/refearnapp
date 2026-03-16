@@ -1,20 +1,30 @@
 import { NextRequest, NextResponse } from "next/server"
 import { handleRoute } from "@/lib/handleRoute"
 import { Polar } from "@polar-sh/sdk"
+import { AppError } from "@/lib/exceptions"
+import { polarConfig } from "@/lib/polarConfig"
 
-const polar = new Polar({ accessToken: process.env.POLAR_ACCESS_TOKEN! })
+const polar = new Polar({
+  accessToken: polarConfig.accessToken,
+  server: polarConfig.server,
+})
 
 // app/api/licenses/activate/route.ts
 export const POST = handleRoute(
   "ActivateLicenseAPI",
   async (req: NextRequest) => {
     const { orgId, key, oldLicenseKey } = await req.json()
-
-    // 1. Revoke old keys on Polar
+    if (!orgId || !key) {
+      throw new AppError({
+        status: 400,
+        error: "MISSING_REQUIRED_FIELDS",
+        toast: "Organization ID and License Key are required.",
+      })
+    }
     if (oldLicenseKey && Array.isArray(oldLicenseKey)) {
       for (const old of oldLicenseKey) {
         await polar.licenseKeys.update({
-          id: old.key, // Ensure this is the UUID
+          id: old.key,
           licenseKeyUpdate: { status: "revoked" },
         })
       }
@@ -26,6 +36,13 @@ export const POST = handleRoute(
       organizationId: process.env.POLAR_ORGANIZATION_ID!,
       label: orgId,
     })
-    return NextResponse.json({ success: true, data: result })
+    if (!result) {
+      throw new AppError({
+        status: 500,
+        error: "ACTIVATION_FAILED",
+        toast: "Failed to activate the new license key.",
+      })
+    }
+    return NextResponse.json({ data: result })
   }
 )

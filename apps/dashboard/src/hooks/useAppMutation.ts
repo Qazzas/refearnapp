@@ -32,6 +32,7 @@ export function useAppMutation<TData extends AppResponse, TVariables>(
     disableErrorToast?: boolean
     affiliate?: boolean
     redirectUrl?: string
+    enableRedirect?: boolean
     onSuccess?: (data: TData, variables: TVariables, context: unknown) => void
   }
 ) {
@@ -55,9 +56,9 @@ export function useAppMutation<TData extends AppResponse, TVariables>(
         }
 
         // 🔁 Handle redirect
-        if (res.redirectUrl) {
+        if (res.redirectUrl && (options?.enableRedirect ?? true)) {
           router.push(res.redirectUrl)
-        } else if (options?.redirectUrl) {
+        } else if (options?.redirectUrl && (options?.enableRedirect ?? true)) {
           router.push(options.redirectUrl)
         }
       } else {
