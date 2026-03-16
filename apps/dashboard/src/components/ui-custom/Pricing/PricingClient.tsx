@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import type { PlanInfo } from "@/lib/types/organization/planInfo"
@@ -8,8 +8,6 @@ import { featuresList } from "@/util/FeatureList"
 import { SubscriptionSection } from "@/components/ui-custom/Pricing/SubscriptionSection"
 import { PricingGrid } from "@/components/ui-custom/Pricing/PricingGrid"
 import { getResponsiveTabSize } from "@/util/GetResponsiveTabSize"
-import { useParams, useRouter } from "next/navigation"
-import { PRICING_CONFIG } from "@/lib/types/organization/priceConfig"
 
 export type BillingType = "SUBSCRIPTION" | "PURCHASE"
 export type SubscriptionCycle = "MONTHLY" | "YEARLY"

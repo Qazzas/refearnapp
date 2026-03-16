@@ -166,7 +166,11 @@ export function PricingGrid({
   }
   const getPrice = (tier: PlanInfo["plan"]) => {
     if (tier === "FREE") return "$0"
+    // 1. SELF-HOSTED Logic
     if (isSelfHosted) {
+      if (tier === "ULTIMATE" && plan?.plan === "PRO") {
+        return "$400 / year"
+      }
       const price = PRICING_CONFIG.SELF_HOSTED[tier]
       return `$${price} / year`
     }
@@ -282,6 +286,9 @@ Proceed?`
   const isDisabled = (targetPlan: PlanInfo["plan"]) => {
     // No plan → always enabled
     if (!plan) return false
+    if (isSelfHosted && plan.plan === "ULTIMATE") {
+      return true
+    }
     if (
       billingType === "PURCHASE" &&
       ((plan?.type === "PURCHASE" && plan.plan === "ULTIMATE") ||

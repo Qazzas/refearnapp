@@ -1,22 +1,31 @@
 import { db } from "@/db/drizzle"
-import { licenseKeys } from "@/db/schema"
+import { licenseKeys, licenseActivations } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { getOrgOwnerId } from "@/lib/server/organization/getOrgOwnerId"
 import { handleAction } from "@/lib/handleAction"
-// lib/server/organization/getLicense.ts
+import { getOrgOwnerId } from "@/lib/server/organization/getOrgOwnerId"
+import { CENTRAL_API_URL } from "@/lib/constants/centralDomain"
 
 export async function getLicense(orgId: string) {
   if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") return null
 
   const ownerId = await getOrgOwnerId(orgId)
   if (!ownerId) return null
-  // We wrap the internal logic in your handleAction
-  return await handleAction("GetLicenseSync", async () => {
-    let license = await db.query.licenseKeys.findFirst({
-      where: eq(licenseKeys.userId, ownerId),
-    })
 
-    if (!license) {
+  return await handleAction("GetLicenseSync", async () => {
+    // Perform explicit left join
+    const result = await db
+      .select()
+      .from(licenseKeys)
+      .leftJoin(
+        licenseActivations,
+        eq(licenseKeys.id, licenseActivations.licenseId)
+      )
+      .where(eq(licenseKeys.userId, ownerId))
+
+    const row = result[0]
+
+    // If no license found
+    if (!row) {
       return {
         ok: true,
         data: {
@@ -29,22 +38,25 @@ export async function getLicense(orgId: string) {
       }
     }
 
+    const license = row.license_keys
+    const activation = row.license_activations
+
     const now = new Date()
     const lastValidated = license.lastValidatedAt || new Date(0)
     const needsSync =
       now.getTime() - lastValidated.getTime() > 24 * 60 * 60 * 1000
 
-    if (needsSync) {
-      const res = await fetch(
-        "https://origin.refearnapp.com/api/license/validate",
-        {
-          method: "POST",
-          body: JSON.stringify({ userId: ownerId }),
-        }
-      )
+    if (needsSync && activation) {
+      const res = await fetch(`${CENTRAL_API_URL}/api/license/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: license.key,
+          activationId: activation.activationId,
+          expectedUserId: ownerId,
+        }),
+      })
 
-      // If server responds, update DB.
-      // If res.ok is false, the error is handled by the sync logic naturally (we just keep stale data).
       if (res.ok) {
         const remoteLicense = await res.json()
         await db
@@ -55,30 +67,22 @@ export async function getLicense(orgId: string) {
             expiresAt: new Date(remoteLicense.expiresAt),
             lastValidatedAt: new Date(),
           })
-          .where(eq(licenseKeys.userId, ownerId))
-
-        license = await db.query.licenseKeys.findFirst({
-          where: eq(licenseKeys.userId, ownerId),
-        })
+          .where(eq(licenseKeys.id, license.id))
       }
     }
 
-    // Logic: Calculation remains the same
-    const expiresAt = new Date(license!.expiresAt)
+    const expiresAt = new Date(license.expiresAt)
     const isExpired = expiresAt < now
 
     return {
       ok: true,
       data: {
-        ...license!,
+        ...license,
         isCommunity: false,
-        isActive: license!.status === "active" && !isExpired,
-        isPro: license!.tier === "PRO",
-        isUltimate: license!.tier === "ULTIMATE",
+        isActive: license.status === "active" && !isExpired,
+        isPro: license.tier === "PRO",
+        isUltimate: license.tier === "ULTIMATE",
       },
     }
   })
 }
-type GetLicenseReturn = Awaited<ReturnType<typeof getLicense>>
-export type UserLicense =
-  NonNullable<GetLicenseReturn> extends { data: infer T } ? T : null
