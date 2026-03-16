@@ -86,3 +86,6 @@ export async function getLicense(orgId: string) {
     }
   })
 }
+type GetLicenseReturn = Awaited<ReturnType<typeof getLicense>>
+export type UserLicense =
+  NonNullable<GetLicenseReturn> extends { data: infer T } ? T : null
