@@ -8,6 +8,15 @@ const polar = new Polar({
   server: polarConfig.server,
 })
 export const POST = handleRoute("CheckoutCreation", async (req) => {
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+  const isDev = process.env.NODE_ENV === "development"
+  if (isSelfHosted && !isDev) {
+    throw new AppError({
+      status: 403,
+      error: "FORBIDDEN",
+      toast: "Access denied",
+    })
+  }
   const { targetPlan, upgrade } = await req.json()
   let productId =
     targetPlan === "PRO"

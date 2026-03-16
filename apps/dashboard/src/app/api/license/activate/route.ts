@@ -13,6 +13,15 @@ const polar = new Polar({
 export const POST = handleRoute(
   "ActivateLicenseAPI",
   async (req: NextRequest) => {
+    const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+    const isDev = process.env.NODE_ENV === "development"
+    if (isSelfHosted && !isDev) {
+      throw new AppError({
+        status: 403,
+        error: "FORBIDDEN",
+        toast: "Access denied",
+      })
+    }
     const { orgId, key, oldLicenseKey } = await req.json()
     if (!orgId || !key) {
       throw new AppError({
