@@ -30,7 +30,6 @@ const CLOUD_FEATURES: FeatureList[] = [
 ]
 
 const SELF_HOSTED_FEATURES: FeatureList[] = [
-  { name: "Advanced Analytics", pro: true, ultimate: true },
   { name: "Coupon code tracking", pro: false, ultimate: true },
   { name: "Team management", pro: false, ultimate: true },
 ]

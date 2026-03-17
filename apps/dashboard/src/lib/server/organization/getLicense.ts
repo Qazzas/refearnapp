@@ -59,6 +59,16 @@ export async function getLicense(orgId: string) {
 
       if (res.ok) {
         const remoteLicense = await res.json()
+        // --- CATCH THE EXPIRED/REVOKED LOGIC HERE ---
+        if (remoteLicense.status === "revoked") {
+          await db
+            .update(licenseKeys)
+            .set({
+              expiresAt: new Date(0),
+              lastValidatedAt: new Date(),
+            })
+            .where(eq(licenseKeys.id, license.id))
+        }
         let localStatus: LicenseStatus = "revoked"
         if (remoteLicense.status === "granted") {
           localStatus = "active"

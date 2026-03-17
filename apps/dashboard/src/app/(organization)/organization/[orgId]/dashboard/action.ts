@@ -52,17 +52,13 @@ export async function activateLicense(orgId: string, key: string) {
     }
 
     const { data } = await response.json()
-    console.log("Activation response from Central API:", data)
     await db.transaction(async (tx) => {
-      await tx
-        .update(licenseKeys)
-        .set({ status: "revoked" })
-        .where(eq(licenseKeys.userId, ownerId))
+      await tx.delete(licenseKeys).where(eq(licenseKeys.userId, ownerId))
 
       const [insertedLicense] = await tx
         .insert(licenseKeys)
         .values({
-          licenseId: data.licenseKey.id,
+          polarId: data.licenseKey.id,
           userId: ownerId,
           key: data.licenseKey.key,
           status: "active",

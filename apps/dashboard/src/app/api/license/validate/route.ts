@@ -30,12 +30,31 @@ export const POST = handleRoute("ValidateLicense", async (req: NextRequest) => {
     })
   }
 
-  const result = await polar.licenseKeys.validate({
-    key,
-    organizationId: process.env.POLAR_ORGANIZATION_ID!,
-    activationId,
-  })
+  const result = await polar.licenseKeys
+    .validate({
+      key,
+      organizationId: process.env.POLAR_ORGANIZATION_ID!,
+      activationId,
+    })
+    .catch((err: any) => {
+      const isExpired =
+        err.statusCode === 404 &&
+        err.error === "ResourceNotFound" &&
+        err.detail?.toLowerCase().includes("expired")
 
+      if (isExpired) {
+        return {
+          status: "revoked" as const,
+          detail: "expired",
+          tier: "PRO",
+          isCustomError: true, // Add a flag to distinguish it easily
+        }
+      }
+      throw err
+    })
+  if ("isCustomError" in result) {
+    return NextResponse.json(result)
+  }
   if (!result.activation) {
     throw new AppError({
       status: 401,
