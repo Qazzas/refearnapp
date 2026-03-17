@@ -719,6 +719,7 @@ export const licenseKeys = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     key: text("key").notNull().unique(),
+    polarId: text("polar_id").unique(),
     status: text("status").$type<LicenseStatus>().notNull().default("active"),
     tier: text("tier").$type<PurchaseTier>().notNull().default("PRO"),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
