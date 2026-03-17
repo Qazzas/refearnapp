@@ -1,31 +1,30 @@
--- migration_rename_license_id_to_polar_id.sql
-
 BEGIN;
 
 DO $$
 BEGIN
-  -- 1. Rename column ONLY if the old name exists
-  IF EXISTS (SELECT 1 FROM information_schema.columns
-             WHERE table_name='license_keys' AND column_name='license_id') THEN
+  -- SCENARIO A: Old name exists -> Rename it
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='license_keys' AND column_name='license_id') THEN
 ALTER TABLE "license_keys" RENAME COLUMN "license_id" TO "polar_id";
-RAISE NOTICE 'Column license_id renamed to polar_id';
+RAISE NOTICE 'Renamed license_id to polar_id';
+
+  -- SCENARIO B: Neither exists -> Create fresh
+  ELSIF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='license_keys' AND column_name='polar_id') THEN
+ALTER TABLE "license_keys" ADD COLUMN "polar_id" text;
+RAISE NOTICE 'Created polar_id fresh';
+
 ELSE
-    RAISE NOTICE 'Column license_id does not exist, skipping rename';
+    RAISE NOTICE 'polar_id already exists, doing nothing';
 END IF;
 
-  -- 2. Drop the old constraint if it exists
+  -- Ensure the Unique Constraint exists
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_polar_id_unique') THEN
+ALTER TABLE "license_keys" ADD CONSTRAINT "license_keys_polar_id_unique" UNIQUE("polar_id");
+RAISE NOTICE 'Constraint added';
+END IF;
+
+  -- Cleanup old constraint if it somehow still exists
   IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_license_id_unique') THEN
 ALTER TABLE "license_keys" DROP CONSTRAINT "license_keys_license_id_unique";
-RAISE NOTICE 'Dropped old constraint license_keys_license_id_unique';
-END IF;
-
-  -- 3. Add the new constraint ONLY if it doesn't exist yet
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_polar_id_unique') THEN
-    -- Ensure the column exists before trying to add a constraint to it
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='license_keys' AND column_name='polar_id') THEN
-ALTER TABLE "license_keys" ADD CONSTRAINT "license_keys_polar_id_unique" UNIQUE("polar_id");
-RAISE NOTICE 'Added new unique constraint on polar_id';
-END IF;
 END IF;
 END $$;
 
