@@ -1,5 +1,5 @@
 {
-  "id": "ab554ed4-4cda-4c21-a2de-6f0178f9768f",
+  "id": "e1cf34b3-8b5c-4086-9ca1-691a79ebab4a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1102,6 +1102,84 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.license_activations": {
+      "name": "license_activations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "license_id": {
+          "name": "license_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "activation_id": {
+          "name": "activation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "license_activations_license_id_idx": {
+          "name": "license_activations_license_id_idx",
+          "columns": [
+            {
+              "expression": "license_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "license_activations_license_id_license_keys_id_fk": {
+          "name": "license_activations_license_id_license_keys_id_fk",
+          "tableFrom": "license_activations",
+          "tableTo": "license_keys",
+          "columnsFrom": [
+            "license_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_license_activation": {
+          "name": "unique_license_activation",
+          "nullsNotDistinct": false,
+          "columns": [
+            "license_id",
+            "activation_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.license_keys": {
       "name": "license_keys",
       "schema": "",
@@ -1124,6 +1202,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "polar_id": {
+          "name": "polar_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "status": {
           "name": "status",
@@ -1213,6 +1297,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "key"
+          ]
+        },
+        "license_keys_polar_id_unique": {
+          "name": "license_keys_polar_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "polar_id"
           ]
         }
       },
