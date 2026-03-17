@@ -35,12 +35,13 @@ export default async function CustomizationServerPage({ params }: OrgIdProps) {
           requiredTier="PRO"
           isExpired={true}
           domainName={domain?.domainName}
+          orgId={orgId}
         />
       )
     }
 
     const license = licenseResult.data
-    const hasAccess = license.isActive && license.isUltimate
+    const hasAccess = license.isActive && (license.isPro || license.isUltimate)
 
     if (!hasAccess) {
       return (
@@ -49,6 +50,7 @@ export default async function CustomizationServerPage({ params }: OrgIdProps) {
           requiredTier="PRO"
           isExpired={!license.isActive}
           domainName={domain?.domainName}
+          orgId={orgId}
         />
       )
     }

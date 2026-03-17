@@ -34,6 +34,7 @@ export default async function CustomizationServerPage({ params }: OrgIdProps) {
           featureName="Customization Options"
           requiredTier="PRO"
           isExpired={true}
+          orgId={orgId}
         />
       )
     }
@@ -47,6 +48,7 @@ export default async function CustomizationServerPage({ params }: OrgIdProps) {
           featureName="Customization Options"
           requiredTier="PRO"
           isExpired={!license.isActive}
+          orgId={orgId}
         />
       )
     }

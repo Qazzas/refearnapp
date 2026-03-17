@@ -33,7 +33,7 @@ export async function getLicense(orgId: string) {
           isActive: true,
           isPro: false,
           isUltimate: false,
-          inGracePeriod: false,
+          activationId: null,
         },
       }
     }
@@ -79,6 +79,7 @@ export async function getLicense(orgId: string) {
       data: {
         ...license,
         isCommunity: false,
+        activationId: activation?.activationId ?? null,
         isActive: license.status === "active" && !isExpired,
         isPro: license.tier === "PRO",
         isUltimate: license.tier === "ULTIMATE",

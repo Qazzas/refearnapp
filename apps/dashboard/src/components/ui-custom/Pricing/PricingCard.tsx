@@ -108,7 +108,13 @@ export function PricingCard({
                 highlight ? "text-slate-400" : "text-slate-500"
               )}
             >
-              {price.includes("/") ? "/ month" : "one-time"}
+              {price.includes("one-time")
+                ? "one-time"
+                : price.includes("/")
+                  ? price.split("/")[1].trim() === "year"
+                    ? "/ year"
+                    : "/ month"
+                  : "/ month"}
             </span>
           </div>
 

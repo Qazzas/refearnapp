@@ -49,7 +49,10 @@ import { licenseSchema } from "@/lib/schema/licenseSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useAppMutation } from "@/hooks/useAppMutation"
-import { activateLicense } from "@/app/(organization)/organization/[orgId]/dashboard/action"
+import {
+  activateLicense,
+  deactivateLicense,
+} from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { InputField } from "@/components/Auth/FormFields"
 
 // Menu items for the sidebar
@@ -167,6 +170,15 @@ const OrganizationDashboardSidebar = ({
         form.reset()
         router.refresh()
       },
+    }
+  )
+  const deactivateMutation = useAppMutation(
+    () => {
+      if (!license?.activationId) return Promise.reject("No activation ID")
+      return deactivateLicense(orgId!, license.activationId)
+    },
+    {
+      onSuccess: () => router.refresh(),
     }
   )
   const handleClick = () => {
@@ -299,20 +311,15 @@ const OrganizationDashboardSidebar = ({
                       isActive={pathname === item.url}
                       tooltip={item.title}
                     >
-                      {locked ? (
-                        <div className="flex items-center w-full justify-between opacity-50 cursor-not-allowed">
-                          <div className="flex items-center gap-2">
-                            <item.icon className="w-5 h-5" />
-                            <span>{item.title}</span>
+                      <Link href={item.url}>
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                        {locked && (
+                          <div className="ml-auto">
+                            <Lock className="w-3 h-3 text-amber-500" />
                           </div>
-                          <Lock className="w-3 h-3" />
-                        </div>
-                      ) : (
-                        <Link href={item.url}>
-                          <item.icon className="w-5 h-5" />
-                          <span>{item.title}</span>
-                        </Link>
-                      )}
+                        )}
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
@@ -328,29 +335,62 @@ const OrganizationDashboardSidebar = ({
         {/* 🛡️ SELF-HOSTED: Show a "Pro License" badge instead of billing buttons */}
         {isSelfHosted ? (
           <div className="p-4 space-y-3">
-            {plan.plan === "FREE" && (
-              <Link href="/pricing" className="block w-full">
-                <Button className="w-full">Get License Key</Button>
-              </Link>
+            {/* If community/no license, offer to buy/get one */}
+            {license?.isCommunity && (
+              <>
+                <Link
+                  href={`/organization/${orgId}/dashboard/pricing`}
+                  className="block w-full"
+                >
+                  <Button className="w-full">Get License Key</Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  className="w-full text-xs opacity-70 hover:opacity-100 underline-offset-4 hover:underline"
+                  onClick={() => setLicenseModalOpen(true)}
+                >
+                  Already have a key? Activate
+                </Button>
+              </>
             )}
-            {(plan.plan === "PRO" || plan.plan === "ULTIMATE") && (
+
+            {(license?.isPro || license?.isUltimate) && (
               <>
                 <Button
                   variant="outline"
                   className="w-full"
                   onClick={() =>
-                    window.open("https://polar.sh/your-portal-link", "_blank")
+                    window.open("https://your-license-portal.com", "_blank")
                   }
                 >
                   Manage Licenses
                 </Button>
-                <Button
-                  variant="secondary"
-                  className="w-full text-xs"
-                  onClick={() => setLicenseModalOpen(true)}
-                >
-                  Enter New License Key
-                </Button>
+                {license.activationId ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between px-2 text-[10px] font-bold uppercase text-green-500">
+                      <span>● Device Active</span>
+                      <span>{license.tier}</span>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      className="w-full text-xs"
+                      disabled={deactivateMutation.isPending}
+                      onClick={() => deactivateMutation.mutate(undefined)}
+                    >
+                      {deactivateMutation.isPending
+                        ? "Deactivating..."
+                        : "Deactivate License"}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    className="w-full text-xs"
+                    onClick={() => setLicenseModalOpen(true)}
+                  >
+                    Activate License Key
+                  </Button>
+                )}
               </>
             )}
           </div>

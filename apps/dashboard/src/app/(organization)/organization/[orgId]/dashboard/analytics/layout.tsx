@@ -43,6 +43,7 @@ export default async function AnalyticsLayout({
           featureName="Analytics"
           requiredTier="PRO"
           isExpired={true}
+          orgId={orgId}
         />
       )
     }
@@ -56,6 +57,7 @@ export default async function AnalyticsLayout({
           featureName="Advanced Analytics"
           requiredTier="PRO"
           isExpired={!license.isActive}
+          orgId={orgId}
         />
       )
     }

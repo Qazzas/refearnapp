@@ -22,8 +22,8 @@ export const POST = handleRoute(
         toast: "Access denied",
       })
     }
-    const { orgId, key, oldLicenseKey } = await req.json()
-    if (!orgId || !key) {
+    const { ownerId, key, oldLicenseKey } = await req.json()
+    if (!ownerId || !key) {
       throw new AppError({
         status: 400,
         error: "MISSING_REQUIRED_FIELDS",
@@ -43,7 +43,7 @@ export const POST = handleRoute(
     const result = await polar.licenseKeys.activate({
       key,
       organizationId: process.env.POLAR_ORGANIZATION_ID!,
-      label: orgId,
+      label: ownerId,
     })
     if (!result) {
       throw new AppError({

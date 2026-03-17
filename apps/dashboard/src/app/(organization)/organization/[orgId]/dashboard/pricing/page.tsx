@@ -4,6 +4,7 @@ import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { Metadata } from "next"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { buildMetadata } from "@/util/BuildMetadata"
+import { getLicense } from "@/lib/server/organization/getLicense"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
@@ -16,7 +17,9 @@ export async function generateMetadata({
     indexable: false,
   })
 }
-export default async function PricingPage() {
+export default async function PricingPage({ params }: OrgIdProps) {
+  const orgId = await getValidatedOrgFromParams({ params })
+  const licenseResult = await getLicense(orgId)
   const plan = await getUserPlan()
   const showSubscription = !(
     (plan?.type === "PURCHASE" &&
@@ -29,6 +32,7 @@ export default async function PricingPage() {
       plan={plan}
       dashboard={true}
       showSubscription={showSubscription}
+      license={licenseResult?.data ?? null}
     />
   )
 }

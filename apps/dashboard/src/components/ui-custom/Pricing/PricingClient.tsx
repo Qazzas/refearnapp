@@ -8,12 +8,14 @@ import { featuresList } from "@/util/FeatureList"
 import { SubscriptionSection } from "@/components/ui-custom/Pricing/SubscriptionSection"
 import { PricingGrid } from "@/components/ui-custom/Pricing/PricingGrid"
 import { getResponsiveTabSize } from "@/util/GetResponsiveTabSize"
+import { UserLicense } from "@/lib/server/organization/getLicense"
 
 export type BillingType = "SUBSCRIPTION" | "PURCHASE"
 export type SubscriptionCycle = "MONTHLY" | "YEARLY"
 type PricingClientProps = {
   dashboard?: boolean
   plan?: PlanInfo | null
+  license?: UserLicense | null
   showSubscription?: boolean
   showPurchase?: boolean
 }
@@ -21,6 +23,7 @@ type PricingClientProps = {
 export default function PricingClient({
   dashboard = false,
   plan,
+  license,
   showSubscription = true,
   showPurchase = true,
 }: PricingClientProps) {
@@ -36,7 +39,17 @@ export default function PricingClient({
 
     const currentPlan = plan.plan
     const currentType = plan.type
+    if (isSelfHosted) {
+      if (!license) return "License Unavailable"
+      const isCurrent =
+        (targetPlan === "PRO" && license.isPro) ||
+        (targetPlan === "ULTIMATE" && license.isUltimate)
+      if (isCurrent) return "Current License"
+      if (targetPlan === "ULTIMATE" && license.isPro)
+        return "Upgrade to Ultimate"
 
+      return targetPlan === "PRO" ? "Get Pro License" : "Get Ultimate License"
+    }
     // 🔒 1. Handle expired subscriptions
     if (currentType === "EXPIRED") {
       // 🧩 Free Expired — always show upgrade options
@@ -51,10 +64,7 @@ export default function PricingClient({
         }
         return "Upgrade Plan"
       }
-      if (isSelfHosted) {
-        if (plan?.plan === targetPlan) return "Current License"
-        return targetPlan === "PRO" ? "Get Pro License" : "Get Ultimate License"
-      }
+
       // 🧩 Pro / Ultimate Expired (subscription expired)
       if (billingType === "SUBSCRIPTION") {
         if (targetPlan === "PRO") return "Upgrade to Pro"
@@ -195,6 +205,7 @@ export default function PricingClient({
               billingType="PURCHASE"
               dashboard={dashboard}
               plan={plan}
+              license={license}
               featuresList={featuresList}
               getButtonText={(plan) => getButtonText(plan, "PURCHASE")}
             />
@@ -227,6 +238,7 @@ export default function PricingClient({
           billingType="PURCHASE"
           dashboard={dashboard}
           plan={plan}
+          license={license}
           featuresList={featuresList}
           getButtonText={(plan) => getButtonText(plan, "PURCHASE")}
         />

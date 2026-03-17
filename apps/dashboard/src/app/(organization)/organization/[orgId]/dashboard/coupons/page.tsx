@@ -31,6 +31,7 @@ const couponsPage = async ({ params }: OrgIdProps) => {
           featureName="Coupons"
           requiredTier="ULTIMATE"
           isExpired={true}
+          orgId={orgId}
         />
       )
     }
@@ -44,6 +45,7 @@ const couponsPage = async ({ params }: OrgIdProps) => {
           featureName="Coupons"
           requiredTier="ULTIMATE"
           isExpired={!license.isActive}
+          orgId={orgId}
         />
       )
     }

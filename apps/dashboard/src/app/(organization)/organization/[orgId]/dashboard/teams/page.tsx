@@ -32,6 +32,7 @@ const TeamsPage = async ({ params }: OrgIdProps) => {
           featureName="Teams Management"
           requiredTier="ULTIMATE"
           isExpired={true}
+          orgId={orgId}
         />
       )
     }
@@ -45,6 +46,7 @@ const TeamsPage = async ({ params }: OrgIdProps) => {
           featureName="Teams Management"
           requiredTier="ULTIMATE"
           isExpired={!license.isActive}
+          orgId={orgId}
         />
       )
     }

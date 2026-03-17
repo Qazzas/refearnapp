@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/db/drizzle"
-import { licenseKeys } from "@/db/schema"
+import { licenseActivations, licenseKeys } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { CENTRAL_API_URL } from "@/lib/constants/centralDomain"
 import { handleAction } from "@/lib/handleAction"
@@ -32,11 +32,11 @@ export async function activateLicense(orgId: string, key: string) {
       )
 
     // 3. Remote Sync (send orgId to Central API as it's the organization context)
-    const response = await fetch(`${CENTRAL_API_URL}/api/licenses/activate`, {
+    const response = await fetch(`${CENTRAL_API_URL}/api/license/activate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        orgId,
+        ownerId,
         key,
         oldLicenseKey: existingKeys,
       }),
@@ -59,12 +59,19 @@ export async function activateLicense(orgId: string, key: string) {
         .set({ status: "revoked" })
         .where(eq(licenseKeys.userId, ownerId))
 
-      await tx.insert(licenseKeys).values({
-        userId: ownerId, // Correctly using ownerId here
-        key: data.licenseKey.key,
-        status: "active",
-        tier: data.licenseKey.key.startsWith("ULTIMATE") ? "ULTIMATE" : "PRO",
-        expiresAt: new Date(data.licenseKey.expiresAt),
+      const [insertedLicense] = await tx
+        .insert(licenseKeys)
+        .values({
+          userId: ownerId,
+          key: data.licenseKey.key,
+          status: "active",
+          tier: data.licenseKey.key.startsWith("ULTIMATE") ? "ULTIMATE" : "PRO",
+          expiresAt: new Date(data.licenseKey.expiresAt),
+        })
+        .returning({ id: licenseKeys.id })
+      await tx.insert(licenseActivations).values({
+        licenseId: insertedLicense.id,
+        activationId: data.id,
       })
     })
 
@@ -72,5 +79,60 @@ export async function activateLicense(orgId: string, key: string) {
       ok: true,
       toast: "License activated successfully!",
     }
+  })
+}
+export async function deactivateLicense(orgId: string, activationId: string) {
+  return await handleAction("DeactivateLicense", async () => {
+    const ownerId = await getOrgOwnerId(orgId)
+    if (!ownerId) {
+      throw new AppError({
+        status: 403,
+        error: "UNAUTHORIZED",
+        toast: "Organization owner not found.",
+      })
+    }
+    const license = await db.query.licenseKeys.findFirst({
+      where: and(
+        eq(licenseKeys.userId, ownerId),
+        eq(licenseKeys.status, "active")
+      ),
+    })
+
+    if (!license) {
+      throw new AppError({
+        status: 404,
+        error: "NOT_FOUND",
+        toast: "No active license found to deactivate.",
+      })
+    }
+    const res = await fetch(`${CENTRAL_API_URL}/api/license/deactivate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        activationId,
+        key: license.key, // The actual license key string (e.g., "PRO-XXXX")
+      }),
+    })
+
+    if (!res.ok) {
+      throw new AppError({
+        status: res.status || 500,
+        error: "DEACTIVATION_FAILED",
+        toast: "Remote deactivation failed. Please try again.",
+      })
+    }
+
+    // 3. Clean up local database
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(licenseActivations)
+        .where(eq(licenseActivations.activationId, activationId))
+      await tx
+        .update(licenseKeys)
+        .set({ lastValidatedAt: new Date(0) })
+        .where(eq(licenseKeys.id, license.id))
+    })
+
+    return { ok: true, toast: "Device deactivated successfully" }
   })
 }

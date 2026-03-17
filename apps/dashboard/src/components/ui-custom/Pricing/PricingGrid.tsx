@@ -18,11 +18,13 @@ import {
 import { Loader2 } from "lucide-react"
 import { PRICING_CONFIG } from "@/lib/types/organization/priceConfig"
 import { EnterpriseCard } from "@/components/ui-custom/EnterpriseCard"
+import { UserLicense } from "@/lib/server/organization/getLicense"
 
 export function PricingGrid({
   billingType,
   dashboard,
   plan,
+  license,
   subscriptionCycle,
   featuresList,
   getButtonText,
@@ -30,6 +32,7 @@ export function PricingGrid({
   billingType: BillingType
   dashboard: boolean
   plan?: PlanInfo | null
+  license?: UserLicense | null
   subscriptionCycle?: SubscriptionCycle
   featuresList: FeatureList[]
   getButtonText: (p: PlanInfo["plan"], t: PlanInfo["type"]) => string
@@ -79,7 +82,8 @@ export function PricingGrid({
       return
     }
     if (isSelfHosted) {
-      const isUpgrade = plan?.plan === "PRO" && targetPlan === "ULTIMATE"
+      if (!license) return
+      const isUpgrade = license.isPro && targetPlan === "ULTIMATE"
       checkoutMutation.mutate({
         targetPlan,
         upgrade: isUpgrade,
@@ -186,7 +190,7 @@ export function PricingGrid({
     if (tier === "FREE") return "$0"
     // 1. SELF-HOSTED Logic
     if (isSelfHosted) {
-      if (tier === "ULTIMATE" && plan?.plan === "PRO") {
+      if (tier === "ULTIMATE" && license?.isPro) {
         return "$400 / year"
       }
       const price = PRICING_CONFIG.SELF_HOSTED[tier]
@@ -304,8 +308,11 @@ Proceed?`
   const isDisabled = (targetPlan: PlanInfo["plan"]) => {
     // No plan → always enabled
     if (!plan) return false
-    if (isSelfHosted && plan.plan === "ULTIMATE") {
-      return true
+    if (isSelfHosted && license) {
+      if (targetPlan === "ULTIMATE" && license.isUltimate) return true
+      if (targetPlan === "PRO" && (license.isPro || license.isUltimate))
+        return true
+      return false
     }
     if (
       billingType === "PURCHASE" &&
