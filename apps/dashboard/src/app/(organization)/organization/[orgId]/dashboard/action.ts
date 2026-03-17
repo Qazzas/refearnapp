@@ -14,7 +14,7 @@ export async function activateLicense(orgId: string, key: string) {
       return { ok: true, data: "Not self-hosted, skipping sync" }
     }
 
-    // 1. Resolve the ownerId for local database operations
+    // 1. Resolve ownerId
     const ownerId = await getOrgOwnerId(orgId)
     if (!ownerId) {
       throw new AppError({
@@ -23,7 +23,8 @@ export async function activateLicense(orgId: string, key: string) {
         toast: "Organization owner not found.",
       })
     }
-    // 2. Local State Retrieval (using ownerId)
+
+    // 2. Get existing active keys to send to Central API for revocation
     const existingKeys = await db
       .select()
       .from(licenseKeys)
@@ -31,7 +32,7 @@ export async function activateLicense(orgId: string, key: string) {
         and(eq(licenseKeys.userId, ownerId), eq(licenseKeys.status, "active"))
       )
 
-    // 3. Remote Sync (send orgId to Central API as it's the organization context)
+    // 3. Remote Sync with Central API
     const response = await fetch(`${CENTRAL_API_URL}/api/license/activate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -44,15 +45,14 @@ export async function activateLicense(orgId: string, key: string) {
 
     if (!response.ok) {
       throw new AppError({
-        status: response.status || 500,
+        status: 500,
         error: "ACTIVATION_FAILED",
         toast: "Central API activation failed",
       })
     }
 
     const { data } = await response.json()
-
-    // 4. Local Database Persistence (using ownerId)
+    console.log("Activation response from Central API:", data)
     await db.transaction(async (tx) => {
       await tx
         .update(licenseKeys)
@@ -62,13 +62,16 @@ export async function activateLicense(orgId: string, key: string) {
       const [insertedLicense] = await tx
         .insert(licenseKeys)
         .values({
+          licenseId: data.licenseKey.id,
           userId: ownerId,
           key: data.licenseKey.key,
           status: "active",
           tier: data.licenseKey.key.startsWith("ULTIMATE") ? "ULTIMATE" : "PRO",
           expiresAt: new Date(data.licenseKey.expiresAt),
+          lastValidatedAt: new Date(0),
         })
         .returning({ id: licenseKeys.id })
+
       await tx.insert(licenseActivations).values({
         licenseId: insertedLicense.id,
         activationId: data.id,

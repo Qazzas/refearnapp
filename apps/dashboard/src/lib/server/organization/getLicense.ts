@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle"
-import { licenseKeys, licenseActivations } from "@/db/schema"
+import { licenseKeys, licenseActivations, LicenseStatus } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { handleAction } from "@/lib/handleAction"
 import { getOrgOwnerId } from "@/lib/server/organization/getOrgOwnerId"
@@ -59,10 +59,19 @@ export async function getLicense(orgId: string) {
 
       if (res.ok) {
         const remoteLicense = await res.json()
+        let localStatus: LicenseStatus = "revoked"
+        if (remoteLicense.status === "granted") {
+          localStatus = "active"
+        } else if (
+          remoteLicense.status === "revoked" ||
+          remoteLicense.status === "disabled"
+        ) {
+          localStatus = "revoked"
+        }
         await db
           .update(licenseKeys)
           .set({
-            status: remoteLicense.status,
+            status: localStatus,
             tier: remoteLicense.tier,
             expiresAt: new Date(remoteLicense.expiresAt),
             lastValidatedAt: new Date(),

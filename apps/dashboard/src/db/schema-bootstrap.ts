@@ -61,7 +61,7 @@ export const BOOTSTRAP_QUERIES = [
         "expires_at" timestamp with time zone NOT NULL,
         "last_validated_at" timestamp with time zone,
         "created_at" timestamp DEFAULT now() NOT NULL,
-        CONSTRAINT "license_keys_key_unique" UNIQUE("key")
+        CONSTRAINT "license_keys_license_id_unique" UNIQUE("license_id")
     );`,
   },
   {
@@ -451,6 +451,24 @@ export const BOOTSTRAP_QUERIES = [
       CREATE INDEX IF NOT EXISTS "license_keys_key_idx" ON "license_keys" ("key");
       CREATE INDEX IF NOT EXISTS "license_activations_license_id_idx" ON "license_activations" USING btree ("license_id");
     `,
+  },
+  {
+    name: "migration_add_license_id_to_keys",
+    sql: `
+    DO $$ 
+    BEGIN 
+      -- Add column if it doesn't exist
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                     WHERE table_name='license_keys' AND column_name='license_id') THEN
+        ALTER TABLE "license_keys" ADD COLUMN "license_id" text;
+      END IF;
+
+      -- Add unique constraint if it doesn't exist
+      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_license_id_unique') THEN
+        ALTER TABLE "license_keys" ADD CONSTRAINT "license_keys_license_id_unique" UNIQUE("license_id");
+      END IF;
+    END $$;
+  `,
   },
 
   // --- PHASE 3: FOREIGN KEYS ---

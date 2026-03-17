@@ -9,7 +9,7 @@ const polar = new Polar({
   server: polarConfig.server,
 })
 
-// app/api/licenses/activate/route.ts
+// app/api/license/activate/route.ts
 export const POST = handleRoute(
   "ActivateLicenseAPI",
   async (req: NextRequest) => {
@@ -33,7 +33,7 @@ export const POST = handleRoute(
     if (oldLicenseKey && Array.isArray(oldLicenseKey)) {
       for (const old of oldLicenseKey) {
         await polar.licenseKeys.update({
-          id: old.key,
+          id: old.id,
           licenseKeyUpdate: { status: "revoked" },
         })
       }

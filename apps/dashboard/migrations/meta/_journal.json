@@ -15,6 +15,34 @@
       "when": 1773600421050,
       "tag": "0001_normal_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773751401703,
+      "tag": "0002_burly_pestilence",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773751477746,
+      "tag": "0003_superb_mentor",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1773751527926,
+      "tag": "0004_sleepy_warbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773751601983,
+      "tag": "0005_odd_carlie_cooper",
+      "breakpoints": true
     }
   ]
 }
