@@ -453,24 +453,6 @@ export const BOOTSTRAP_QUERIES = [
     `,
   },
   {
-    name: "migration_add_license_id_to_keys",
-    sql: `
-    DO $$ 
-    BEGIN 
-      -- Add column if it doesn't exist
-      IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                     WHERE table_name='license_keys' AND column_name='license_id') THEN
-        ALTER TABLE "license_keys" ADD COLUMN "license_id" text;
-      END IF;
-
-      -- Add unique constraint if it doesn't exist
-      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_license_id_unique') THEN
-        ALTER TABLE "license_keys" ADD CONSTRAINT "license_keys_license_id_unique" UNIQUE("license_id");
-      END IF;
-    END $$;
-  `,
-  },
-  {
     name: "migration_update_affiliate_link_cascades",
     sql: `
     DO $$ 
