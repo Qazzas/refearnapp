@@ -29,13 +29,16 @@ export const EditableSlugCell = ({
   initialSlug,
   affiliate,
   orgId,
+  isPreview,
 }: {
   linkId: string
   initialSlug: string
   affiliate: boolean
   orgId: string
+  isPreview?: boolean
 }) => {
   const [isEditing, setIsEditing] = useState(false)
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false)
   const { showCustomToast } = useCustomToast()
   const queryClient = useQueryClient()
   // Grab the button customization atoms to mimic the "Create New Link" button style
@@ -73,14 +76,30 @@ export const EditableSlugCell = ({
     }
   )
 
-  const onSubmit = (values: SlugFormValues) => {
+  const onSubmit = async (values: SlugFormValues) => {
     if (values.slug === initialSlug) {
       setIsEditing(false)
       return
     }
+
+    if (isPreview) {
+      setIsPreviewLoading(true)
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      setIsPreviewLoading(false)
+      setIsEditing(false)
+
+      showCustomToast({
+        type: "success",
+        title: "Preview Mode",
+        description: `Simulated slug change to: ${values.slug}`,
+        affiliate,
+      })
+      return
+    }
     mutation.mutate(values)
   }
-
+  const isLoading = mutation.isPending || isPreviewLoading
   if (isEditing) {
     return (
       <Form {...form}>
@@ -96,7 +115,7 @@ export const EditableSlugCell = ({
               placeholder="Slug..."
               type="text"
               affiliate={affiliate}
-              disabled={mutation.isPending}
+              disabled={isLoading}
             />
           </div>
 
@@ -105,19 +124,19 @@ export const EditableSlugCell = ({
             <Button
               type="submit"
               size="icon"
-              disabled={mutation.isPending}
+              disabled={isLoading}
               className="h-8 w-8"
               style={{
-                backgroundColor: mutation.isPending
+                backgroundColor: isLoading
                   ? (affiliate && dashboardButtonDisabledBackgroundColor) ||
                     undefined
                   : (affiliate && dashboardButtonBackgroundColor) || undefined,
-                color: mutation.isPending
+                color: isLoading
                   ? (affiliate && dashboardButtonDisabledTextColor) || undefined
                   : (affiliate && dashboardButtonTextColor) || undefined,
               }}
             >
-              {mutation.isPending ? (
+              {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Check className="h-4 w-4" />
@@ -134,7 +153,7 @@ export const EditableSlugCell = ({
                 form.reset()
                 setIsEditing(false)
               }}
-              disabled={mutation.isPending}
+              disabled={isLoading}
             >
               <X className="h-4 w-4" />
             </Button>

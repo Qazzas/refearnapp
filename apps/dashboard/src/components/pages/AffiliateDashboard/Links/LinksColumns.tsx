@@ -11,7 +11,8 @@ import { EditableSlugCell } from "@/components/ui-custom/EditableSlugCell"
 export const useLinksColumns = (
   affiliate: boolean,
   currency: string,
-  orgId: string
+  orgId: string,
+  isPreview?: boolean
 ): ColumnDef<AffiliateLinkWithStats>[] => {
   const dashboardTable = useAtomValue(tableCustomizationAtom)
   return React.useMemo(
@@ -73,6 +74,7 @@ export const useLinksColumns = (
                   initialSlug={slug}
                   affiliate={affiliate}
                   orgId={orgId}
+                  isPreview={isPreview}
                 />
               </div>
 
@@ -275,6 +277,6 @@ export const useLinksColumns = (
         ),
       },
     ],
-    [affiliate, currency, dashboardTable, orgId]
+    [affiliate, currency, dashboardTable, orgId, isPreview]
   )
 }
