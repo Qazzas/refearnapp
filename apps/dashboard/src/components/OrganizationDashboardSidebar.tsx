@@ -54,6 +54,7 @@ import {
   deactivateLicense,
 } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { InputField } from "@/components/Auth/FormFields"
+import { polarConfig } from "@/lib/polarConfig"
 
 // Menu items for the sidebar
 
@@ -360,7 +361,7 @@ const OrganizationDashboardSidebar = ({
                   variant="outline"
                   className="w-full"
                   onClick={() =>
-                    window.open("https://your-license-portal.com", "_blank")
+                    window.open(polarConfig.customerPortalUrl, "_blank")
                   }
                 >
                   Manage Licenses

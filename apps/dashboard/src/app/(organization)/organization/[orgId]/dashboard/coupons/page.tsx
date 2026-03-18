@@ -37,14 +37,17 @@ const couponsPage = async ({ params }: OrgIdProps) => {
     }
 
     const license = licenseResult.data
-    const hasAccess = license.isActive && license.isUltimate
+    const hasAccess =
+      license.isActive && license.isUltimate && !!license.activationId
 
     if (!hasAccess) {
+      const needsActivation = !license.activationId && !license.isCommunity
       return (
         <LicenseRequiredState
           featureName="Coupons"
           requiredTier="ULTIMATE"
           isExpired={!license.isActive}
+          needsActivation={needsActivation}
           orgId={orgId}
         />
       )

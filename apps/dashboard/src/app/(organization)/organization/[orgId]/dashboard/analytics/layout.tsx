@@ -49,14 +49,19 @@ export default async function AnalyticsLayout({
     }
 
     const license = licenseResult.data
-    const hasAccess = license.isActive && (license.isPro || license.isUltimate)
+    const hasAccess =
+      license.isActive &&
+      (license.isPro || license.isUltimate) &&
+      !!license.activationId
 
     if (!hasAccess) {
+      const needsActivation = !license.activationId && !license.isCommunity
       return (
         <LicenseRequiredState
           featureName="Advanced Analytics"
           requiredTier="PRO"
           isExpired={!license.isActive}
+          needsActivation={needsActivation}
           orgId={orgId}
         />
       )

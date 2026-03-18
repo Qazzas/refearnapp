@@ -171,7 +171,7 @@ export default function Links({
       mutation.mutate(orgId)
     }
   }
-  const columns = useLinksColumns(affiliate, displayCurrency)
+  const columns = useLinksColumns(affiliate, displayCurrency, orgId)
   const { table } = useAppTable({
     data: isPreview ? (filteredPreviewData ?? []) : (searchData ?? []),
     columns,

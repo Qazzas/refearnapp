@@ -1,5 +1,5 @@
 "use client"
-import { KeyRound, AlertCircle, ShieldCheck, Sparkles } from "lucide-react"
+import { KeyRound, AlertCircle, ShieldCheck, Sparkles, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 
@@ -7,6 +7,7 @@ interface LicenseRequiredProps {
   featureName: string
   requiredTier: "PRO" | "ULTIMATE"
   isExpired?: boolean
+  needsActivation?: boolean
   domainName?: string
   orgId?: string
 }
@@ -15,24 +16,38 @@ export function LicenseRequiredState({
   featureName,
   requiredTier,
   isExpired = false,
+  needsActivation = false,
   domainName,
   orgId,
 }: LicenseRequiredProps) {
   const router = useRouter()
 
-  const title = isExpired ? "License Expired" : "Upgrade Required"
-  const message = isExpired
-    ? `Your license has expired. Please renew your ${requiredTier} subscription to regain access to ${featureName}.`
-    : `You need an active ${requiredTier} license to access ${featureName}.`
+  let title = "Upgrade Required"
+  let message = `You need an active ${requiredTier} license to access ${featureName}.`
+  let buttonLabel = "Manage License Key"
+  let ButtonIcon = KeyRound
 
-  // Colorful styling logic
+  if (isExpired) {
+    title = "License Expired"
+    message = `Your license has expired. Please renew your ${requiredTier} subscription.`
+    buttonLabel = "Renew License"
+    ButtonIcon = ShieldCheck
+  } else if (needsActivation) {
+    title = "Activation Required"
+    message = `You have a ${requiredTier} key, but it hasn't been activated for this server yet.`
+    buttonLabel = "Activate Now"
+    ButtonIcon = Zap
+  }
+
   const Icon = isExpired ? AlertCircle : Sparkles
   const iconBg = isExpired
     ? "bg-destructive/10 text-destructive"
     : "bg-violet-100 text-violet-600"
   const cardGradient = isExpired
     ? "from-rose-50 to-orange-50 border-rose-200"
-    : "from-indigo-50 to-blue-50 border-indigo-200"
+    : needsActivation
+      ? "from-amber-50 to-yellow-50 border-amber-200"
+      : "from-indigo-50 to-blue-50 border-indigo-200"
 
   return (
     <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-in fade-in zoom-in duration-500">
@@ -82,8 +97,8 @@ export function LicenseRequiredState({
               : "bg-indigo-600 hover:bg-indigo-700 text-white"
           }`}
         >
-          {isExpired ? <ShieldCheck size={18} /> : <KeyRound size={18} />}
-          {isExpired ? "Renew License" : "Manage License Key"}
+          <ButtonIcon size={18} />
+          {buttonLabel}
         </Button>
       </div>
     </div>

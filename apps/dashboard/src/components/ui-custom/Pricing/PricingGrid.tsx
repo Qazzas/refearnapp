@@ -309,10 +309,9 @@ Proceed?`
     // No plan → always enabled
     if (!plan) return false
     if (isSelfHosted && license) {
+      if (!license.isActive) return false
       if (targetPlan === "ULTIMATE" && license.isUltimate) return true
-      if (targetPlan === "PRO" && (license.isPro || license.isUltimate))
-        return true
-      return false
+      return targetPlan === "PRO" && (license.isPro || license.isUltimate)
     }
     if (
       billingType === "PURCHASE" &&
@@ -360,6 +359,12 @@ Proceed?`
   }
   return (
     <>
+      {isSelfHosted && license && !license.isCommunity && !license.isActive && (
+        <div className="w-full max-w-md mx-auto mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center text-sm font-medium">
+          Your {license.tier} license has expired. Please renew to continue
+          using premium features.
+        </div>
+      )}
       <div className="flex flex-wrap justify-center w-full gap-6">
         <div className="flex w-full flex-wrap justify-center gap-6">
           <PricingCard

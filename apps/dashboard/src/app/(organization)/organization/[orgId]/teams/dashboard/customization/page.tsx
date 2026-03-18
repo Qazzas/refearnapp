@@ -40,14 +40,19 @@ export default async function CustomizationServerPage({ params }: OrgIdProps) {
     }
 
     const license = licenseResult.data
-    const hasAccess = license.isActive && (license.isPro || license.isUltimate)
+    const hasAccess =
+      license.isActive &&
+      (license.isPro || license.isUltimate) &&
+      !!license.activationId
 
     if (!hasAccess) {
+      const needsActivation = !license.activationId && !license.isCommunity
       return (
         <LicenseRequiredState
           featureName="Customization Options"
           requiredTier="PRO"
           isExpired={!license.isActive}
+          needsActivation={needsActivation}
           orgId={orgId}
         />
       )

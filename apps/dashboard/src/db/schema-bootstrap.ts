@@ -471,25 +471,31 @@ export const BOOTSTRAP_QUERIES = [
   `,
   },
   {
-    name: "migration_rename_license_id_to_polar_id",
+    name: "migration_update_affiliate_link_cascades",
     sql: `
     DO $$ 
     BEGIN 
-      -- 1. Rename column ONLY if the old name exists
-      IF EXISTS (SELECT 1 FROM information_schema.columns 
-                 WHERE table_name='license_keys' AND column_name='license_id') THEN
-        ALTER TABLE "license_keys" RENAME COLUMN "license_id" TO "polar_id";
+      -- 1. Update affiliate_click constraints
+      IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'affiliate_click_affiliate_link_id_affiliate_link_id_fk') THEN
+        ALTER TABLE "affiliate_click" DROP CONSTRAINT "affiliate_click_affiliate_link_id_affiliate_link_id_fk";
       END IF;
+      ALTER TABLE "affiliate_click" ADD CONSTRAINT "affiliate_click_affiliate_link_id_affiliate_link_id_fk" 
+        FOREIGN KEY ("affiliate_link_id") REFERENCES "affiliate_link"("id") ON DELETE cascade ON UPDATE cascade;
 
-      -- 2. Drop the old constraint if it exists
-      IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_license_id_unique') THEN
-        ALTER TABLE "license_keys" DROP CONSTRAINT "license_keys_license_id_unique";
+      -- 2. Update affiliate_invoice constraints
+      IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'affiliate_invoice_affiliate_link_id_affiliate_link_id_fk') THEN
+        ALTER TABLE "affiliate_invoice" DROP CONSTRAINT "affiliate_invoice_affiliate_link_id_affiliate_link_id_fk";
       END IF;
+      ALTER TABLE "affiliate_invoice" ADD CONSTRAINT "affiliate_invoice_affiliate_link_id_affiliate_link_id_fk" 
+        FOREIGN KEY ("affiliate_link_id") REFERENCES "affiliate_link"("id") ON DELETE cascade ON UPDATE cascade;
 
-      -- 3. Add the new constraint ONLY if it doesn't exist yet
-      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'license_keys_polar_id_unique') THEN
-        ALTER TABLE "license_keys" ADD CONSTRAINT "license_keys_polar_id_unique" UNIQUE("polar_id");
+      -- 3. Update referrals constraints
+      IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'referrals_referral_link_id_affiliate_link_id_fk') THEN
+        ALTER TABLE "referrals" DROP CONSTRAINT "referrals_referral_link_id_affiliate_link_id_fk";
       END IF;
+      ALTER TABLE "referrals" ADD CONSTRAINT "referrals_referral_link_id_affiliate_link_id_fk" 
+        FOREIGN KEY ("referral_link_id") REFERENCES "affiliate_link"("id") ON DELETE cascade ON UPDATE cascade;
+
     END $$;
   `,
   },

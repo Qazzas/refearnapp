@@ -40,14 +40,18 @@ export default function PricingClient({
     const currentPlan = plan.plan
     const currentType = plan.type
     if (isSelfHosted) {
-      if (!license) return "License Unavailable"
-      const isCurrent =
-        (targetPlan === "PRO" && license.isPro) ||
-        (targetPlan === "ULTIMATE" && license.isUltimate)
-      if (isCurrent) return "Current License"
+      if (!license) return "Select Plan"
+      const isCurrentActive =
+        ((targetPlan === "PRO" && license.isPro) ||
+          (targetPlan === "ULTIMATE" && license.isUltimate)) &&
+        license.isActive
+
+      if (isCurrentActive) return "Current License"
+      if (!license.isActive) {
+        return targetPlan === "PRO" ? "Renew Pro" : "Renew Ultimate"
+      }
       if (targetPlan === "ULTIMATE" && license.isPro)
         return "Upgrade to Ultimate"
-
       return targetPlan === "PRO" ? "Get Pro License" : "Get Ultimate License"
     }
     // 🔒 1. Handle expired subscriptions

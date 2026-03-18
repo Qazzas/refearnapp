@@ -512,7 +512,10 @@ export const affiliateClick = pgTable(
       .$defaultFn(() => generateAffiliateClickId()),
     affiliateLinkId: text("affiliate_link_id")
       .notNull()
-      .references(() => affiliateLink.id, { onDelete: "cascade" }),
+      .references(() => affiliateLink.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     clickCount: integer("click_count").default(1),
     referrer: text("referrer").default("unknown").notNull(),
     deviceType: text("device_type"),
@@ -551,7 +554,7 @@ export const affiliateInvoice = pgTable(
       .notNull(),
     affiliateLinkId: text("affiliate_link_id").references(
       () => affiliateLink.id,
-      { onDelete: "cascade" }
+      { onDelete: "cascade", onUpdate: "cascade" }
     ),
     promotionCodeId: uuid("promotion_code_id").references(
       () => promotionCodes.id,
@@ -647,7 +650,11 @@ export const referrals = pgTable(
       () => promotionCodes.id
     ),
     affiliateLinkId: text("referral_link_id").references(
-      () => affiliateLink.id
+      () => affiliateLink.id,
+      {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }
     ),
     signedAt: timestamp("signed_at").defaultNow().notNull(),
     convertedAt: timestamp("converted_at"),

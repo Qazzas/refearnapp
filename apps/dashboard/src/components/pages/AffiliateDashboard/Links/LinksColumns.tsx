@@ -6,10 +6,12 @@ import { Check, Copy } from "lucide-react"
 import { useAtomValue } from "jotai"
 import { tableCustomizationAtom } from "@/store/DashboardCustomizationAtom"
 import { formatValue } from "@/util/FormatValue"
+import { EditableSlugCell } from "@/components/ui-custom/EditableSlugCell"
 
 export const useLinksColumns = (
   affiliate: boolean,
-  currency: string
+  currency: string,
+  orgId: string
 ): ColumnDef<AffiliateLinkWithStats>[] => {
   const dashboardTable = useAtomValue(tableCustomizationAtom)
   return React.useMemo(
@@ -28,6 +30,9 @@ export const useLinksColumns = (
         ),
         cell: ({ row }) => {
           const url: string = row.getValue("fullUrl")
+          const slug: string = row.original.id // "my-slug"
+          const baseUrl = url && slug ? url.split(slug)[0] : ""
+
           const [isHovered, setIsHovered] = useState(false)
           const [copied, setCopied] = useState(false)
 
@@ -37,6 +42,7 @@ export const useLinksColumns = (
               setTimeout(() => setCopied(false), 1000)
             })
           }
+
           const iconColor = copied
             ? (affiliate && dashboardTable.tableIconHoverColor) || "#2563eb"
             : isHovered
@@ -49,6 +55,7 @@ export const useLinksColumns = (
               ? (affiliate && dashboardTable.tableIconHoverBackgroundColor) ||
                 "#dbeafe"
               : "transparent"
+
           return (
             <div
               className="flex items-center"
@@ -58,7 +65,17 @@ export const useLinksColumns = (
                   undefined,
               }}
             >
-              <span className="break-all">{url}</span>
+              {/* --- Logic Added: Editable Slug instead of static break-all span --- */}
+              <div className="flex items-center gap-0">
+                <span className="text-muted-foreground/60">{baseUrl}</span>
+                <EditableSlugCell
+                  linkId={slug}
+                  initialSlug={slug}
+                  affiliate={affiliate}
+                  orgId={orgId}
+                />
+              </div>
+
               <Button
                 type="button"
                 size="icon"
@@ -258,6 +275,6 @@ export const useLinksColumns = (
         ),
       },
     ],
-    [affiliate, currency, dashboardTable]
+    [affiliate, currency, dashboardTable, orgId]
   )
 }
