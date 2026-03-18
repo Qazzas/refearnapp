@@ -7,6 +7,8 @@ import { CENTRAL_API_URL } from "@/lib/constants/centralDomain"
 import { handleAction } from "@/lib/handleAction"
 import { getOrgOwnerId } from "@/lib/server/organization/getOrgOwnerId"
 import { AppError } from "@/lib/exceptions"
+import { getLicense } from "@/lib/server/organization/getLicense"
+import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 
 export async function activateLicense(orgId: string, key: string) {
   return await handleAction("ActivateLicense", async () => {
@@ -133,5 +135,71 @@ export async function deactivateLicense(orgId: string, activationId: string) {
     })
 
     return { ok: true, toast: "Device deactivated successfully" }
+  })
+}
+
+export async function syncDiscordAccess(orgId: string, code: string) {
+  return await handleAction("SyncDiscord", async () => {
+    const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+    let payload: any = { code }
+
+    if (isSelfHosted) {
+      const licenseResult = await getLicense(orgId)
+      const license = licenseResult?.data
+
+      // Local check: Verify license exists and is active before proceeding
+      if (!license || !license.isActive || !license.key) {
+        throw new AppError({
+          status: 403,
+          error: "INVALID_LICENSE",
+          toast:
+            "An active Pro or Ultimate license is required for Discord access.",
+        })
+      }
+
+      payload = {
+        ...payload,
+        type: "SELF_HOSTED",
+        tier: license.tier, // Only passing the tier name (PRO/ULTIMATE)
+      }
+    } else {
+      const planInfo = await getUserPlan()
+
+      if (planInfo.plan === "FREE") {
+        throw new AppError({
+          status: 402,
+          error: "UPGRADE_REQUIRED",
+          toast:
+            "Please upgrade to a Pro or Ultimate plan to join the Discord.",
+        })
+      }
+
+      payload = {
+        ...payload,
+        type: "CLOUD",
+        plan: planInfo.plan,
+      }
+    }
+
+    // 2. Call Central API (The "Bridge")
+    const response = await fetch(`${CENTRAL_API_URL}/api/discord/callback`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      throw new AppError({
+        status: 500,
+        error: "DISCORD_SYNC_FAILED",
+        toast:
+          "Failed to sync roles. Ensure you authorized the correct account.",
+      })
+    }
+
+    return {
+      ok: true,
+      toast: "Discord roles synced! Welcome to the club.",
+    }
   })
 }

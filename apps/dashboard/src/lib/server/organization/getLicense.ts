@@ -35,6 +35,7 @@ export async function getLicense(orgId: string) {
           isUltimate: false,
           activationId: null,
           tier: "FREE" as const,
+          key: null,
         },
       }
     }

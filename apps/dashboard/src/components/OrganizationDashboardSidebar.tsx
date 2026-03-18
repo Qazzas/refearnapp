@@ -16,6 +16,7 @@ import {
   TicketPercent,
   MousePointerClick,
   Lock,
+  RefreshCw,
 } from "lucide-react"
 import {
   Sidebar,
@@ -55,6 +56,8 @@ import {
 } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { InputField } from "@/components/Auth/FormFields"
 import { polarConfig } from "@/lib/polarConfig"
+import { useDiscordSync } from "@/hooks/useDiscordSync"
+import { DiscordIcon } from "@/components/ui-custom/DiscordIcon"
 
 // Menu items for the sidebar
 
@@ -90,6 +93,10 @@ const OrganizationDashboardSidebar = ({
     }
     return false
   }
+  const showDiscordOption = isSelfHosted
+    ? license?.isPro || license?.isUltimate
+    : plan.plan === "PRO" || plan.plan === "ULTIMATE"
+  const { sync, isPending: isSyncingDiscord } = useDiscordSync(orgId!)
   const { mutate: switchOrg, isPending } = useSwitchOrg()
   const items = [
     {
@@ -325,6 +332,30 @@ const OrganizationDashboardSidebar = ({
                   </SidebarMenuItem>
                 )
               })}
+              {showDiscordOption && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={sync}
+                    disabled={isSyncingDiscord}
+                    className="bg-indigo-600/10 text-indigo-500 hover:bg-indigo-600/20"
+                  >
+                    <div className="flex items-center gap-2">
+                      {isSyncingDiscord ? (
+                        <RefreshCw className="w-4 h-4 animate-spin text-indigo-500" />
+                      ) : (
+                        <DiscordIcon className="w-4 h-4" />
+                      )}
+                      <span className="font-medium">
+                        {isSyncingDiscord
+                          ? "Syncing..."
+                          : canAccessUltimate
+                            ? "Ultimate VIP Discord"
+                            : "Pro Discord"}
+                      </span>
+                    </div>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
