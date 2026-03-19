@@ -5,7 +5,7 @@ node_modules
 # Next.js (Dashboard)
 apps/dashboard/.next/
 apps/dashboard/out/
-
+apps/dashboard/self-hosted-migrations/
 # Astro (Landing Page)
 apps/landing-page/dist/
 apps/landing-page/.astro/
