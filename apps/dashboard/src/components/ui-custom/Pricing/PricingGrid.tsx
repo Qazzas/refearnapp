@@ -188,13 +188,18 @@ export function PricingGrid({
   }
   const getPrice = (tier: PlanInfo["plan"]) => {
     if (tier === "FREE") return "$0"
-    // 1. SELF-HOSTED Logic
+    // 1. SELF-HOSTED Logic (One-time feel)
     if (isSelfHosted) {
+      const proPrice = PRICING_CONFIG.SELF_HOSTED.PRO
+      const ultimatePrice = PRICING_CONFIG.SELF_HOSTED.ULTIMATE
+
       if (tier === "ULTIMATE" && license?.isPro) {
-        return "$400 / year"
+        const upgradePrice = ultimatePrice - proPrice
+        return `$${upgradePrice} upgrade`
       }
+
       const price = PRICING_CONFIG.SELF_HOSTED[tier]
-      return `$${price} / year`
+      return `$${price} one-time`
     }
     if (billingType === "SUBSCRIPTION") {
       const monthlyPrice =

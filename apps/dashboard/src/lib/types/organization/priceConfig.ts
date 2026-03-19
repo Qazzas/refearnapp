@@ -26,8 +26,8 @@ export const PRICING_CONFIG: PricingConfig = {
     ULTIMATE: 299,
   },
   SELF_HOSTED: {
-    PRO: 399,
-    ULTIMATE: 799,
+    PRO: 199,
+    ULTIMATE: 299,
   },
   MARKUP_PERCENT: 1.43,
 } as const
