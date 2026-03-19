@@ -5,6 +5,6 @@
  * This is public and safe to include in the source code.
  */
 export const DISCORD_CONFIG = {
-  clientId: "123456789012345678",
+  clientId: "1484120120602263673",
   scopes: "identify guilds.join",
 }
