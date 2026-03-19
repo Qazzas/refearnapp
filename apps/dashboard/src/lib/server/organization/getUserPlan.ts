@@ -17,10 +17,11 @@ async function getPlanByUserId(userId: string): Promise<PlanInfo> {
   // Helper for validity
   const isValid = (sub: typeof subscription.$inferSelect | null) =>
     sub?.expiresAt && sub.expiresAt.getTime() >= Date.now()
-
+  const base = { userId }
   if (userSub) {
     if (isValid(userSub)) {
       return {
+        ...base,
         plan: userSub.plan as PlanInfo["plan"],
         type: "SUBSCRIPTION",
         cycle: userSub.billingInterval as PlanInfo["cycle"],
@@ -31,6 +32,7 @@ async function getPlanByUserId(userId: string): Promise<PlanInfo> {
       }
     }
     return {
+      ...base,
       plan: userSub.plan as PlanInfo["plan"],
       type: "EXPIRED",
       cycle: userSub.billingInterval as PlanInfo["cycle"],
@@ -41,12 +43,13 @@ async function getPlanByUserId(userId: string): Promise<PlanInfo> {
 
   if (userPurchase?.isActive) {
     return {
+      ...base,
       plan: userPurchase.tier === "ULTIMATE" ? "ULTIMATE" : "PRO",
       type: "PURCHASE",
     }
   }
 
-  return { plan: "FREE", type: "FREE" }
+  return { ...base, plan: "FREE", type: "FREE" }
 }
 
 // 2. Wrapper A: Get plan for current user session

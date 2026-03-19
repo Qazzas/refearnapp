@@ -759,6 +759,20 @@ export const systemSettings = pgTable("system_settings", {
   lastUpdated: timestamp("last_updated").defaultNow(),
   latestAvailableVersion: text("latest_available_version"),
 })
+export const discordAccount = pgTable(
+  "discord_account",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: text("owner_id").notNull().unique(),
+    discordUserId: text("discord_user_id").notNull(),
+    discordUsername: text("discord_username").notNull(),
+    plan: text("plan").$type<Plan>().notNull(),
+    isSelfHosted: boolean("is_self_hosted").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("discord_account_discord_user_idx").on(table.discordUserId)]
+)
 export const organizationDashboardCustomization = pgTable(
   "organization_dashboard_customization",
   {

@@ -161,6 +161,7 @@ export async function syncDiscordAccess(orgId: string, code: string) {
         ...payload,
         type: "SELF_HOSTED",
         tier: license.tier, // Only passing the tier name (PRO/ULTIMATE)
+        key: license.key,
       }
     } else {
       const planInfo = await getUserPlan()
@@ -178,6 +179,7 @@ export async function syncDiscordAccess(orgId: string, code: string) {
         ...payload,
         type: "CLOUD",
         plan: planInfo.plan,
+        userId: planInfo.userId,
       }
     }
 

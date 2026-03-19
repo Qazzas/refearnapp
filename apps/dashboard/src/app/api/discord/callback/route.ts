@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
+import { db } from "@/db/drizzle"
+import { discordAccount } from "@/db/schema"
 
 export const POST = handleRoute("DiscordSyncAPI", async (req: NextRequest) => {
-  const { type, code, tier, plan } = await req.json()
+  const { type, code, tier, plan, userId, key } = await req.json()
   if (!code) {
     throw new AppError({ status: 400, toast: "Authorization code missing." })
   }
@@ -31,6 +33,7 @@ export const POST = handleRoute("DiscordSyncAPI", async (req: NextRequest) => {
   })
   const discordUser = await userResponse.json()
   const discordUserId = discordUser.id
+  const ownerId = type === "SELF_HOSTED" ? key : userId
   const targetTier = type === "SELF_HOSTED" ? tier : plan
 
   if (!targetTier || targetTier === "FREE") {
@@ -39,6 +42,24 @@ export const POST = handleRoute("DiscordSyncAPI", async (req: NextRequest) => {
       toast: "No eligible plan found for sync.",
     })
   }
+  await db
+    .insert(discordAccount)
+    .values({
+      ownerId: ownerId,
+      discordUserId: discordUserId,
+      discordUsername: discordUser.username,
+      plan: targetTier,
+      isSelfHosted: type === "SELF_HOSTED",
+    })
+    .onConflictDoUpdate({
+      target: discordAccount.ownerId,
+      set: {
+        discordUserId,
+        discordUsername: discordUser.username,
+        plan: targetTier,
+        updatedAt: new Date(),
+      },
+    })
   const GUILD_ID = process.env.DISCORD_GUILD_ID
   const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
   const roleId =
