@@ -58,6 +58,7 @@ import { InputField } from "@/components/Auth/FormFields"
 import { polarConfig } from "@/lib/polarConfig"
 import { useDiscordSync } from "@/hooks/useDiscordSync"
 import { DiscordIcon } from "@/components/ui-custom/DiscordIcon"
+import { cn } from "@/lib/utils"
 
 // Menu items for the sidebar
 
@@ -93,10 +94,26 @@ const OrganizationDashboardSidebar = ({
     }
     return false
   }
-  const showDiscordOption = isSelfHosted
+  const isPremium = isSelfHosted
     ? (license?.isPro || license?.isUltimate) && !!license?.activationId
     : plan.plan === "PRO" || plan.plan === "ULTIMATE"
+
+  const isUltimate = isSelfHosted
+    ? license?.isUltimate
+    : plan.plan === "ULTIMATE"
+  const discordLabel = isUltimate
+    ? "Join Ultimate VIP"
+    : isPremium
+      ? "Join Pro Discord"
+      : "Join Community Discord"
   const { sync, isPending: isSyncingDiscord } = useDiscordSync(orgId!)
+  const handleDiscordAction = () => {
+    if (isPremium) {
+      sync()
+    } else {
+      window.open("https://discord.gg/fHw9j7P3w9", "_blank")
+    }
+  }
   const { mutate: switchOrg, isPending } = useSwitchOrg()
   const items = [
     {
@@ -338,23 +355,33 @@ const OrganizationDashboardSidebar = ({
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
-        {showDiscordOption && (
-          <Button
-            onClick={sync}
-            disabled={isSyncingDiscord}
-            variant="outline"
-            className="w-full justify-start gap-3 border-indigo-500/30 bg-indigo-600/5 text-indigo-500 hover:bg-indigo-600/10 hover:text-indigo-400"
-          >
-            {isSyncingDiscord ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <DiscordIcon className="w-4 h-4" />
-            )}
-            <span className="text-xs font-semibold uppercase tracking-wider">
-              {isSyncingDiscord ? "Syncing..." : "Join VIP Discord"}
+        <Button
+          onClick={handleDiscordAction}
+          disabled={isSyncingDiscord}
+          variant="outline"
+          className={cn(
+            "w-full justify-start gap-3 border-dashed transition-all",
+            isUltimate
+              ? "border-amber-500/50 bg-amber-500/5 text-amber-600 hover:bg-amber-500/10"
+              : isPremium
+                ? "border-indigo-500/30 bg-indigo-600/5 text-indigo-500 hover:bg-indigo-600/10"
+                : "border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100"
+          )}
+        >
+          {isSyncingDiscord ? (
+            <RefreshCw className="w-4 h-4 animate-spin" />
+          ) : (
+            <DiscordIcon className="w-4 h-4" />
+          )}
+          <div className="flex flex-col items-start overflow-hidden">
+            <span className="text-[10px] font-bold uppercase tracking-tighter opacity-70">
+              Discord Access
             </span>
-          </Button>
-        )}
+            <span className="text-xs font-semibold truncate">
+              {isSyncingDiscord ? "Syncing Roles..." : discordLabel}
+            </span>
+          </div>
+        </Button>
         <SidebarHelp />
         <SystemUpdate variant="badge" updateInfo={updateInfo} />
         {/* 🛡️ SELF-HOSTED: Show a "Pro License" badge instead of billing buttons */}

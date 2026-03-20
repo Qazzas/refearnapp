@@ -6,6 +6,7 @@ import { useAppMutation } from "@/hooks/useAppMutation"
 import { syncDiscordAccess } from "@/app/(organization)/organization/[orgId]/dashboard/action"
 import { useRouter } from "next/navigation"
 import { DISCORD_CONFIG } from "@/lib/constants/discordConfig"
+import { CENTRAL_API_URL } from "@/lib/constants/centralDomain"
 
 export function useDiscordSync(orgId: string) {
   const router = useRouter()
@@ -23,11 +24,11 @@ export function useDiscordSync(orgId: string) {
   const handleSync = () => {
     // No more process.env needed for the ID!
     const REDIRECT_URI = encodeURIComponent(
-      `${window.location.origin}/api/auth/discord/callback`
+      `${CENTRAL_API_URL}/api/auth/discord/callback`
     )
     const SCOPES = encodeURIComponent(DISCORD_CONFIG.scopes)
-
-    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CONFIG.clientId}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPES}`
+    const state = encodeURIComponent(window.location.origin)
+    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CONFIG.clientId}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPES}&state=${state}`
 
     const width = 500,
       height = 750
@@ -41,7 +42,7 @@ export function useDiscordSync(orgId: string) {
     )
 
     const messageListener = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return
+      if (event.origin !== CENTRAL_API_URL) return
 
       if (event.data?.type === "DISCORD_AUTH_SUCCESS") {
         mutation.mutate(event.data.code)

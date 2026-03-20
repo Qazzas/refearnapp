@@ -104,17 +104,19 @@ export function PricingCard({
             </span>
             <span
               className={cn(
-                "text-sm font-medium",
+                "text-sm font-medium uppercase tracking-wider",
                 highlight ? "text-slate-400" : "text-slate-500"
               )}
             >
-              {price.includes("one-time")
-                ? "one-time"
-                : price.includes("/")
-                  ? price.split("/")[1].trim() === "year"
-                    ? "/ year"
-                    : "/ month"
-                  : "/ month"}
+              {price.includes("upgrade")
+                ? "upgrade"
+                : price.includes("one-time")
+                  ? "one-time"
+                  : price.includes("/")
+                    ? price.split("/")[1].trim() === "year"
+                      ? "/ year"
+                      : "/ month"
+                    : "/ month"}
             </span>
           </div>
 

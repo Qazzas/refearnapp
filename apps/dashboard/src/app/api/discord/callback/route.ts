@@ -3,12 +3,14 @@ import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
 import { db } from "@/db/drizzle"
 import { discordAccount } from "@/db/schema"
+import { CENTRAL_API_URL } from "@/lib/constants/centralDomain"
 
 export const POST = handleRoute("DiscordSyncAPI", async (req: NextRequest) => {
   const { type, code, tier, plan, userId, key } = await req.json()
   if (!code) {
     throw new AppError({ status: 400, toast: "Authorization code missing." })
   }
+  const redirectUri = `${CENTRAL_API_URL}/api/auth/discord/callback`
   const tokenResponse = await fetch("https://discord.com/api/oauth2/token", {
     method: "POST",
     body: new URLSearchParams({
@@ -16,7 +18,7 @@ export const POST = handleRoute("DiscordSyncAPI", async (req: NextRequest) => {
       client_secret: process.env.DISCORD_CLIENT_SECRET!,
       grant_type: "authorization_code",
       code,
-      redirect_uri: `${new URL(req.url).origin}/api/auth/discord/callback`,
+      redirect_uri: redirectUri,
     }),
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
   })
@@ -42,6 +44,48 @@ export const POST = handleRoute("DiscordSyncAPI", async (req: NextRequest) => {
       toast: "No eligible plan found for sync.",
     })
   }
+  const GUILD_ID = process.env.DISCORD_GUILD_ID
+  const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
+  const roleId =
+    targetTier === "ULTIMATE"
+      ? process.env.DISCORD_ULTIMATE_ROLE_ID
+      : process.env.DISCORD_PRO_ROLE_ID
+  const joinResponse = await fetch(
+    `https://discord.com/api/guilds/${GUILD_ID}/members/${discordUserId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bot ${BOT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        access_token: tokenData.access_token,
+      }),
+    }
+  )
+  if (!joinResponse.ok) {
+    throw new AppError({
+      status: 500,
+      toast: "Discord failed to add you to the server. Contact support.",
+    })
+  }
+  const syncResponse = await fetch(
+    `https://discord.com/api/guilds/${GUILD_ID}/members/${discordUserId}/roles/${roleId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bot ${BOT_TOKEN}`,
+        "X-Audit-Log-Reason": `Syncing ${targetTier} access`,
+      },
+    }
+  )
+
+  if (!syncResponse.ok) {
+    throw new AppError({
+      status: 500,
+      toast: "Discord failed to assign roles. Contact support.",
+    })
+  }
   await db
     .insert(discordAccount)
     .values({
@@ -60,32 +104,5 @@ export const POST = handleRoute("DiscordSyncAPI", async (req: NextRequest) => {
         updatedAt: new Date(),
       },
     })
-  const GUILD_ID = process.env.DISCORD_GUILD_ID
-  const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
-  const roleId =
-    targetTier === "ULTIMATE"
-      ? process.env.DISCORD_ULTIMATE_ROLE_ID
-      : process.env.DISCORD_PRO_ROLE_ID
-
-  const syncResponse = await fetch(
-    `https://discord.com/api/guilds/${GUILD_ID}/members/${discordUserId}/roles/${roleId}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bot ${BOT_TOKEN}`,
-        "X-Audit-Log-Reason": `Syncing ${targetTier} access`,
-      },
-    }
-  )
-
-  if (!syncResponse.ok) {
-    const errorBody = await syncResponse.text()
-    console.error("Discord API Error:", errorBody)
-    throw new AppError({
-      status: 500,
-      toast: "Discord failed to assign roles. Contact support.",
-    })
-  }
-
   return NextResponse.json({ ok: true, message: "Roles synced successfully!" })
 })
