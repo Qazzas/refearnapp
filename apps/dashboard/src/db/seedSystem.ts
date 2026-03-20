@@ -1,4 +1,3 @@
-// src/scripts/seedSystem.ts
 import { db } from "@/db/drizzle"
 import { systemSettings } from "@/db/schema"
 import { APP_VERSION } from "@/lib/constants/version"
