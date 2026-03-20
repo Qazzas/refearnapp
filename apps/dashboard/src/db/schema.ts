@@ -729,7 +729,7 @@ export const licenseKeys = pgTable(
     polarId: text("polar_id").unique(),
     status: text("status").$type<LicenseStatus>().notNull().default("active"),
     tier: text("tier").$type<PurchaseTier>().notNull().default("PRO"),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
     lastValidatedAt: timestamp("last_validated_at", { withTimezone: true }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
