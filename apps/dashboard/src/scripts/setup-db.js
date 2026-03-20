@@ -91,6 +91,14 @@ async function run() {
     console.error("❌ Migration failed. Check your Database URL permissions.")
     process.exit(1)
   }
+  // --- STEP 3: SEEDING ---
+  console.log("\n🌱 Running system initialization...")
+  try {
+    await $`bun src/scripts/seedSystem.ts`
+    console.log("✅ System version initialized.")
+  } catch (err) {
+    console.warn("⚠️ System seeding failed.")
+  }
 
   console.log("\n🌱 Running currency seed script...")
   try {
