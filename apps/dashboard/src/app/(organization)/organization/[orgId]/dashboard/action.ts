@@ -56,7 +56,9 @@ export async function activateLicense(orgId: string, key: string) {
     const { data } = await response.json()
     await db.transaction(async (tx) => {
       await tx.delete(licenseKeys).where(eq(licenseKeys.userId, ownerId))
-
+      const expiresAt = data.licenseKey.expiresAt
+        ? new Date(data.licenseKey.expiresAt)
+        : null
       const [insertedLicense] = await tx
         .insert(licenseKeys)
         .values({
@@ -65,7 +67,7 @@ export async function activateLicense(orgId: string, key: string) {
           key: data.licenseKey.key,
           status: "active",
           tier: data.licenseKey.key.startsWith("ULTIMATE") ? "ULTIMATE" : "PRO",
-          expiresAt: new Date(data.licenseKey.expiresAt),
+          expiresAt,
           lastValidatedAt: new Date(0),
         })
         .returning({ id: licenseKeys.id })
