@@ -94,7 +94,7 @@ const OrganizationDashboardSidebar = ({
     return false
   }
   const showDiscordOption = isSelfHosted
-    ? license?.isPro || license?.isUltimate
+    ? (license?.isPro || license?.isUltimate) && !!license?.activationId
     : plan.plan === "PRO" || plan.plan === "ULTIMATE"
   const { sync, isPending: isSyncingDiscord } = useDiscordSync(orgId!)
   const { mutate: switchOrg, isPending } = useSwitchOrg()
@@ -332,36 +332,29 @@ const OrganizationDashboardSidebar = ({
                   </SidebarMenuItem>
                 )
               })}
-              {showDiscordOption && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={sync}
-                    disabled={isSyncingDiscord}
-                    className="bg-indigo-600/10 text-indigo-500 hover:bg-indigo-600/20"
-                  >
-                    <div className="flex items-center gap-2">
-                      {isSyncingDiscord ? (
-                        <RefreshCw className="w-4 h-4 animate-spin text-indigo-500" />
-                      ) : (
-                        <DiscordIcon className="w-4 h-4" />
-                      )}
-                      <span className="font-medium">
-                        {isSyncingDiscord
-                          ? "Syncing..."
-                          : canAccessUltimate
-                            ? "Ultimate VIP Discord"
-                            : "Pro Discord"}
-                      </span>
-                    </div>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
+        {showDiscordOption && (
+          <Button
+            onClick={sync}
+            disabled={isSyncingDiscord}
+            variant="outline"
+            className="w-full justify-start gap-3 border-indigo-500/30 bg-indigo-600/5 text-indigo-500 hover:bg-indigo-600/10 hover:text-indigo-400"
+          >
+            {isSyncingDiscord ? (
+              <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <DiscordIcon className="w-4 h-4" />
+            )}
+            <span className="text-xs font-semibold uppercase tracking-wider">
+              {isSyncingDiscord ? "Syncing..." : "Join VIP Discord"}
+            </span>
+          </Button>
+        )}
         <SidebarHelp />
         <SystemUpdate variant="badge" updateInfo={updateInfo} />
         {/* 🛡️ SELF-HOSTED: Show a "Pro License" badge instead of billing buttons */}
