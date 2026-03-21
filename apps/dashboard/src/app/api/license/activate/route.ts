@@ -32,10 +32,12 @@ export const POST = handleRoute(
     }
     if (oldLicenseKey && Array.isArray(oldLicenseKey)) {
       for (const old of oldLicenseKey) {
-        await polar.licenseKeys.update({
-          id: old.polarId,
-          licenseKeyUpdate: { status: "revoked" },
-        })
+        if (old.key !== key) {
+          await polar.licenseKeys.update({
+            id: old.polarId,
+            licenseKeyUpdate: { status: "revoked" },
+          })
+        }
       }
     }
 
