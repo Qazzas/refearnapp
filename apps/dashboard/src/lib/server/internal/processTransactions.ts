@@ -1,10 +1,11 @@
-import { sql, inArray, eq, and, or, isNull } from "drizzle-orm"
+import { sql, inArray, eq, and, or } from "drizzle-orm"
 import { db } from "@/db/drizzle"
 import {
   affiliateInvoice,
   affiliateLink,
   payoutReference,
   payoutReferencePeriods,
+  promotionCodes,
 } from "@/db/schema"
 import pLimit from "p-limit"
 
@@ -19,55 +20,78 @@ export interface Transaction {
 async function bulkUpdateInvoices(refIds: string[]) {
   if (refIds.length === 0) return { rowCount: 0 }
 
-  // We use a join that checks both paths for the payout association
-  const result = await db
-    .update(affiliateInvoice)
-    .set({
-      paidAmount: sql`${affiliateInvoice.paidAmount} + ${affiliateInvoice.unpaidAmount}`,
-      unpaidAmount: sql`0`,
-      updatedAt: new Date(),
-    })
-    .from(payoutReference)
-    // Join the payout reference period
-    .leftJoin(
-      payoutReferencePeriods,
-      eq(payoutReference.refId, payoutReferencePeriods.refId)
-    )
-    // Logic: The invoice must match the PayoutReference either via Link OR Promo Code
-    .where(
-      and(
-        inArray(payoutReference.refId, refIds),
-        // This condition bridges the invoice to the payout reference
-        or(
-          sql`${affiliateInvoice.affiliateLinkId} IS NOT NULL AND ${affiliateInvoice.affiliateLinkId} = (SELECT id FROM affiliate_link WHERE affiliate_id = ${payoutReference.affiliateId} LIMIT 1)`,
-          sql`${affiliateInvoice.promotionCodeId} IS NOT NULL AND ${affiliateInvoice.promotionCodeId} = (SELECT id FROM promotion_codes WHERE affiliate_id = ${payoutReference.affiliateId} LIMIT 1)`
-        ),
-        // Keep your existing date/period logic
-        or(
-          isNull(payoutReferencePeriods.refId),
-          and(
-            eq(
-              sql`EXTRACT(YEAR FROM ${affiliateInvoice.createdAt})`,
-              payoutReferencePeriods.year
-            ),
-            eq(payoutReferencePeriods.month, 0)
+  return await db.transaction(async (tx) => {
+    const payoutDetails = await tx
+      .select({
+        affiliateId: payoutReference.affiliateId,
+        month: payoutReferencePeriods.month,
+        year: payoutReferencePeriods.year,
+      })
+      .from(payoutReference)
+      .leftJoin(
+        payoutReferencePeriods,
+        eq(payoutReference.refId, payoutReferencePeriods.refId)
+      )
+      .where(inArray(payoutReference.refId, refIds))
+
+    if (payoutDetails.length === 0) return { rowCount: 0 }
+
+    const affiliateIds = payoutDetails.map((p) => p.affiliateId)
+    const [links, codes] = await Promise.all([
+      tx
+        .select({ id: affiliateLink.id })
+        .from(affiliateLink)
+        .where(inArray(affiliateLink.affiliateId, affiliateIds)),
+      tx
+        .select({ id: promotionCodes.id })
+        .from(promotionCodes)
+        .where(inArray(promotionCodes.affiliateId, affiliateIds)),
+    ])
+
+    const linkIds = links.map((l) => l.id)
+    const codeIds = codes.map((c) => c.id)
+    const result = await tx
+      .update(affiliateInvoice)
+      .set({
+        paidAmount: sql`${affiliateInvoice.paidAmount} + ${affiliateInvoice.unpaidAmount}`,
+        unpaidAmount: "0.00",
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          sql`${affiliateInvoice.unpaidAmount} > 0`,
+          or(
+            linkIds.length > 0
+              ? inArray(affiliateInvoice.affiliateLinkId, linkIds)
+              : undefined,
+            codeIds.length > 0
+              ? inArray(affiliateInvoice.promotionCodeId, codeIds)
+              : undefined
           ),
-          and(
-            eq(
-              sql`EXTRACT(YEAR FROM ${affiliateInvoice.createdAt})`,
-              payoutReferencePeriods.year
-            ),
-            eq(
-              sql`EXTRACT(MONTH FROM ${affiliateInvoice.createdAt})`,
-              payoutReferencePeriods.month
-            )
+          or(
+            ...payoutDetails.map((p) => {
+              if (!p.year) return sql`TRUE`
+              const yearMatch = eq(
+                sql`EXTRACT(YEAR FROM ${affiliateInvoice.createdAt})`,
+                p.year
+              )
+              const monthMatch =
+                p.month && p.month !== 0
+                  ? eq(
+                      sql`EXTRACT(MONTH FROM ${affiliateInvoice.createdAt})`,
+                      p.month
+                    )
+                  : sql`TRUE`
+
+              return and(yearMatch, monthMatch)
+            })
           )
         )
       )
-    )
-    .returning({ id: affiliateInvoice.id })
+      .returning({ id: affiliateInvoice.id })
 
-  return { rowCount: result.length }
+    return { rowCount: result.length }
+  })
 }
 
 // Process transactions from PayPal
