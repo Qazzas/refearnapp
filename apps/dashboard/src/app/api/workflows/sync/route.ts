@@ -96,9 +96,7 @@ export const { POST } = serve(async (context: any) => {
           headers: { "x-internal-secret": env.INTERNAL_SECRET! },
         }
       )
-
       if (!response.ok) throw new Error("Seed rates failed")
-
       const result = await response.json()
       console.log("Seed Rates Response:", result)
     })
