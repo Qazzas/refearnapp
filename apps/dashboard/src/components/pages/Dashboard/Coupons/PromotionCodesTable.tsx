@@ -18,13 +18,16 @@ import {
   COUPON_SORT_OPTIONS,
   CouponSortKeys,
 } from "@/lib/types/organization/couponSortKeys"
+import { getDummyCoupons } from "@/lib/types/analytics/dummyCouponData"
 
 export default function PromotionCodesTable({
   orgId,
   isTeam = false,
+  isPreview = false,
 }: {
   orgId: string
   isTeam?: boolean
+  isPreview?: boolean
 }) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [selectedCodeId, setSelectedCodeId] = React.useState<string | null>(
@@ -66,7 +69,7 @@ export default function PromotionCodesTable({
         orderDir: filters.orderDir,
       },
     ] as const,
-    { enabled: !!orgId }
+    { enabled: !!orgId && !isPreview }
   )
   const { data: settings, isPending: isFetchingSettings } = useAppQuery(
     ["promo-settings", orgId, selectedCodeId],
@@ -77,7 +80,7 @@ export default function PromotionCodesTable({
         isTeam ? "team" : "admin",
       ]),
     [orgId, selectedCodeId!] as const, // The ! tells TS we handle the null via 'enabled'
-    { enabled: !!selectedCodeId }
+    { enabled: !!selectedCodeId && !isPreview }
   )
   useEffect(() => {
     if (settings && selectedCodeId) {
@@ -86,6 +89,7 @@ export default function PromotionCodesTable({
   }, [settings, selectedCodeId])
 
   const handleAssignClick = (code: any) => {
+    if (isPreview) return
     setSelectedCodeId(code.id)
     setSelectedCodeRow(code)
   }
@@ -94,7 +98,7 @@ export default function PromotionCodesTable({
     setSelectedCodeId(null)
   }
   const columns = PromotionCodesColumns(handleAssignClick)
-  const tableData = searchData?.rows ?? []
+  const tableData = isPreview ? getDummyCoupons() : (searchData?.rows ?? [])
   const hasNext = searchData?.hasNext ?? false
 
   const { table } = useAppTable({
