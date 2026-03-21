@@ -102,29 +102,5 @@ export const { POST } = serve(async (context: any) => {
       const result = await response.json()
       console.log("Seed Rates Response:", result)
     })
-
-    await context.run("polar-sync", async () => {
-      const isSelfHosted =
-        process.env.IS_SELF_HOSTED === "true" ||
-        process.env.IS_SELF_HOSTED === "1"
-
-      if (isSelfHosted) {
-        console.log("☁️ Skipping Polar Sync: Self-hosted environment.")
-        return
-      }
-
-      const response = await fetch(
-        `${process.env.MAIN_APP_URL}/api/license/sync`,
-        {
-          method: "POST",
-          headers: { "x-internal-secret": process.env.INTERNAL_SECRET! },
-        }
-      )
-
-      if (!response.ok) throw new Error("Polar sync endpoint failed")
-
-      const result = await response.json()
-      console.log("✅ Polar Sync complete:", result)
-    })
   }
 })
