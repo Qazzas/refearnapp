@@ -61,6 +61,7 @@ export const { POST } = serve(
           Object.keys(clickBatch).length > 0 ||
           Object.keys(leadData).length > 0
         ) {
+          const syncId = `sync_clicks_${Date.now()}`
           const response = await fetch(
             `${env.MAIN_APP_URL}/api/internal/sync-batch`,
             {
@@ -68,8 +69,13 @@ export const { POST } = serve(
               headers: {
                 "Content-Type": "application/json",
                 "x-internal-secret": env.INTERNAL_SECRET!,
+                "x-sync-id": syncId,
               },
-              body: JSON.stringify({ batch: clickBatch, leads: leadData }),
+              body: JSON.stringify({
+                batch: clickBatch,
+                leads: leadData,
+                syncId,
+              }),
             }
           )
 

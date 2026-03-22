@@ -3,6 +3,7 @@ import { affiliateClick, referrals } from "@/db/schema"
 import { NextResponse } from "next/server"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
+import { redis } from "@/lib/redis"
 
 export const POST = handleRoute("Sync Click Batch", async (req) => {
   // 1. Security Check
@@ -13,11 +14,18 @@ export const POST = handleRoute("Sync Click Batch", async (req) => {
       status: 401,
     })
   }
-  const { batch, leads } = (await req.json()) as {
+  const { batch, leads, syncId } = (await req.json()) as {
     batch: Record<string, string>
     leads: Record<string, string[]>
+    syncId?: string
   }
-
+  if (syncId) {
+    const isProcessed = await redis.get(`processed:${syncId}`)
+    if (isProcessed) {
+      console.log(`♻️ Skipping already processed batch: ${syncId}`)
+      return NextResponse.json({ ok: true, duplicated: true })
+    }
+  }
   // --- PART A: PROCESS CLICKS ---
   if (batch && Object.keys(batch).length > 0) {
     const clickEntries = Object.entries(batch).map(([key, count]) => {
@@ -69,6 +77,8 @@ export const POST = handleRoute("Sync Click Batch", async (req) => {
       }
     }
   }
-
+  if (syncId) {
+    await redis.set(`processed:${syncId}`, "true", { ex: 600 })
+  }
   return NextResponse.json({ ok: true })
 })
