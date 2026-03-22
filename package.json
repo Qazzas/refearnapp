@@ -6,6 +6,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "deploy:tracker": "pnpm --filter @repo/tracking-worker run deploy:self",
+    "logs:tracker": "pnpm --filter @repo/tracking-worker run logs:tracker",
     "db:setup": "pnpm --filter @repo/dashboard run db:setup",
     "db:database:reset": "pnpm --filter @repo/dashboard db:database:reset",
     "lint": "turbo run lint",

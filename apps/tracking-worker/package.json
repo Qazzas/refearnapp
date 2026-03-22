@@ -7,6 +7,7 @@
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"deploy:self": "bun self-host.js",
+		"logs:tracker": "bun tail-tracker.js",
 		"test": "vitest",
 		"cf-typegen": "wrangler types"
 	},
