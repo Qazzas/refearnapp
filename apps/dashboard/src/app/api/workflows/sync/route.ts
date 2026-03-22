@@ -1,15 +1,18 @@
 import { serve } from "@upstash/workflow/nextjs"
-import { Redis } from "@upstash/redis"
+import { redis } from "@/lib/redis"
 
 export const { POST } = serve(
   async (context: any) => {
+    // Using process.env directly
+    const internalSecret = process.env.INTERNAL_SECRET
+    const originUrl = process.env.NEXT_PUBLIC_REDIRECTION_URL
+
     const authHeader = context.headers.get("x-internal-secret")
-    if (authHeader !== process.env.INTERNAL_SECRET) {
+    if (authHeader !== internalSecret) {
       return new Response("Unauthorized", { status: 401 })
     }
+
     const { cron } = context.requestPayload
-    const env = process.env // Accessible in Node.js runtime
-    const redis = Redis.fromEnv()
 
     // --- 5 MINUTE SYNC ---
     if (cron === "*/5 * * * *") {
@@ -62,31 +65,31 @@ export const { POST } = serve(
           Object.keys(leadData).length > 0
         ) {
           const syncId = `sync_clicks_${Date.now()}`
-          const response = await fetch(
-            `${env.MAIN_APP_URL}/api/internal/sync-batch`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-internal-secret": env.INTERNAL_SECRET!,
-                "x-sync-id": syncId,
-              },
-              body: JSON.stringify({
-                batch: clickBatch,
-                leads: leadData,
-                syncId,
-              }),
-            }
-          )
+
+          // Using the redirection URL from process.env
+          const response = await fetch(`${originUrl}/api/internal/sync-batch`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-internal-secret": internalSecret!,
+              "x-sync-id": syncId,
+            },
+            body: JSON.stringify({
+              batch: clickBatch,
+              leads: leadData,
+              syncId,
+            }),
+          })
 
           if (!response.ok)
             throw new Error(`Batch Sync failed with status ${response.status}`)
 
-          // Cleanup Redis
+          // Cleanup Redis using the requested redis instance
           const pipeline = redis.pipeline()
           if (clickProcessingKey) pipeline.del(clickProcessingKey)
           for (const key of leadKeys) pipeline.del(key)
           await pipeline.exec()
+
           const clickCount = Object.keys(clickBatch).length
           const leadCount = Object.keys(leadData).length
 
@@ -100,13 +103,10 @@ export const { POST } = serve(
     // --- MIDNIGHT TASKS ---
     if (cron === "0 0 * * *") {
       await context.run("seed-rates", async () => {
-        const response = await fetch(
-          `${env.MAIN_APP_URL}/api/internal/seed-rates`,
-          {
-            method: "POST",
-            headers: { "x-internal-secret": env.INTERNAL_SECRET! },
-          }
-        )
+        const response = await fetch(`${originUrl}/api/internal/seed-rates`, {
+          method: "POST",
+          headers: { "x-internal-secret": internalSecret! },
+        })
         if (!response.ok) throw new Error("Seed rates failed")
         const result = await response.json()
         console.log("Seed Rates Response:", result)
