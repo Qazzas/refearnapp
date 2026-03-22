@@ -1,7 +1,7 @@
 {
   "name": "refearnapp-monorepo",
   "private": true,
-  "packageManager": "pnpm@10.30.1",
+  "packageManager": "pnpm@10.32.1",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
