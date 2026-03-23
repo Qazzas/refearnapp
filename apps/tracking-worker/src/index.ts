@@ -259,7 +259,12 @@ export default {
 			redirect: 'manual',
 		});
 		// Perform the fetch
-		return await fetch(newRequest);
+		const resp = await fetch(newRequest);
+
+		const newResp = new Response(resp.body, resp);
+		newResp.headers.set('Access-Control-Allow-Origin', url.origin);
+
+		return newResp;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
