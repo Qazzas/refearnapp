@@ -6,7 +6,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "launch:tracker": "pnpm --filter @repo/tracking-worker run deploy:self",
-    "deploy:tracker": "pnpm --filter @repo/tracking-worker exec wrangler deploy --keep-vars",
+    "deploy:tracker": "pnpm --filter @repo/tracking-worker exec wrangler deploy --config wrangler.toml --keep-vars",
     "logs:tracker": "pnpm --filter @repo/tracking-worker exec wrangler tail",
     "db:setup": "pnpm --filter @repo/dashboard run db:setup",
     "deploy:main": "pnpm --filter @repo/tracking-worker exec bun scripts/sync-main.js && pnpm --filter @repo/tracking-worker exec wrangler deploy --keep-vars",
