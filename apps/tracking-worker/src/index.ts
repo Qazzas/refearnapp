@@ -256,7 +256,7 @@ export default {
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-
+		if (!isSelfHosted) newRequest.headers.set('host', 'refearnapp.com');
 		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
