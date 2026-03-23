@@ -256,7 +256,24 @@ export default {
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-		return await fetch(newRequest);
+		const response = await fetch(newRequest);
+		// 🛑 CHECK FOR REDIRECTS (301, 302, 307, 308)
+		if (response.status >= 300 && response.status < 400) {
+			const location = response.headers.get('location');
+
+			if (location && location.includes('origin.refearnapp.com')) {
+				// Create a NEW response so we can modify the Location header
+				const newResponse = new Response(response.body, response);
+
+				// Swap the origin URL back to the clean primary URL
+				const cleanLocation = location.replace('origin.refearnapp.com', 'refearnapp.com');
+				newResponse.headers.set('location', cleanLocation);
+
+				return newResponse;
+			}
+		}
+
+		return response;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
