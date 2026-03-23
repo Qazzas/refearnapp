@@ -29,8 +29,8 @@ export default {
 			'/sitemap-0.xml',
 			'/sitemap.xml',
 		];
-		// const isNextAsset = url.pathname.startsWith('/_next/');
-		// const isStaticImage = /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname);
+		const isNextAsset = url.pathname.startsWith('/_next/');
+		const isStaticImage = /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname);
 		// 2. CHECK IF ROUTE BELONGS TO ASTRO
 		const isHome = url.pathname === '/';
 		const isExplicitAsset = publicAssets.includes(url.pathname);
@@ -52,11 +52,11 @@ export default {
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
 		}
-		// if (isSelfHosted && (isNextAsset || isStaticImage)) {
-		// 	const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
-		// 	const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
-		// 	return await fetch(vpsRequest);
-		// }
+		if (isSelfHosted && (isNextAsset || isStaticImage)) {
+			const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
+			const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
+			return await fetch(vpsRequest);
+		}
 		const origin = request.headers.get('Origin') || '*';
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': '*',
@@ -250,14 +250,14 @@ export default {
 		headers.set('host', PRIMARY_HOST);
 		headers.set('x-forwarded-host', PRIMARY_HOST);
 		headers.set('x-forwarded-proto', 'https');
-		console.log(`[OUTBOUND] ${request.method} -> ${VERCEL_ORIGIN}${url.pathname}`);
-		console.log(`[OUTBOUND HOST] ${headers.get('host')}`);
+		headers.set('x-is-proxy', 'true');
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
+		// Perform the fetch
 		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
