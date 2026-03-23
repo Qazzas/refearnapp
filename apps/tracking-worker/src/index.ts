@@ -252,6 +252,10 @@ export default {
 		headers.set('host', PRIMARY_HOST);
 		headers.set('x-forwarded-host', PRIMARY_HOST);
 		headers.set('x-forwarded-proto', 'https');
+		// Remove Cloudflare headers to prevent the 522 Loop
+		headers.delete('cf-ray');
+		headers.delete('cf-connecting-ip');
+		headers.delete('cf-visitor');
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
