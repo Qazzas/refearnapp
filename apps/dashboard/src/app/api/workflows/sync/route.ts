@@ -113,7 +113,5 @@ export const { POST } = serve(
       })
     }
   },
-  {
-    receiver: undefined,
-  }
+  { baseUrl: process.env.NEXT_PUBLIC_REDIRECTION_URL, receiver: undefined }
 )
