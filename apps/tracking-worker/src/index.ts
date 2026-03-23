@@ -52,7 +52,7 @@ export default {
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
 		}
-		if (isSelfHosted && (isNextAsset || isStaticImage)) {
+		if (isNextAsset || isStaticImage) {
 			const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 			const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
 			return await fetch(vpsRequest);
