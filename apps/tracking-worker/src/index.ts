@@ -252,6 +252,7 @@ export default {
 		headers.set('host', PRIMARY_HOST);
 		headers.set('x-forwarded-host', PRIMARY_HOST);
 		headers.set('x-forwarded-proto', 'https');
+		headers.set('x-is-proxy', 'true');
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
@@ -259,7 +260,28 @@ export default {
 			redirect: 'manual',
 		});
 		// Perform the fetch
-		return await fetch(newRequest);
+		const response = await fetch(newRequest);
+
+		// --- VERCEL SPECIFIC POLISHING ---
+		// If it's NOT self-hosted, we need to fix CORS and Redirects for Vercel/Next.js
+		if (!isSelfHosted) {
+			let newResponse = new Response(response.body, response);
+
+			// 1. Force CORS headers onto the response (Fixes Signup/Login CORS errors)
+			Object.entries(corsHeaders).forEach(([k, v]) => {
+				newResponse.headers.set(k, v);
+			});
+
+			// 2. Intercept Redirects to 'origin' and point them back to the Primary Host
+			const location = newResponse.headers.get('location');
+			if (location && location.includes('origin.refearnapp.com')) {
+				const fixedLocation = location.replace('origin.refearnapp.com', PRIMARY_HOST);
+				newResponse.headers.set('location', fixedLocation);
+			}
+
+			return newResponse;
+		}
+		return response;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
