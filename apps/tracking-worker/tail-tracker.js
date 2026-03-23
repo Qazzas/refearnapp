@@ -11,7 +11,6 @@ async function tail() {
 		process.exit(1);
 	}
 
-	// --- REUSABLE AUTH CHECK ---
 	await checkCloudflareAuth();
 
 	const fileContent = fs.readFileSync(CONFIG_PATH, 'utf-8');
@@ -24,8 +23,17 @@ async function tail() {
 
 	const workerName = workerNameLine.split('=')[1].trim();
 
-	console.log(`\n🕵️  Tailing logs for: ${workerName}...\n`);
-	await $`npx wrangler tail --name ${workerName}`.inherit();
+	console.log(`\n🕵️  Tailing logs for: ${workerName}...`);
+	console.log(`📡 Connecting to Cloudflare...`);
+	console.log(`💡 Press Ctrl+C to stop.\n`);
+
+	try {
+		// .quiet(false) ensures the output is piped to your terminal immediately
+		// .nothrow() prevents the script from crashing when you hit Ctrl+C
+		await $`npx wrangler tail ${workerName}`.quiet(false).nothrow();
+	} catch (e) {
+		// Silent exit
+	}
 }
 
 tail();
