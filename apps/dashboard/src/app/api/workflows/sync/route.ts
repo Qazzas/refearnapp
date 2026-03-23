@@ -3,6 +3,7 @@ import { redis } from "@/lib/redis"
 
 export const { POST } = serve(
   async (context: any) => {
+    console.log("DEBUG: Workflow Payload:", context.requestPayload)
     const internalSecret = process.env.INTERNAL_SECRET
     const originUrl = process.env.NEXT_PUBLIC_REDIRECTION_URL
 
