@@ -15,7 +15,7 @@ export const { POST } = serve(
     const { cron } = context.requestPayload
 
     // --- 5 MINUTE SYNC ---
-    if (cron === "*/5 * * * *") {
+    if (cron === "*/10 * * * *") {
       await context.run("sync-batch", async () => {
         // 1. HANDLE CLICK BATCH
         const clickExists = await redis.exists("sync_batch")

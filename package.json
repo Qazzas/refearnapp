@@ -8,6 +8,8 @@
     "deploy:tracker": "pnpm --filter @repo/tracking-worker run deploy:self",
     "logs:tracker": "pnpm --filter @repo/tracking-worker run logs:tracker",
     "db:setup": "pnpm --filter @repo/dashboard run db:setup",
+    "deploy:main":"pnpm --filter @repo/tracking-worker exec wrangler deploy --keep-vars",
+    "logs:main": "pnpm --filter @repo/tracking-worker exec wrangler tail",
     "db:database:reset": "pnpm --filter @repo/dashboard db:database:reset",
     "lint": "turbo run lint",
     "lint:unused": "eslint . --config eslint.unused.config.mjs",
