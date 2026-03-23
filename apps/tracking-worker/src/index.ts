@@ -260,8 +260,14 @@ export default {
 		});
 		// Perform the fetch
 		const response = await fetch(newRequest);
-		console.log(`[INBOUND] Status: ${response.status}`);
-		console.log(`[INBOUND LOCATION] ${response.headers.get('location') || 'none'}`);
+		// 📊 DIAGNOSTIC LOGS
+		console.log(`--- DEBUG START ---`);
+		console.log(`1. Path: ${url.pathname}`);
+		console.log(`2. Backend URL: ${VERCEL_ORIGIN}${url.pathname}`);
+		console.log(`3. Sent Host Header: ${headers.get('host')}`);
+		console.log(`4. Response Status: ${response.status}`);
+		console.log(`5. Response Location: ${response.headers.get('location') || 'NONE'}`);
+		console.log(`--- DEBUG END ---`);
 		return response;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
