@@ -29,7 +29,8 @@ export default {
 			'/sitemap-0.xml',
 			'/sitemap.xml',
 		];
-
+		const isNextAsset = url.pathname.startsWith('/_next/');
+		const isStaticImage = /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname);
 		// 2. CHECK IF ROUTE BELONGS TO ASTRO
 		const isHome = url.pathname === '/';
 		const isExplicitAsset = publicAssets.includes(url.pathname);
@@ -50,6 +51,11 @@ export default {
 			const newResp = new Response(resp.body, resp);
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
+		}
+		if (isSelfHosted && (isNextAsset || isStaticImage)) {
+			const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
+			const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
+			return await fetch(vpsRequest);
 		}
 		const origin = request.headers.get('Origin') || '*';
 		const corsHeaders = {
