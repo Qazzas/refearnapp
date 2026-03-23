@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
     if (!isSelfHosted && redirectFromHost && baseUrl) {
       return [
         {
+          source: "/:path*",
           has: [
             {
               type: "host",
@@ -30,9 +31,8 @@ const nextConfig: NextConfig = {
               value: redirectFromHost,
             },
           ],
-          source: "/",
           // Sends them to the root of your NEXT_PUBLIC_BASE_URL
-          destination: baseUrl,
+          destination: `${baseUrl.replace(/\/$/, "")}/:path*`,
           permanent: true,
         },
       ]
