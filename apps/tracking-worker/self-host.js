@@ -4,7 +4,7 @@ import path from 'node:path';
 import { checkCloudflareAuth } from './scripts/auth-helper';
 
 const CONFIG_PATH = path.join(process.cwd(), '.env.selfhost');
-
+const TOML_PATH = path.join(process.cwd(), 'wrangler.toml');
 async function setup() {
 	console.log('\n🌐 Voteflow Tracker: Self-Host Deployment\n');
 
@@ -83,12 +83,27 @@ async function setup() {
 
 	// Final safety strip for wrangler command
 	const workerName = config.WORKER_NAME.replace(/^https?[:/-]+/, '');
+	// --- STEP 2: SYNC WRANGLER.TOML ---
 
+	const tomlContent = `
+name = "${workerName}"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+[triggers]
+crons = ["*/10 * * * *", "0 0 * * *"]
+
+[env.dev]
+name = "${workerName}-dev"
+`.trim();
+
+	fs.writeFileSync(TOML_PATH, tomlContent);
+	console.log(`✅ Synced wrangler.toml for: ${workerName}`);
 	// --- STEP 4: DEPLOY ---
 	try {
 		console.log(`\n📦 Deploying to Worker: ${workerName}...`);
 
-		await $`npx wrangler deploy src/index.ts --name ${workerName} --compatibility-date 2026-01-01 --var PRIMARY_HOST:${vpsPrimaryHost} --var MAIN_APP_URL:${mainAppUrl} --var IS_SELF_HOSTED:true`;
+		await $`npx wrangler deploy --config ${TOML_PATH} src/index.ts --name ${workerName} --compatibility-date 2026-01-01 --var PRIMARY_HOST:${vpsPrimaryHost} --var MAIN_APP_URL:${mainAppUrl} --var IS_SELF_HOSTED:true`;
 
 		console.log(`\n🔒 Updating Secrets...`);
 		const setSecret = async (k, v) => {
