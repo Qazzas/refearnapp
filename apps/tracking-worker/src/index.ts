@@ -250,29 +250,18 @@ export default {
 		headers.set('host', PRIMARY_HOST);
 		headers.set('x-forwarded-host', PRIMARY_HOST);
 		headers.set('x-forwarded-proto', 'https');
+		console.log(`[OUTBOUND] ${request.method} -> ${VERCEL_ORIGIN}${url.pathname}`);
+		console.log(`[OUTBOUND HOST] ${headers.get('host')}`);
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
+		// Perform the fetch
 		const response = await fetch(newRequest);
-		// 🛑 CHECK FOR REDIRECTS (301, 302, 307, 308)
-		if (response.status >= 300 && response.status < 400) {
-			const location = response.headers.get('location');
-
-			if (location && location.includes('origin.refearnapp.com')) {
-				// Create a NEW response so we can modify the Location header
-				const newResponse = new Response(response.body, response);
-
-				// Swap the origin URL back to the clean primary URL
-				const cleanLocation = location.replace('origin.refearnapp.com', 'refearnapp.com');
-				newResponse.headers.set('location', cleanLocation);
-
-				return newResponse;
-			}
-		}
-
+		console.log(`[INBOUND] Status: ${response.status}`);
+		console.log(`[INBOUND LOCATION] ${response.headers.get('location') || 'none'}`);
 		return response;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
