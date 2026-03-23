@@ -247,7 +247,8 @@ export default {
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
 		const headers = new Headers(request.headers);
-		headers.set('x-forwarded-host', url.host);
+		headers.set('host', PRIMARY_HOST);
+		headers.set('x-forwarded-host', PRIMARY_HOST);
 		headers.set('x-forwarded-proto', 'https');
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
