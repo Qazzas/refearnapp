@@ -5,6 +5,9 @@ import { and, eq } from "drizzle-orm"
 import { isReservedDomain } from "@/lib/constants/domains"
 
 export async function proxy(req: NextRequest) {
+  if (req.headers.get("x-is-proxy") === "true") {
+    return NextResponse.next()
+  }
   const host = req.headers.get("host")
   if (!host) return NextResponse.next()
 
