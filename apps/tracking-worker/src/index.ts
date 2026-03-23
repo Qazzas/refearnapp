@@ -58,6 +58,7 @@ export default {
 			return await fetch(vpsRequest);
 		}
 		const origin = request.headers.get('Origin') || '*';
+		const allowedHeaders = 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-is-proxy';
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -66,7 +67,7 @@ export default {
 		const credentialedCorsHeaders = {
 			'Access-Control-Allow-Origin': origin,
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-			'Access-Control-Allow-Headers': 'Content-Type',
+			'Access-Control-Allow-Headers': allowedHeaders,
 			'Access-Control-Allow-Credentials': 'true',
 		};
 		if (request.method === 'OPTIONS') {
