@@ -29,8 +29,8 @@ export default {
 			'/sitemap-0.xml',
 			'/sitemap.xml',
 		];
-		const isNextAsset = url.pathname.startsWith('/_next/');
-		const isStaticImage = /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname);
+		// const isNextAsset = url.pathname.startsWith('/_next/');
+		// const isStaticImage = /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname);
 		// 2. CHECK IF ROUTE BELONGS TO ASTRO
 		const isHome = url.pathname === '/';
 		const isExplicitAsset = publicAssets.includes(url.pathname);
@@ -52,11 +52,11 @@ export default {
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
 		}
-		if (isSelfHosted && (isNextAsset || isStaticImage)) {
-			const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
-			const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
-			return await fetch(vpsRequest);
-		}
+		// if (isSelfHosted && (isNextAsset || isStaticImage)) {
+		// 	const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
+		// 	const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
+		// 	return await fetch(vpsRequest);
+		// }
 		const origin = request.headers.get('Origin') || '*';
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': '*',
@@ -258,17 +258,7 @@ export default {
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-		// Perform the fetch
-		const response = await fetch(newRequest);
-		// 📊 DIAGNOSTIC LOGS
-		console.log(`--- DEBUG START ---`);
-		console.log(`1. Path: ${url.pathname}`);
-		console.log(`2. Backend URL: ${VERCEL_ORIGIN}${url.pathname}`);
-		console.log(`3. Sent Host Header: ${headers.get('host')}`);
-		console.log(`4. Response Status: ${response.status}`);
-		console.log(`5. Response Location: ${response.headers.get('location') || 'NONE'}`);
-		console.log(`--- DEBUG END ---`);
-		return response;
+		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
