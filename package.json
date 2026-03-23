@@ -9,6 +9,7 @@
     "deploy:tracker": "pnpm --filter @repo/tracking-worker exec wrangler deploy --config wrangler.toml --keep-vars",
     "logs:tracker": "pnpm --filter @repo/tracking-worker exec wrangler tail --config wrangler.toml",
     "db:setup": "pnpm --filter @repo/dashboard run db:setup",
+    "local:dev":"pnpm dev --filter @repo/dashboard",
     "deploy:main": "pnpm --filter @repo/tracking-worker exec bun scripts/sync-main.js && pnpm --filter @repo/tracking-worker exec wrangler deploy --keep-vars",
     "logs:main": "pnpm --filter @repo/tracking-worker exec bun scripts/sync-main.js && pnpm --filter @repo/tracking-worker exec wrangler tail",
     "db:database:reset": "pnpm --filter @repo/dashboard db:database:reset",
