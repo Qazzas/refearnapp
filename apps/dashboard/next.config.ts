@@ -19,24 +19,24 @@ const redirectFromHost = redirectFromUrl ? getHostname(redirectFromUrl) : null
 
 const nextConfig: NextConfig = {
   async redirects() {
-    // // Only redirect if both URLs are provided and we are in self-hosted mode
-    // if (!isSelfHosted && redirectFromHost && baseUrl) {
-    //   return [
-    //     {
-    //       has: [
-    //         {
-    //           type: "host",
-    //           // Matches the specific host provided in NEXT_PUBLIC_REDIRECTION_URL
-    //           value: redirectFromHost,
-    //         },
-    //       ],
-    //       source: "/",
-    //       // Sends them to the root of your NEXT_PUBLIC_BASE_URL
-    //       destination: baseUrl,
-    //       permanent: true,
-    //     },
-    //   ]
-    // }
+    // Only redirect if both URLs are provided and we are in self-hosted mode
+    if (!isSelfHosted && redirectFromHost && baseUrl) {
+      return [
+        {
+          has: [
+            {
+              type: "host",
+              // Matches the specific host provided in NEXT_PUBLIC_REDIRECTION_URL
+              value: redirectFromHost,
+            },
+          ],
+          source: "/",
+          // Sends them to the root of your NEXT_PUBLIC_BASE_URL
+          destination: baseUrl,
+          permanent: true,
+        },
+      ]
+    }
     return []
   },
 
