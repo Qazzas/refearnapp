@@ -267,11 +267,11 @@ export default {
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
 		const headers = new Headers(request.headers);
-		headers.set('host', new URL(VERCEL_ORIGIN).host);
+		headers.set('host', PRIMARY_HOST);
 		headers.delete('x-forwarded-host');
 		headers.delete('x-forwarded-proto');
-		if (origin !== '*') {
-			headers.set('origin', VERCEL_ORIGIN);
+		if (url.searchParams.has('_rsc')) {
+			headers.set('rsc', '1');
 		}
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
@@ -281,37 +281,36 @@ export default {
 		});
 		const response = await fetch(newRequest);
 
-		// If Vercel tries to send the user to the 'origin' domain, we rewrite it back to 'refearnapp.com'
-		let finalStatus = response.status;
-		const finalHeaders = new Headers(response.headers);
-
+		// 3. INTERCEPT REDIRECTS (Break the loop)
+		// If the response is a redirect to our own domain, it means Vercel
+		// accepted the request but wants to move us. We just follow it INTERNALLY.
 		if ([301, 302, 307, 308].includes(response.status)) {
 			const location = response.headers.get('Location');
-			if (location && location.includes('origin.refearnapp.com')) {
-				// Stay on the clean domain
-				finalHeaders.set('Location', location.replace('origin.refearnapp.com', 'refearnapp.com'));
+			if (location && (location.includes(PRIMARY_HOST) || location.includes('origin.refearnapp.com'))) {
+				// Instead of telling the browser to redirect, we fetch the NEW location ourselves
+				const redirectUrl = new URL(location);
+				return await this.fetch(new Request(redirectUrl.toString(), request), env, ctx);
 			}
 		}
+
+		// 4. CLEANUP AND CORS
+		const finalResponse = new Response(response.body, response);
+
+		// Mask Cookies
 		const setCookie = response.headers.get('set-cookie');
-		if (setCookie && setCookie.includes('origin.refearnapp.com')) {
-			finalHeaders.set('set-cookie', setCookie.replace(/domain=origin\.refearnapp\.com/g, 'domain=refearnapp.com'));
+		if (setCookie) {
+			finalResponse.headers.set('set-cookie', setCookie.replace(/origin\.refearnapp\.com/g, 'refearnapp.com'));
 		}
 
-		// 4. RETURN THE RESPONSE
-		const newResponse = new Response(response.body, {
-			status: finalStatus,
-			headers: finalHeaders,
-		});
-
-		// Apply CORS to the final masked response
-		newResponse.headers.set('Access-Control-Allow-Origin', origin);
-		newResponse.headers.set('Access-Control-Allow-Credentials', 'true');
-		newResponse.headers.set(
+		// Final CORS injection
+		finalResponse.headers.set('Access-Control-Allow-Origin', origin);
+		finalResponse.headers.set('Access-Control-Allow-Credentials', 'true');
+		finalResponse.headers.set(
 			'Access-Control-Allow-Headers',
 			'Content-Type, rsc, next-router-prefetch, next-router-segment-prefetch, next-url, x-nextjs-data, accept',
 		);
 
-		return newResponse;
+		return finalResponse;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
