@@ -267,9 +267,12 @@ export default {
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
 		const headers = new Headers(request.headers);
-		headers.set('host', PRIMARY_HOST);
-		headers.set('x-forwarded-host', PRIMARY_HOST);
-		headers.set('x-forwarded-proto', 'https');
+		headers.set('host', new URL(VERCEL_ORIGIN).host);
+		headers.delete('x-forwarded-host');
+		headers.delete('x-forwarded-proto');
+		if (origin !== '*') {
+			headers.set('origin', VERCEL_ORIGIN);
+		}
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
@@ -278,28 +281,31 @@ export default {
 		});
 		const response = await fetch(newRequest);
 
-		// 1. Rewrite the Location header if Vercel tries to redirect to the origin domain
-		let finalResponse = response;
+		// If Vercel tries to send the user to the 'origin' domain, we rewrite it back to 'refearnapp.com'
+		let finalStatus = response.status;
+		const finalHeaders = new Headers(response.headers);
+
 		if ([301, 302, 307, 308].includes(response.status)) {
 			const location = response.headers.get('Location');
-			if (location) {
-				const newLocation = location.replace('origin.refearnapp.com', 'refearnapp.com');
-
-				// Create a new response with the corrected URL
-				finalResponse = new Response(response.body, {
-					status: response.status,
-					statusText: response.statusText,
-					headers: response.headers,
-				});
-				finalResponse.headers.set('Location', newLocation);
+			if (location && location.includes('origin.refearnapp.com')) {
+				// Stay on the clean domain
+				finalHeaders.set('Location', location.replace('origin.refearnapp.com', 'refearnapp.com'));
 			}
 		}
+		const setCookie = response.headers.get('set-cookie');
+		if (setCookie && setCookie.includes('origin.refearnapp.com')) {
+			finalHeaders.set('set-cookie', setCookie.replace(/domain=origin\.refearnapp\.com/g, 'domain=refearnapp.com'));
+		}
 
-		// 2. THE HEADER WRAPPER (Updated to use finalResponse)
-		const newResponse = new Response(finalResponse.body, finalResponse);
+		// 4. RETURN THE RESPONSE
+		const newResponse = new Response(response.body, {
+			status: finalStatus,
+			headers: finalHeaders,
+		});
+
+		// Apply CORS to the final masked response
 		newResponse.headers.set('Access-Control-Allow-Origin', origin);
 		newResponse.headers.set('Access-Control-Allow-Credentials', 'true');
-		// Ensure these match your OPTIONS block perfectly
 		newResponse.headers.set(
 			'Access-Control-Allow-Headers',
 			'Content-Type, rsc, next-router-prefetch, next-router-segment-prefetch, next-url, x-nextjs-data, accept',
