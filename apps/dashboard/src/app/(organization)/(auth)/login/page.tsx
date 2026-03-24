@@ -1,6 +1,5 @@
 import React from "react"
 import Login from "@/components/pages/Login"
-import { redirectIfAuthed } from "@/lib/server/auth/authGuards"
 import type { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 export const metadata: Metadata = buildMetadata({
@@ -10,7 +9,6 @@ export const metadata: Metadata = buildMetadata({
   indexable: false,
 })
 const loginPage = async () => {
-  await redirectIfAuthed()
   return (
     <>
       <Login affiliate={false} plan={"ULTIMATE"} />
