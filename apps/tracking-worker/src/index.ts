@@ -72,17 +72,8 @@ export default {
 			'Access-Control-Allow-Credentials': 'true',
 		};
 		if (request.method === 'OPTIONS') {
-			return new Response(null, {
-				status: 204,
-				headers: {
-					'Access-Control-Allow-Origin': request.headers.get('Origin') || '*',
-					'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-					// THIS LINE BELOW IS THE CURE:
-					'Access-Control-Allow-Headers': 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-nextjs-data',
-					'Access-Control-Allow-Credentials': 'true',
-					'Access-Control-Max-Age': '86400',
-				},
-			});
+			const isCredentialed = url.pathname === '/track-signup';
+			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
 		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
@@ -267,12 +258,8 @@ export default {
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-		const response = await fetch(newRequest);
-		const finalResponse = new Response(response.body, response);
-		finalResponse.headers.set('Access-Control-Allow-Origin', origin);
-		finalResponse.headers.set('Access-Control-Allow-Credentials', 'true');
-
-		return finalResponse;
+		// Perform the fetch
+		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));

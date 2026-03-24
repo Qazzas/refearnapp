@@ -86,24 +86,9 @@ export async function proxy(req: NextRequest) {
   const response = NextResponse.rewrite(rewriteUrl)
   response.headers.set("x-current-host", host)
 
-  return addCorsHeaders(response, req)
+  return response
 }
-function addCorsHeaders(res: NextResponse, req: NextRequest) {
-  const origin = req.headers.get("origin") || "*"
 
-  res.headers.set("Access-Control-Allow-Origin", origin)
-  res.headers.set("Access-Control-Allow-Credentials", "true")
-  res.headers.set(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  )
-  res.headers.set(
-    "Access-Control-Allow-Headers",
-    "Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, accept, x-nextjs-data"
-  )
-
-  return res
-}
 export const config = {
   matcher: ["/((?!_next|api|.*\\..*).*)"],
 }
