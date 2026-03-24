@@ -1,10 +1,11 @@
 import { db } from "@/db/drizzle"
 import { subscription, purchase, organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { syncOrgDataToRedisLinks } from "@/lib/server/organization/syncOrgDataToRedisLinks"
 import { parseArgs } from "util"
 
-// This script is specifically for GitHub Actions
+// Note: We REMOVED the static import of syncOrgDataToRedisLinks from the top
+// to prevent early Redis initialization crashes.
+
 async function githubSetUserPlan({
   userId,
   plan,
@@ -15,6 +16,10 @@ async function githubSetUserPlan({
   type: "FREE" | "SUBSCRIPTION" | "PURCHASE"
 }) {
   try {
+    // 1. LAZY LOAD the sync function (This prevents the early URL error)
+    const { syncOrgDataToRedisLinks } =
+      await import("@/lib/server/organization/syncOrgDataToRedisLinks")
+
     const userOrg = await db.query.organization.findFirst({
       where: eq(organization.userId, userId),
     })
@@ -61,6 +66,7 @@ async function githubSetUserPlan({
       })
     }
 
+    // 2. Sync to Redis now that we know the environment is loaded
     await syncOrgDataToRedisLinks(userOrg.id, {
       planType: plan as "FREE" | "PRO" | "ULTIMATE",
       paymentType: paymentType,
@@ -69,21 +75,20 @@ async function githubSetUserPlan({
 
     console.info(`✅ Successfully set ${type} plan "${plan}" for ${userId}`)
   } catch (error) {
-    console.error(`❌ Sync Failed:`, error)
+    console.error(`❌ Operation Failed:`, error)
     process.exit(1)
   }
 }
 
 async function main() {
-  if (
-    !process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.UPSTASH_REDIS_REST_URL === ""
-  ) {
+  // Helpful debug check for GitHub Logs
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
     console.error(
-      "❌ ERROR: UPSTASH_REDIS_REST_URL is missing in the environment."
+      "❌ ERROR: UPSTASH_REDIS_REST_URL is undefined in process.env"
     )
     process.exit(1)
   }
+
   const { values } = parseArgs({
     args: process.argv.slice(2),
     options: {
@@ -94,13 +99,11 @@ async function main() {
     strict: false,
   })
 
-  // Add type assertions (as string) to satisfy the compiler
   const userId =
     (values.userId as string) || (process.env.TARGET_USER_ID as string)
   const plan = values.plan as "FREE" | "PRO" | "ULTIMATE"
   const type = values.type as "FREE" | "SUBSCRIPTION" | "PURCHASE"
 
-  // Check that they aren't undefined or empty before calling the function
   if (!userId || !plan || !type) {
     console.error("❌ Missing required arguments: --userId, --plan, --type")
     process.exit(1)
