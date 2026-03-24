@@ -71,9 +71,20 @@ export default {
 			'Access-Control-Allow-Headers': allowedHeaders,
 			'Access-Control-Allow-Credentials': 'true',
 		};
+		const allAllowedHeaders = 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-is-proxy, x-nextjs-data';
+		const universalCorsHeaders = {
+			'Access-Control-Allow-Origin': request.headers.get('Origin') || '*',
+			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+			'Access-Control-Allow-Headers': allAllowedHeaders,
+			'Access-Control-Allow-Credentials': 'true',
+		};
+
+		// 2. Handle ALL preflights immediately
 		if (request.method === 'OPTIONS') {
-			const isCredentialed = url.pathname === '/track-signup';
-			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
+			return new Response(null, {
+				status: 204, // 204 No Content is standard for OPTIONS
+				headers: universalCorsHeaders,
+			});
 		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
