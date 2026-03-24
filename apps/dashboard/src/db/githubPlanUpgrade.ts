@@ -1,10 +1,26 @@
-import { db } from "@/db/drizzle"
-import { subscription, purchase, organization } from "@/db/schema"
-import { eq } from "drizzle-orm"
 import { parseArgs } from "util"
 
-// Note: We REMOVED the static import of syncOrgDataToRedisLinks from the top
-// to prevent early Redis initialization crashes.
+// 🚨 MOVE LOGS TO THE ABSOLUTE TOP
+console.log("--- DEBUGGING ENV VARIABLES ---")
+console.log(
+  "TARGET_USER_ID:",
+  process.env.TARGET_USER_ID ? "✅ Present" : "❌ Missing"
+)
+console.log(
+  "DATABASE_URL:",
+  process.env.DATABASE_URL ? "✅ Present" : "❌ Missing"
+)
+console.log(
+  "REDIS_URL:",
+  process.env.UPSTASH_REDIS_REST_URL
+    ? `✅ Starts with: ${process.env.UPSTASH_REDIS_REST_URL.substring(0, 8)}...`
+    : "❌ Missing"
+)
+console.log(
+  "REDIS_TOKEN:",
+  process.env.UPSTASH_REDIS_REST_TOKEN ? "✅ Present" : "❌ Missing"
+)
+console.log("-------------------------------")
 
 async function githubSetUserPlan({
   userId,
@@ -16,7 +32,10 @@ async function githubSetUserPlan({
   type: "FREE" | "SUBSCRIPTION" | "PURCHASE"
 }) {
   try {
-    // 1. LAZY LOAD the sync function (This prevents the early URL error)
+    // DYNAMIC IMPORTS: Only load DB and Redis logic AFTER we've logged everything
+    const { db } = await import("@/db/drizzle")
+    const { subscription, purchase, organization } = await import("@/db/schema")
+    const { eq } = await import("drizzle-orm")
     const { syncOrgDataToRedisLinks } =
       await import("@/lib/server/organization/syncOrgDataToRedisLinks")
 
@@ -66,7 +85,6 @@ async function githubSetUserPlan({
       })
     }
 
-    // 2. Sync to Redis now that we know the environment is loaded
     await syncOrgDataToRedisLinks(userOrg.id, {
       planType: plan as "FREE" | "PRO" | "ULTIMATE",
       paymentType: paymentType,
@@ -81,14 +99,6 @@ async function githubSetUserPlan({
 }
 
 async function main() {
-  // Helpful debug check for GitHub Logs
-  if (!process.env.UPSTASH_REDIS_REST_URL) {
-    console.error(
-      "❌ ERROR: UPSTASH_REDIS_REST_URL is undefined in process.env"
-    )
-    process.exit(1)
-  }
-
   const { values } = parseArgs({
     args: process.argv.slice(2),
     options: {
@@ -101,8 +111,8 @@ async function main() {
 
   const userId =
     (values.userId as string) || (process.env.TARGET_USER_ID as string)
-  const plan = values.plan as "FREE" | "PRO" | "ULTIMATE"
-  const type = values.type as "FREE" | "SUBSCRIPTION" | "PURCHASE"
+  const plan = values.plan as any
+  const type = values.type as any
 
   if (!userId || !plan || !type) {
     console.error("❌ Missing required arguments: --userId, --plan, --type")
