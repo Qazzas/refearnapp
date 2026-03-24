@@ -8,11 +8,6 @@ export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
-		const method = request.method;
-		const origin = request.headers.get('Origin') || '*';
-		console.log(`[Request] ${method} ${url.pathname}${url.search}`);
-		console.log(`[Origin] ${origin}`);
-		console.log(`[Request Headers]`, JSON.stringify(Object.fromEntries(request.headers.entries())));
 		const PAGES_URL = env.PAGES_URL || 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = env.PRIMARY_HOST || 'www.refearnapp.com';
@@ -48,43 +43,35 @@ export default {
 		const isCompiledAsset = url.pathname.startsWith('/_astro/');
 		const isDocsPage = url.pathname.startsWith('/docs');
 		const shouldServeAstro =
-			isExplicitAsset || isCompiledAsset || isHome || isLegalPage || isContactPage || isToolPage || isComparePage || isDocsPage;
+			isExplicitAsset ||
+			isCompiledAsset ||
+			(!isSelfHosted && (isHome || isLegalPage || isContactPage || isToolPage || isComparePage || isDocsPage));
 		if (shouldServeAstro) {
 			const resp = await fetch(`${PAGES_URL}${url.pathname}${url.search}`);
 			const newResp = new Response(resp.body, resp);
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
 			return newResp;
 		}
-		if (isNextAsset || isStaticImage) {
+		if (isSelfHosted && (isNextAsset || isStaticImage)) {
 			const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 			const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
 			return await fetch(vpsRequest);
 		}
-		const allowedHeaders = 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-is-proxy';
+		const origin = request.headers.get('Origin') || '*';
 		const corsHeaders = {
-			'Access-Control-Allow-Origin': origin,
+			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-			'Access-Control-Allow-Headers': allowedHeaders,
-			'Access-Control-Allow-Credentials': 'true',
+			'Access-Control-Allow-Headers': 'Content-Type',
 		};
 		const credentialedCorsHeaders = {
 			'Access-Control-Allow-Origin': origin,
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-			'Access-Control-Allow-Headers': allowedHeaders,
+			'Access-Control-Allow-Headers': 'Content-Type',
 			'Access-Control-Allow-Credentials': 'true',
 		};
 		if (request.method === 'OPTIONS') {
-			return new Response(null, {
-				status: 204,
-				headers: {
-					'Access-Control-Allow-Origin': request.headers.get('Origin') || '*',
-					'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-					// THIS LINE BELOW IS THE CURE:
-					'Access-Control-Allow-Headers': 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-nextjs-data',
-					'Access-Control-Allow-Credentials': 'true',
-					'Access-Control-Max-Age': '86400',
-				},
-			});
+			const isCredentialed = url.pathname === '/track-signup';
+			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
 		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
@@ -269,7 +256,7 @@ export default {
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-		// Perform the fetch
+
 		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
