@@ -1,0 +1,48 @@
+name: Plan Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target Environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options: [dev, prod]
+      target_user_id:
+        description: 'User ID to upgrade'
+        required: true
+        default: '29022934-eb52-49af-aca4-b6ed553c89dd'
+      plan:
+        description: 'Select Plan Tier'
+        required: true
+        type: choice
+        options: [FREE, PRO, ULTIMATE]
+      type:
+        description: 'Select Payment Type'
+        required: true
+        type: choice
+        options: [FREE, SUBSCRIPTION, PURCHASE]
+
+jobs:
+  upgrade-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Run Upgrade Script
+        env:
+          # Dynamic DB and Redis selection based on 'target' input
+          DATABASE_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+          UPSTASH_REDIS_REST_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_REDIS_URL || secrets.DEV_REDIS_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ github.event.inputs.target == 'prod' && secrets.PROD_REDIS_TOKEN || secrets.DEV_REDIS_TOKEN }}
+        run: |
+          cd apps/dashboard
+          bun src/db/githubPlanUpgrade.ts --userId "${{ github.event.inputs.target_user_id }}" --plan "${{ github.event.inputs.plan }}" --type "${{ github.event.inputs.type }}"
