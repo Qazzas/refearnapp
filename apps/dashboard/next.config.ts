@@ -18,28 +18,6 @@ const baseHost = getHostname(baseUrl)
 const redirectFromHost = redirectFromUrl ? getHostname(redirectFromUrl) : null
 
 const nextConfig: NextConfig = {
-  async headers() {
-    return [
-      {
-        // Match ALL routes, including /_next/ and root
-        source: "/:path*",
-        headers: [
-          { key: "Access-Control-Allow-Credentials", value: "true" },
-          // Allow both your proxy domain and the origin domain
-          { key: "Access-Control-Allow-Origin", value: `https://${baseHost}` },
-          {
-            key: "Access-Control-Allow-Methods",
-            value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-          },
-          {
-            key: "Access-Control-Allow-Headers",
-            value:
-              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-Type, Date, X-Api-Version, rsc, next-router-state-tree, next-router-prefetch, next-url",
-          },
-        ],
-      },
-    ]
-  },
   async redirects() {
     // Only redirect if both URLs are provided and we are in self-hosted mode
     if (!isSelfHosted && redirectFromHost && baseUrl) {
