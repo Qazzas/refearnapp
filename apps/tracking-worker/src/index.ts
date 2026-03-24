@@ -267,8 +267,12 @@ export default {
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-		// Perform the fetch
-		return await fetch(newRequest);
+		const response = await fetch(newRequest);
+		const finalResponse = new Response(response.body, response);
+		finalResponse.headers.set('Access-Control-Allow-Origin', origin);
+		finalResponse.headers.set('Access-Control-Allow-Credentials', 'true');
+
+		return finalResponse;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
