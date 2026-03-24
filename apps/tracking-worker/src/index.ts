@@ -63,7 +63,8 @@ export default {
 			return await fetch(vpsRequest);
 		}
 
-		const allowedHeaders = 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-is-proxy';
+		const allowedHeaders =
+			'Content-Type, rsc, next-router-prefetch, next-router-segment-prefetch, next-url, x-is-proxy, x-nextjs-data, accept';
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': origin,
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -78,8 +79,16 @@ export default {
 		};
 		if (request.method === 'OPTIONS') {
 			console.log(`[CORS] Handling Preflight for ${url.pathname}`);
-			const isCredentialed = url.pathname === '/track-signup';
-			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
+			return new Response(null, {
+				status: 204,
+				headers: {
+					'Access-Control-Allow-Origin': origin,
+					'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+					'Access-Control-Allow-Headers': allowedHeaders, // Use the updated string here
+					'Access-Control-Allow-Credentials': 'true',
+					'Access-Control-Max-Age': '86400',
+				},
+			});
 		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
