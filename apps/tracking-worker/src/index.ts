@@ -61,9 +61,7 @@ export default {
 		const isCompiledAsset = url.pathname.startsWith('/_astro/');
 		const isDocsPage = url.pathname.startsWith('/docs');
 		const shouldServeAstro =
-			isExplicitAsset ||
-			isCompiledAsset ||
-			(!isSelfHosted && (isHome || isLegalPage || isContactPage || isToolPage || isComparePage || isDocsPage));
+			isExplicitAsset || isCompiledAsset || isHome || isLegalPage || isContactPage || isToolPage || isComparePage || isDocsPage;
 		if (shouldServeAstro) {
 			const resp = await fetch(`${PAGES_URL}${url.pathname}${url.search}`);
 			const newResp = new Response(resp.body, resp);
@@ -89,9 +87,17 @@ export default {
 			'Access-Control-Allow-Credentials': 'true',
 		};
 		if (request.method === 'OPTIONS') {
-			console.log(`[CORS] Handling Preflight for ${url.pathname}`);
-			const isCredentialed = url.pathname === '/track-signup';
-			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
+			return new Response(null, {
+				status: 204,
+				headers: {
+					'Access-Control-Allow-Origin': request.headers.get('Origin') || '*',
+					'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+					// THIS LINE BELOW IS THE CURE:
+					'Access-Control-Allow-Headers': 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-nextjs-data',
+					'Access-Control-Allow-Credentials': 'true',
+					'Access-Control-Max-Age': '86400',
+				},
+			});
 		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
@@ -268,49 +274,16 @@ export default {
 		}
 		const headers = new Headers(request.headers);
 		headers.set('host', PRIMARY_HOST);
-		headers.delete('x-forwarded-host');
-		headers.delete('x-forwarded-proto');
-		if (url.searchParams.has('_rsc')) {
-			headers.set('rsc', '1');
-		}
+		headers.set('x-forwarded-host', PRIMARY_HOST);
+		headers.set('x-forwarded-proto', 'https');
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, {
 			method: request.method,
 			headers: headers,
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-		const response = await fetch(newRequest);
-
-		// 3. INTERCEPT REDIRECTS (Break the loop)
-		// If the response is a redirect to our own domain, it means Vercel
-		// accepted the request but wants to move us. We just follow it INTERNALLY.
-		if ([301, 302, 307, 308].includes(response.status)) {
-			const location = response.headers.get('Location');
-			if (location && (location.includes(PRIMARY_HOST) || location.includes('origin.refearnapp.com'))) {
-				// Instead of telling the browser to redirect, we fetch the NEW location ourselves
-				const redirectUrl = new URL(location);
-				return await this.fetch(new Request(redirectUrl.toString(), request), env, ctx);
-			}
-		}
-
-		// 4. CLEANUP AND CORS
-		const finalResponse = new Response(response.body, response);
-
-		// Mask Cookies
-		const setCookie = response.headers.get('set-cookie');
-		if (setCookie) {
-			finalResponse.headers.set('set-cookie', setCookie.replace(/origin\.refearnapp\.com/g, 'refearnapp.com'));
-		}
-
-		// Final CORS injection
-		finalResponse.headers.set('Access-Control-Allow-Origin', origin);
-		finalResponse.headers.set('Access-Control-Allow-Credentials', 'true');
-		finalResponse.headers.set(
-			'Access-Control-Allow-Headers',
-			'Content-Type, rsc, next-router-prefetch, next-router-segment-prefetch, next-url, x-nextjs-data, accept',
-		);
-
-		return finalResponse;
+		// Perform the fetch
+		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
