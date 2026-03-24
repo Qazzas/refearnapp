@@ -8,6 +8,11 @@ export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
+		const method = request.method;
+		const origin = request.headers.get('Origin') || '*';
+		console.log(`[Request] ${method} ${url.pathname}${url.search}`);
+		console.log(`[Origin] ${origin}`);
+		console.log(`[Request Headers]`, JSON.stringify(Object.fromEntries(request.headers.entries())));
 		const PAGES_URL = env.PAGES_URL || 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = env.PRIMARY_HOST || 'www.refearnapp.com';
@@ -57,7 +62,7 @@ export default {
 			const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
 			return await fetch(vpsRequest);
 		}
-		const origin = request.headers.get('Origin') || '*';
+
 		const allowedHeaders = 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-is-proxy';
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': origin,
@@ -72,6 +77,7 @@ export default {
 			'Access-Control-Allow-Credentials': 'true',
 		};
 		if (request.method === 'OPTIONS') {
+			console.log(`[CORS] Handling Preflight for ${url.pathname}`);
 			const isCredentialed = url.pathname === '/track-signup';
 			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
 		}
