@@ -13,6 +13,19 @@ export default {
 		console.log(`[Request] ${method} ${url.pathname}${url.search}`);
 		console.log(`[Origin] ${origin}`);
 		console.log(`[Request Headers]`, JSON.stringify(Object.fromEntries(request.headers.entries())));
+		if (method === 'OPTIONS') {
+			return new Response(null, {
+				status: 204,
+				headers: {
+					'Access-Control-Allow-Origin': origin,
+					'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+					'Access-Control-Allow-Headers':
+						'Content-Type, rsc, next-router-prefetch, next-router-segment-prefetch, next-url, x-nextjs-data, accept',
+					'Access-Control-Allow-Credentials': 'true',
+					'Access-Control-Max-Age': '86400',
+				},
+			});
+		}
 		const PAGES_URL = env.PAGES_URL || 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = env.PRIMARY_HOST || 'www.refearnapp.com';
@@ -62,9 +75,7 @@ export default {
 			const vpsRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
 			return await fetch(vpsRequest);
 		}
-
-		const allowedHeaders =
-			'Content-Type, rsc, next-router-prefetch, next-router-segment-prefetch, next-url, x-is-proxy, x-nextjs-data, accept';
+		const allowedHeaders = 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-is-proxy';
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': origin,
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -79,16 +90,8 @@ export default {
 		};
 		if (request.method === 'OPTIONS') {
 			console.log(`[CORS] Handling Preflight for ${url.pathname}`);
-			return new Response(null, {
-				status: 204,
-				headers: {
-					'Access-Control-Allow-Origin': origin,
-					'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-					'Access-Control-Allow-Headers': allowedHeaders, // Use the updated string here
-					'Access-Control-Allow-Credentials': 'true',
-					'Access-Control-Max-Age': '86400',
-				},
-			});
+			const isCredentialed = url.pathname === '/track-signup';
+			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
 		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
