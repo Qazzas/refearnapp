@@ -1,6 +1,6 @@
 import { parseArgs } from "util"
 
-// 🚨 MOVE LOGS TO THE ABSOLUTE TOP
+// 🚨 TOP-LEVEL LOGS FOR GITHUB ACTIONS DEBUGGING
 console.log("--- DEBUGGING ENV VARIABLES ---")
 console.log(
   "TARGET_USER_ID:",
@@ -32,7 +32,7 @@ async function githubSetUserPlan({
   type: "FREE" | "SUBSCRIPTION" | "PURCHASE"
 }) {
   try {
-    // DYNAMIC IMPORTS: Only load DB and Redis logic AFTER we've logged everything
+    // DYNAMIC IMPORTS to prevent early connection initialization
     const { db } = await import("@/db/drizzle")
     const { subscription, purchase, organization } = await import("@/db/schema")
     const { eq } = await import("drizzle-orm")
@@ -47,6 +47,7 @@ async function githubSetUserPlan({
       throw new Error(`❌ No organization found for user ${userId}.`)
     }
 
+    // 🧹 Clean existing records
     await db.delete(subscription).where(eq(subscription.userId, userId))
     await db.delete(purchase).where(eq(purchase.userId, userId))
 
@@ -85,6 +86,7 @@ async function githubSetUserPlan({
       })
     }
 
+    // 🔥 Sync to Redis
     await syncOrgDataToRedisLinks(userOrg.id, {
       planType: plan as "FREE" | "PRO" | "ULTIMATE",
       paymentType: paymentType,
@@ -94,7 +96,7 @@ async function githubSetUserPlan({
     console.info(`✅ Successfully set ${type} plan "${plan}" for ${userId}`)
   } catch (error) {
     console.error(`❌ Operation Failed:`, error)
-    process.exit(1)
+    process.exit(1) // Exit with error code
   }
 }
 
@@ -120,6 +122,10 @@ async function main() {
   }
 
   await githubSetUserPlan({ userId, plan, type })
+
+  // ✅ FORCE SHUTDOWN: Closes DB/Redis dangling connections
+  console.log("👋 Closing process...")
+  process.exit(0)
 }
 
 main().catch((err) => {
