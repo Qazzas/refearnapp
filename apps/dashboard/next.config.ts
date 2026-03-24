@@ -18,6 +18,34 @@ const baseHost = getHostname(baseUrl)
 const redirectFromHost = redirectFromUrl ? getHostname(redirectFromUrl) : null
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        // Match all API routes
+        source: "/:path*",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            // Use a specific origin here in production, e.g., "https://your-frontend-domain.com"
+            value: "*",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, DELETE, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            // Specify all headers your clients might send, e.g., "Content-Type, Authorization"
+            value: "Content-Type, Authorization",
+          },
+          {
+            key: "Access-Control-Allow-Credentials",
+            value: "true",
+          },
+        ],
+      },
+    ]
+  },
   async redirects() {
     // Only redirect if both URLs are provided and we are in self-hosted mode
     if (!isSelfHosted && redirectFromHost && baseUrl) {
