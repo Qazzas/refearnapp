@@ -92,7 +92,10 @@ compatibility_date = "2026-01-01"
 
 [triggers]
 crons = ["*/10 * * * *", "0 0 * * *"]
-
+[observability]
+[observability.logs]
+enabled = false
+invocation_logs = true
 [env.dev]
 name = "${workerName}-dev"
 `.trim();

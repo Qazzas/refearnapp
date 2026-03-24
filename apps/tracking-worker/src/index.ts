@@ -258,8 +258,16 @@ export default {
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
 			redirect: 'manual',
 		});
-		// Perform the fetch
-		return await fetch(newRequest);
+		const response = await fetch(newRequest);
+
+		// 4. THE HEADER WRAPPER
+		// This ensures the browser gets the CORS permission on the ACTUAL data response too
+		const newResponse = new Response(response.body, response);
+		newResponse.headers.set('Access-Control-Allow-Origin', origin);
+		newResponse.headers.set('Access-Control-Allow-Credentials', 'true');
+		newResponse.headers.set('Access-Control-Allow-Headers', allowedHeaders);
+
+		return newResponse;
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
