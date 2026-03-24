@@ -72,8 +72,17 @@ export default {
 			'Access-Control-Allow-Credentials': 'true',
 		};
 		if (request.method === 'OPTIONS') {
-			const isCredentialed = url.pathname === '/track-signup';
-			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
+			return new Response(null, {
+				status: 204,
+				headers: {
+					'Access-Control-Allow-Origin': request.headers.get('Origin') || '*',
+					'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+					// THIS LINE BELOW IS THE CURE:
+					'Access-Control-Allow-Headers': 'Content-Type, rsc, next-router-state-tree, next-router-prefetch, next-url, x-nextjs-data',
+					'Access-Control-Allow-Credentials': 'true',
+					'Access-Control-Max-Age': '86400',
+				},
+			});
 		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
