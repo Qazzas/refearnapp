@@ -21,26 +21,20 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Match all API routes
+        // Match ALL routes, including /_next/ and root
         source: "/:path*",
         headers: [
-          {
-            key: "Access-Control-Allow-Origin",
-            // Use a specific origin here in production, e.g., "https://your-frontend-domain.com"
-            value: "*",
-          },
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          // Allow both your proxy domain and the origin domain
+          { key: "Access-Control-Allow-Origin", value: `https://${baseHost}` },
           {
             key: "Access-Control-Allow-Methods",
-            value: "GET, POST, PUT, DELETE, OPTIONS",
+            value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
           },
           {
             key: "Access-Control-Allow-Headers",
-            // Specify all headers your clients might send, e.g., "Content-Type, Authorization"
-            value: "Content-Type, Authorization",
-          },
-          {
-            key: "Access-Control-Allow-Credentials",
-            value: "true",
+            value:
+              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-Type, Date, X-Api-Version, rsc, next-router-state-tree, next-router-prefetch, next-url",
           },
         ],
       },
