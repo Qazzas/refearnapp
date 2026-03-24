@@ -1,11 +1,8 @@
 import { db } from "@/db/drizzle"
 import { redis } from "@/lib/redis"
-import { eq, inArray } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import {
   organization,
-  affiliateLink,
-  affiliateInvoice,
-  subscriptionExpiration,
   user,
   organizationAuthCustomization,
   organizationDashboardCustomization,
