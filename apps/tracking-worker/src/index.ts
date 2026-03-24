@@ -278,12 +278,32 @@ export default {
 		});
 		const response = await fetch(newRequest);
 
-		// 4. THE HEADER WRAPPER
-		// This ensures the browser gets the CORS permission on the ACTUAL data response too
-		const newResponse = new Response(response.body, response);
+		// 1. Rewrite the Location header if Vercel tries to redirect to the origin domain
+		let finalResponse = response;
+		if ([301, 302, 307, 308].includes(response.status)) {
+			const location = response.headers.get('Location');
+			if (location) {
+				const newLocation = location.replace('origin.refearnapp.com', 'refearnapp.com');
+
+				// Create a new response with the corrected URL
+				finalResponse = new Response(response.body, {
+					status: response.status,
+					statusText: response.statusText,
+					headers: response.headers,
+				});
+				finalResponse.headers.set('Location', newLocation);
+			}
+		}
+
+		// 2. THE HEADER WRAPPER (Updated to use finalResponse)
+		const newResponse = new Response(finalResponse.body, finalResponse);
 		newResponse.headers.set('Access-Control-Allow-Origin', origin);
 		newResponse.headers.set('Access-Control-Allow-Credentials', 'true');
-		newResponse.headers.set('Access-Control-Allow-Headers', allowedHeaders);
+		// Ensure these match your OPTIONS block perfectly
+		newResponse.headers.set(
+			'Access-Control-Allow-Headers',
+			'Content-Type, rsc, next-router-prefetch, next-router-segment-prefetch, next-url, x-nextjs-data, accept',
+		);
 
 		return newResponse;
 	},
