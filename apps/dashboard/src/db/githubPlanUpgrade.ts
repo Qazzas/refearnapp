@@ -75,6 +75,15 @@ async function githubSetUserPlan({
 }
 
 async function main() {
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.UPSTASH_REDIS_REST_URL === ""
+  ) {
+    console.error(
+      "❌ ERROR: UPSTASH_REDIS_REST_URL is missing in the environment."
+    )
+    process.exit(1)
+  }
   const { values } = parseArgs({
     args: process.argv.slice(2),
     options: {
