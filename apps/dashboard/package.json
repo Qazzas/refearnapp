@@ -11,6 +11,7 @@
     "lint": "next lint",
     "db:migrate": "dotenv -e .env.nextjs -- drizzle-kit migrate",
     "db:reset": "bun src/db/reset.ts npx drizzle-kit generate && npx drizzle-kit migrate && bun src/db/currencySeed.ts && bun src/db/seeds/seedFun1.ts",
+    "db:seed": "bun src/db/seeds/seedFun1.ts",
     "plan:upgrade": "bun src/db/userPlanSeed.ts",
     "db:database:reset": "bun src/db/self-hosted-reset.ts",
     "simulate": "bun src/db/subscriptionCycle.ts",

@@ -7,6 +7,7 @@
     "build": "turbo run build",
     "launch:tracker": "pnpm --filter @repo/tracking-worker run deploy:self",
     "deploy:tracker": "pnpm --filter @repo/tracking-worker exec wrangler deploy --config wrangler.toml --keep-vars",
+    "db:seed": "pnpm --filter @repo/dashboard run db:seed",
     "logs:tracker": "pnpm --filter @repo/tracking-worker exec wrangler tail --config wrangler.toml",
     "db:setup": "pnpm --filter @repo/dashboard run db:setup",
     "local:dev":"pnpm dev --filter @repo/dashboard",
