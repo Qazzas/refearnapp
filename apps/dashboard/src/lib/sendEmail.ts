@@ -65,21 +65,31 @@ export const sendEmail = async ({
 
   // --- 2. SMTP ---
   if (provider === "smtp") {
+    const port = Number(process.env.SMTP_PORT) || 587
+
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
+      port: port,
+      secure: port === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
       },
+      connectionTimeout: 5000,
     })
-    return transporter.sendMail({
-      from: `"${finalFromName}" <${finalFromEmail}>`,
-      to,
-      subject,
-      html,
-      replyTo,
-    })
+
+    try {
+      return await transporter.sendMail({
+        from: `"${finalFromName}" <${finalFromEmail}>`,
+        to,
+        subject,
+        html,
+        replyTo,
+      })
+    } catch (error) {
+      console.error("SMTP Error:", error)
+      throw new Error("Failed to send email via SMTP")
+    }
   }
 
   // --- 3. DEVELOPMENT ---

@@ -55,5 +55,6 @@ jobs:
           cd apps/dashboard
           echo "🚀 Starting Reset and Seed sequence..."
           bun src/db/reset.ts
+          bun src/db/currencySeed.ts
           bun src/db/seeds/seedFun1.ts
           echo "✅ Database operation successful."
