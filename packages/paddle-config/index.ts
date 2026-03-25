@@ -54,6 +54,5 @@ export const paddleConfig = {
   },
   portal: isProd
     ? process.env.NEXT_PUBLIC_PADDLE_CUSTOMER_PORTAL_PRODUCTION || ""
-    : process.env.NEXT_PUBLIC_PADDLE_CUSTOMER_PORTAL_SANDBOX ||
-    "https://sandbox-customer-portal.paddle.com/cpl_01k9cee59hfjpa5qfp6592h1x3",
+    : process.env.NEXT_PUBLIC_PADDLE_CUSTOMER_PORTAL_SANDBOX,
 }

@@ -4,8 +4,8 @@ const isProd = process.env.NODE_ENV === "production"
 export const polarConfig = {
   server: isProd ? ("production" as const) : ("sandbox" as const),
   customerPortalUrl: isProd
-    ? "https://polar.sh/refearnapp-us-one/portal"
-    : "https://sandbox.polar.sh/zekariyas-berihun/portal",
+    ? process.env.NEXT_PUBLIC_POLAR_CUSTOMER_PORTAL_URL_PRODUCTION!
+    : process.env.NEXT_PUBLIC_POLAR_CUSTOMER_PORTAL_URL_SANDBOX!,
   accessToken: isProd
     ? process.env.POLAR_ACCESS_TOKEN_PRODUCTION!
     : process.env.POLAR_ACCESS_TOKEN_SANDBOX!,

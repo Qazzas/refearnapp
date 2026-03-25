@@ -124,5 +124,11 @@ async function main() {
 }
 
 main()
-  .then(() => console.log("Done"))
-  .catch((err) => console.error(err))
+  .then(() => {
+    console.log("🏁 Script finished successfully.")
+    process.exit(0)
+  })
+  .catch((err) => {
+    console.error("❌ Script failed:", err)
+    process.exit(1)
+  })
