@@ -98,69 +98,93 @@ const OrganizationDashboardSidebar = ({
     ? !!(license?.isUltimate && !!license?.activationId)
     : plan.plan === "ULTIMATE"
   const { mutate: switchOrg, isPending } = useSwitchOrg()
-  const items = [
+  const navigationGroups = [
     {
-      title: "Dashboard",
-      url: `/organization/${orgId}/dashboard/analytics`,
-      icon: BarChart3,
+      label: "Activity",
+      items: [
+        {
+          title: "Dashboard",
+          url: `/organization/${orgId}/dashboard/analytics`,
+          icon: BarChart3,
+        },
+        {
+          title: "Affiliates",
+          url: `/organization/${orgId}/dashboard/affiliates`,
+          icon: LinkIcon,
+        },
+        {
+          title: "Payout",
+          url: `/organization/${orgId}/dashboard/payout`,
+          icon: Users,
+        },
+      ],
     },
     {
-      title: "Affiliates",
-      url: `/organization/${orgId}/dashboard/affiliates`,
-      icon: LinkIcon,
+      label: "Promotion",
+      items: [
+        {
+          title: "Coupons",
+          url: `/organization/${orgId}/dashboard/coupons`,
+          icon: TicketPercent,
+        },
+        {
+          title: "Referrals",
+          url: `/organization/${orgId}/dashboard/referrals`,
+          icon: MousePointerClick,
+        },
+      ],
     },
-    {
-      title: "Payout",
-      url: `/organization/${orgId}/dashboard/payout`,
-      icon: Users,
-    },
-    {
-      title: "Customization",
-      url: `/organization/${orgId}/dashboard/customization`,
-      icon: CreditCard,
-    },
-    {
-      title: "Integration",
-      url: `/organization/${orgId}/dashboard/integration`,
-      icon: Layers,
-    },
-    {
-      title: "Referrals",
-      url: `/organization/${orgId}/dashboard/referrals`,
-      icon: MousePointerClick,
-    },
-    {
-      title: "Coupons",
-      url: `/organization/${orgId}/dashboard/coupons`,
-      icon: TicketPercent,
-    },
-    {
-      title: "Settings",
-      url: `/organization/${orgId}/dashboard/settings`,
-      icon: Settings,
-    },
-    {
-      title: "Manage Domains",
-      url: `/organization/${orgId}/dashboard/manageDomains`,
-      icon: Globe,
-    },
-    ...(!isSelfHosted
+    // 👥 NEW: Collaboration Section (Only shows if they have access)
+    ...(plan.plan === "PRO" || plan.plan === "ULTIMATE"
       ? [
           {
-            title: "Support Email",
-            url: `/organization/${orgId}/dashboard/supportEmail`,
-            icon: MailQuestion,
+            label: "Organization",
+            items: [
+              {
+                title: "Teams",
+                url: `/organization/${orgId}/dashboard/teams`,
+                icon: Users,
+              },
+            ],
           },
         ]
       : []),
+    {
+      label: "Configuration",
+      items: [
+        {
+          title: "Integration",
+          url: `/organization/${orgId}/dashboard/integration`,
+          icon: Layers,
+        },
+
+        {
+          title: "Customization",
+          url: `/organization/${orgId}/dashboard/customization`,
+          icon: CreditCard,
+        },
+        {
+          title: "Manage Domains",
+          url: `/organization/${orgId}/dashboard/manageDomains`,
+          icon: Globe,
+        },
+        {
+          title: "Settings",
+          url: `/organization/${orgId}/dashboard/settings`,
+          icon: Settings,
+        },
+        ...(!isSelfHosted
+          ? [
+              {
+                title: "Support Email",
+                url: `/organization/${orgId}/dashboard/supportEmail`,
+                icon: MailQuestion,
+              },
+            ]
+          : []),
+      ],
+    },
   ]
-  if (plan.plan === "PRO" || plan.plan === "ULTIMATE") {
-    items.push({
-      title: "Teams",
-      url: `/organization/${orgId}/dashboard/teams`,
-      icon: Users,
-    })
-  }
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
   const [licenseModalOpen, setLicenseModalOpen] = useState(false)
@@ -307,65 +331,70 @@ const OrganizationDashboardSidebar = ({
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => {
-                const locked = isLocked(item.title)
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.url}
-                      tooltip={item.title}
-                    >
-                      <Link href={item.url}>
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
-                        {locked && (
-                          <div className="ml-auto">
-                            <Lock className="w-3 h-3 text-amber-500" />
-                          </div>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
+        {navigationGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <div className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
+              {group.label}
+            </div>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const locked = isLocked(item.title)
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.url}
+                        tooltip={item.title}
+                      >
+                        <Link href={item.url}>
+                          <item.icon className="w-4 h-4" />
+                          <span>{item.title}</span>
+                          {locked && (
+                            <Lock className="ml-auto w-3 h-3 text-amber-500" />
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+        <SidebarGroup className="mt-auto border-t border-border/40 pt-4">
+          <div className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
+            Account & Support
+          </div>
+          <SidebarGroupContent className="px-4 space-y-4">
+            <SidebarDiscord
+              orgId={orgId!}
+              isPremium={isPremium}
+              isUltimate={isUltimate}
+            />
+            <SidebarBilling
+              orgId={orgId!}
+              isSelfHosted={isSelfHosted}
+              plan={plan}
+              license={license}
+              onOpenLicenseModal={() => setLicenseModalOpen(true)}
+              onDeactivateLicense={() => deactivateMutation.mutate(undefined)}
+              isDeactivating={deactivateMutation.isPending}
+              onOpenPortal={openPortal}
+            />
+            <div className="flex items-center gap-2 pb-4">
+              <div className="flex-1">
+                <SidebarHelp />
+              </div>
+              <div className="flex-1">
+                <SystemUpdate variant="badge" updateInfo={updateInfo} />
+              </div>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
-        {/* 1. Discord Component */}
-        <SidebarDiscord
-          orgId={orgId!}
-          isPremium={isPremium}
-          isUltimate={isUltimate}
-        />
-
-        {/* 2. Help & Update Row (Squashed horizontally) */}
-        <div className="flex items-center gap-1">
-          <div className="flex-1">
-            <SidebarHelp />
-          </div>
-          <div className="flex-1">
-            <SystemUpdate variant="badge" updateInfo={updateInfo} />
-          </div>
-        </div>
-
-        {/* 3. Billing & License Component */}
-        <SidebarBilling
-          orgId={orgId!}
-          isSelfHosted={isSelfHosted}
-          plan={plan}
-          license={license}
-          onOpenLicenseModal={() => setLicenseModalOpen(true)}
-          onDeactivateLicense={() => deactivateMutation.mutate(undefined)}
-          isDeactivating={deactivateMutation.isPending}
-          onOpenPortal={openPortal}
-        />
         <AppDialog
           open={licenseModalOpen}
           onOpenChange={setLicenseModalOpen}

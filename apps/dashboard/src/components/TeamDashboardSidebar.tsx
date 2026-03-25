@@ -50,61 +50,76 @@ const TeamDashboardSidebar = ({
   const pathname = usePathname()
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   useCloseSidebarOnNavigation()
-  const items = [
+  const navigationGroups = [
     {
-      title: "Dashboard",
-      url: `/organization/${orgId}/teams/dashboard/analytics`,
-      icon: BarChart3,
+      label: "Activity",
+      items: [
+        {
+          title: "Dashboard",
+          url: `/organization/${orgId}/teams/dashboard/analytics`,
+          icon: BarChart3,
+        },
+        {
+          title: "Affiliates",
+          url: `/organization/${orgId}/teams/dashboard/affiliates`,
+          icon: LinkIcon,
+        },
+        {
+          title: "Payout",
+          url: `/organization/${orgId}/teams/dashboard/payout`,
+          icon: Users,
+        },
+      ],
     },
     {
-      title: "Affiliates",
-      url: `/organization/${orgId}/teams/dashboard/affiliates`,
-      icon: LinkIcon,
+      label: "Promotion",
+      items: [
+        {
+          title: "Coupons",
+          url: `/organization/${orgId}/dashboard/coupons`,
+          icon: TicketPercent,
+        },
+        {
+          title: "Referrals",
+          url: `/organization/${orgId}/dashboard/referrals`,
+          icon: MousePointerClick,
+        },
+      ],
     },
     {
-      title: "Payout",
-      url: `/organization/${orgId}/teams/dashboard/payout`,
-      icon: Users,
+      label: "Configuration",
+      items: [
+        {
+          title: "Integration",
+          url: `/organization/${orgId}/teams/dashboard/integration`,
+          icon: Layers,
+        },
+        {
+          title: "Customization",
+          url: `/organization/${orgId}/teams/dashboard/customization`,
+          icon: CreditCard,
+        },
+        {
+          title: "Manage Domains",
+          url: `/organization/${orgId}/teams/dashboard/manageDomains`,
+          icon: Globe,
+        },
+        {
+          title: "Settings",
+          url: `/organization/${orgId}/teams/dashboard/settings`,
+          icon: Settings,
+        },
+        ...(!isSelfHosted
+          ? [
+              {
+                title: "Support Email",
+                url: `/organization/${orgId}/dashboard/supportEmail`,
+                icon: MailQuestion,
+              },
+            ]
+          : []),
+      ],
     },
-    {
-      title: "Customization",
-      url: `/organization/${orgId}/teams/dashboard/customization`,
-      icon: CreditCard,
-    },
-    {
-      title: "Integration",
-      url: `/organization/${orgId}/teams/dashboard/integration`,
-      icon: Layers,
-    },
-    {
-      title: "Referrals",
-      url: `/organization/${orgId}/dashboard/referrals`,
-      icon: MousePointerClick,
-    },
-    {
-      title: "Coupons",
-      url: `/organization/${orgId}/dashboard/coupons`,
-      icon: TicketPercent,
-    },
-    {
-      title: "Settings",
-      url: `/organization/${orgId}/teams/dashboard/settings`,
-      icon: Settings,
-    },
-    {
-      title: "Manage Domains",
-      url: `/organization/${orgId}/teams/dashboard/manageDomains`,
-      icon: Globe,
-    },
-    ...(!isSelfHosted
-      ? [
-          {
-            title: "Support Email",
-            url: `/organization/${orgId}/dashboard/supportEmail`,
-            icon: MailQuestion,
-          },
-        ]
-      : []),
   ]
 
   return (
@@ -116,30 +131,50 @@ const TeamDashboardSidebar = ({
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.url}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
-                      <item.icon className="w-5 h-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+        {navigationGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <div className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
+              {group.label}
+            </div>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.url}
+                      tooltip={item.title}
+                    >
+                      <Link href={item.url}>
+                        <item.icon className="w-4 h-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+
+        {/* Support Section at the bottom of content */}
+        <SidebarGroup className="mt-auto border-t border-border/40 pt-4">
+          <div className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">
+            Support & Updates
+          </div>
+          <SidebarGroupContent className="px-4 space-y-4">
+            <div className="flex items-center gap-2 pb-4">
+              <div className="flex-1">
+                <SidebarHelp />
+              </div>
+              <div className="flex-1">
+                <SystemUpdate variant="badge" updateInfo={updateInfo} />
+              </div>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4">
-        <SidebarHelp />
-        <SystemUpdate variant="badge" updateInfo={updateInfo} />
         <Link href={`/organization/${orgId}/teams/dashboard/profile`}>
           <div className="flex items-center space-x-3 p-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors cursor-pointer">
             <div className="flex-1 min-w-0">
