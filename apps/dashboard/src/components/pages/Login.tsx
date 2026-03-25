@@ -52,6 +52,8 @@ const Login = ({
   plan,
 }: Props) => {
   const { showCustomToast } = useCustomToast()
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+  const hideGoogleAuth = isTeam || (isSelfHosted && !affiliate)
   const [previewLoading, setPreviewLoading] = useState(false)
   const { getPath } = useAffiliatePath(orgId)
   const form = useForm<LoginFormValues>({
@@ -283,7 +285,7 @@ const Login = ({
                 {isPreview && <ButtonCustomizationOptions size="w-6 h-6" />}
               </form>
             </Form>
-            {!isTeam && (
+            {!hideGoogleAuth && (
               <>
                 <div className={cn("relative", !isPreview && "my-6")}>
                   <div className="absolute inset-0 flex items-center">

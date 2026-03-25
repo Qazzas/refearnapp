@@ -53,6 +53,8 @@ const Signup = ({
   plan,
 }: Props) => {
   const [previewLoading, setPreviewLoading] = useState(false)
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
+  const hideGoogleAuth = isTeam || (isSelfHosted && !affiliate)
   const { customNotesSignup } = useAtomValue(notesCustomizationAtom)
   const urlParams = new URLSearchParams(window.location.search)
   const txnId = urlParams.get("txn")
@@ -306,7 +308,7 @@ const Signup = ({
                 {isPreview && <ButtonCustomizationOptions size="w-6 h-6" />}
               </form>
             </Form>
-            {!isTeam && (
+            {!hideGoogleAuth && (
               <>
                 <div className={cn("relative", !isPreview && "my-6")}>
                   <div className="absolute inset-0 flex items-center">
