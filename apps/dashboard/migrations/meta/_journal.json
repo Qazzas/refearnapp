@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1773754490015,
-      "tag": "0000_fantastic_micromax",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1773754645651,
-      "tag": "0001_sudden_pride",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1773774254276,
-      "tag": "0002_great_makkari",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1773948537040,
-      "tag": "0003_overrated_firedrake",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1773998805739,
-      "tag": "0004_optimal_krista_starr",
+      "when": 1774460140714,
+      "tag": "0000_regular_sandman",
       "breakpoints": true
     }
   ]

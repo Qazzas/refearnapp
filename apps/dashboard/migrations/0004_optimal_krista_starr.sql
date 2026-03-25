@@ -1,1 +1,0 @@
-ALTER TABLE "license_keys" ALTER COLUMN "expires_at" DROP NOT NULL;
