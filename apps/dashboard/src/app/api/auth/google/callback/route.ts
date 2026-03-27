@@ -59,7 +59,6 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
   const email = payload.email!
   const name = payload.name ?? ""
   const image = payload.picture ?? ""
-  console.log("Google OAuth payload:", { googleSub, email, name, image })
   // ---------- TEAM flow ----------
   if (type === "team") {
     let teamAcc = await db.query.teamAccount.findFirst({
@@ -72,6 +71,10 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
       appUser = await db.query.team.findFirst({
         where: (t, { eq }) => eq(t.id, teamAcc!.teamId),
       })
+      await db
+        .update(team)
+        .set({ image, name })
+        .where(eq(team.id, appUser.teamId))
     } else {
       const existingTeamByEmail = await db.query.team.findFirst({
         where: (t, { eq }) => eq(t.email, email),
@@ -83,10 +86,6 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           providerAccountId: googleSub,
           emailVerified: new Date(),
         })
-        await db
-          .update(team)
-          .set({ image })
-          .where(eq(team.id, existingTeamByEmail.id))
         appUser = existingTeamByEmail
       } else {
         const [createdTeam] = await db
@@ -151,6 +150,10 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
       appUser = await db.query.user.findFirst({
         where: (u, { eq }) => eq(u.id, linkedAccount!.userId),
       })
+      await db
+        .update(user)
+        .set({ image, name })
+        .where(eq(user.id, linkedAccount.userId))
     } else {
       const existingUserByEmail = await db.query.user.findFirst({
         where: (u, { eq }) => eq(u.email, email),
@@ -162,10 +165,6 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           providerAccountId: googleSub,
           emailVerified: new Date(),
         })
-        await db
-          .update(user)
-          .set({ image })
-          .where(eq(user.id, existingUserByEmail.id))
         appUser = existingUserByEmail
         if (txnId) await assignLifetimePurchase(existingUserByEmail.id, txnId)
       } else {
@@ -249,6 +248,10 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
       aff = await db.query.affiliate.findFirst({
         where: (a, { eq }) => eq(a.id, linkedAffAcc!.affiliateId),
       })
+      await db
+        .update(affiliate)
+        .set({ image, name })
+        .where(eq(affiliate.id, linkedAffAcc.affiliateId))
     } else {
       const byEmail = await db.query.affiliate.findFirst({
         where: (a, { and, eq }) =>
@@ -261,10 +264,6 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           providerAccountId: googleSub,
           emailVerified: new Date(),
         })
-        await db
-          .update(affiliate)
-          .set({ image })
-          .where(eq(affiliate.id, byEmail.id))
         aff = byEmail
       } else {
         const [createdAff] = await db
