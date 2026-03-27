@@ -59,7 +59,7 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
   const email = payload.email!
   const name = payload.name ?? ""
   const image = payload.picture ?? ""
-
+  console.log("Google OAuth payload:", { googleSub, email, name, image })
   // ---------- TEAM flow ----------
   if (type === "team") {
     let teamAcc = await db.query.teamAccount.findFirst({
