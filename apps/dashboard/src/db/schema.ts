@@ -109,6 +109,7 @@ export const user = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
+    image: text("image"),
     role: text("role").$type<Role>().default("OWNER").notNull(),
     type: text("type").$type<AccountType>().default("ORGANIZATION").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -147,6 +148,7 @@ export const team = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     email: text("email").notNull(),
+    image: text("image"),
     role: text("role").$type<Role>().default("TEAM").notNull(),
     type: text("type").$type<AccountType>().default("ORGANIZATION").notNull(),
     organizationId: text("organization_id")
@@ -409,6 +411,7 @@ export const affiliate = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     email: text("email").notNull(),
+    image: text("image"),
     type: text("type").$type<AccountType>().default("AFFILIATE").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

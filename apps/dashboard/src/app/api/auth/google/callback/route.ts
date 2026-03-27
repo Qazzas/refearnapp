@@ -12,6 +12,7 @@ import {
   teamAccount,
   team,
 } from "@/db/schema"
+import { eq } from "drizzle-orm"
 import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/organization/assignFreeTrial"
 import { assignLifetimePurchase } from "@/lib/server/organization/assignLifetimePurchase"
@@ -57,6 +58,7 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
   const googleSub = payload.sub!
   const email = payload.email!
   const name = payload.name ?? ""
+  const image = payload.picture ?? ""
 
   // ---------- TEAM flow ----------
   if (type === "team") {
@@ -81,6 +83,10 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           providerAccountId: googleSub,
           emailVerified: new Date(),
         })
+        await db
+          .update(team)
+          .set({ image })
+          .where(eq(team.id, existingTeamByEmail.id))
         appUser = existingTeamByEmail
       } else {
         const [createdTeam] = await db
@@ -88,6 +94,7 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           .values({
             name,
             email,
+            image,
             organizationId: orgIdFromState!,
             type: "ORGANIZATION",
             role: "TEAM",
@@ -155,13 +162,17 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           providerAccountId: googleSub,
           emailVerified: new Date(),
         })
+        await db
+          .update(user)
+          .set({ image })
+          .where(eq(user.id, existingUserByEmail.id))
         appUser = existingUserByEmail
         if (txnId) await assignLifetimePurchase(existingUserByEmail.id, txnId)
       } else {
         await restrictSelfHostedSignup()
         const [createdUser] = await db
           .insert(user)
-          .values({ name, email, type: "ORGANIZATION", role: "OWNER" })
+          .values({ name, image, email, type: "ORGANIZATION", role: "OWNER" })
           .returning()
         appUser = createdUser
         await db.insert(account).values({
@@ -250,11 +261,21 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           providerAccountId: googleSub,
           emailVerified: new Date(),
         })
+        await db
+          .update(affiliate)
+          .set({ image })
+          .where(eq(affiliate.id, byEmail.id))
         aff = byEmail
       } else {
         const [createdAff] = await db
           .insert(affiliate)
-          .values({ name, email, organizationId: orgId, type: "AFFILIATE" })
+          .values({
+            name,
+            email,
+            image,
+            organizationId: orgId,
+            type: "AFFILIATE",
+          })
           .returning()
         aff = createdAff
         await db.insert(affiliateAccount).values({
