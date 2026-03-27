@@ -164,9 +164,15 @@ importers:
       '@upstash/workflow':
         specifier: ^1.1.1
         version: 1.1.1(zod@3.25.76)
+      '@vercel/analytics':
+        specifier: ^2.0.1
+        version: 2.0.1(next@16.1.5(@babel/core@7.29.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(vue@3.5.28(typescript@5.9.3))
       '@vercel/blob':
         specifier: ^2.2.0
         version: 2.3.0
+      '@vercel/speed-insights':
+        specifier: ^2.0.0
+        version: 2.0.0(next@16.1.5(@babel/core@7.29.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(vue@3.5.28(typescript@5.9.3))
       babel-plugin-react-compiler:
         specifier: 19.1.0-rc.2
         version: 19.1.0-rc.2
@@ -3776,9 +3782,64 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
+  '@vercel/analytics@2.0.1':
+    resolution: {integrity: sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g==}
+    peerDependencies:
+      '@remix-run/react': ^2
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      nuxt: '>= 3'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      nuxt:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
+
   '@vercel/blob@2.3.0':
     resolution: {integrity: sha512-oYWiJbWRQ7gz9Mj0X/NHFJ3OcLMOBzq/2b3j6zeNrQmtFo6dHwU8FAwNpxVIYddVMd+g8eqEi7iRueYx8FtM0Q==}
     engines: {node: '>=20.0.0'}
+
+  '@vercel/speed-insights@2.0.0':
+    resolution: {integrity: sha512-jwkNcrTeafWxjmWq4AHBaptSqZiJkYU5adLC9QBSqeim0GcqDMgN5Ievh8OG1rJ6W3A4l1oiP7qr9CWxGuzu3w==}
+    peerDependencies:
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      nuxt: '>= 3'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      nuxt:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
 
   '@vitejs/plugin-vue-jsx@4.2.0':
     resolution: {integrity: sha512-DSTrmrdLp+0LDNF77fqrKfx7X0ErRbOcUAgJL/HbSesqQwoUvUQ4uYQqaex+rovqgGcoPqVk+AwUh3v9CuiYIw==}
@@ -11387,6 +11448,12 @@ snapshots:
       '@upstash/qstash': 2.9.0-rc
       zod: 3.25.76
 
+  '@vercel/analytics@2.0.1(next@16.1.5(@babel/core@7.29.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(vue@3.5.28(typescript@5.9.3))':
+    optionalDependencies:
+      next: 16.1.5(@babel/core@7.29.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      vue: 3.5.28(typescript@5.9.3)
+
   '@vercel/blob@2.3.0':
     dependencies:
       async-retry: 1.3.3
@@ -11394,6 +11461,12 @@ snapshots:
       is-node-process: 1.2.0
       throttleit: 2.1.0
       undici: 6.23.0
+
+  '@vercel/speed-insights@2.0.0(next@16.1.5(@babel/core@7.29.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(vue@3.5.28(typescript@5.9.3))':
+    optionalDependencies:
+      next: 16.1.5(@babel/core@7.29.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      vue: 3.5.28(typescript@5.9.3)
 
   '@vitejs/plugin-vue-jsx@4.2.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.28(typescript@5.9.3))':
     dependencies:
