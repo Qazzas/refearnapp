@@ -78,39 +78,12 @@ async function run() {
 
   fs.writeFileSync(envPath, envContent.trim() + "\n")
   console.log("✅ .env updated and inputs cleaned.")
-
-  // Proceeding with Migrations...
-  console.log("\n🔄 Syncing database...")
-  try {
-    // We use generate to ensure the local user has the SQL files
-    // that match the specific schema code they just downloaded.
-    await $`npx drizzle-kit generate`.throws(true)
-    await $`npx drizzle-kit migrate`.throws(true)
-    console.log("✅ Database schema is synced.")
-  } catch (err) {
-    console.error("❌ Migration failed. Check your Database URL permissions.")
-    process.exit(1)
-  }
-  // --- STEP 3: SEEDING ---
-  console.log("\n🌱 Running system initialization...")
-  try {
-    await $`bun src/db/seedSystem.ts`
-    console.log("✅ System version initialized.")
-  } catch (err) {
-    console.warn("⚠️ System seeding failed.")
-  }
-
-  console.log("\n🌱 Running currency seed script...")
-  try {
-    // This will now have access to the CURRENCY_API_KEY we just saved
-    await $`bun src/db/currencySeed.ts`
-    console.log("✅ Seeding complete.")
-  } catch (err) {
-    console.warn("⚠️  Currency seeding failed. Ensure your API key is valid.")
-    console.error(err.message)
-  }
-
-  console.log("\n✨ ALL DONE! Your database and currency rates are ready.\n")
 }
-
-run()
+try {
+  await run()
+  console.log("✅ Database setup completed successfully!")
+  process.exit(0)
+} catch (err) {
+  console.error("❌ Error syncing system version:", err)
+  process.exit(1)
+}

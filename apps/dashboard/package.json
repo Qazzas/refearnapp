@@ -16,6 +16,8 @@
     "db:database:reset": "bun src/db/self-hosted-reset.ts",
     "simulate": "bun src/db/subscriptionCycle.ts",
     "db:setup": "bun src/scripts/setup-db.js",
+    "db:sync": "pnpm exec drizzle-kit generate && pnpm exec drizzle-kit migrate",
+    "db:init-data": "bun src/db/seedSystem.ts && bun src/db/currencySeed.ts",
     "simulate:cancel": "bun src/db/subscriptionCancel.ts",
     "simulate:create:expire": "bun src/db/subscriptionCreateAndExpire.ts",
     "simulate:expire": "bun src/db/subscriptionExpire.ts",
