@@ -16,6 +16,7 @@ apps/tracking-worker/.wrangler/
 
 
 # Env files (Important!)
+.env.selfhosted
 .env.example
 .env
 .env.local
