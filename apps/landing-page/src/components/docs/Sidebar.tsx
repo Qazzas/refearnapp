@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   MousePointer2,
   Zap,
+  Database,
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -26,13 +27,8 @@ export default function Sidebar() {
         { title: 'VPS & Dashboard', href: '#vps-setup', icon: ShieldCheck },
         { title: 'Self-Hosting', href: '#self-hosting', icon: ShieldCheck },
         { title: 'Worker Deployment', href: '#tracker-setup', icon: Zap },
+        { title: 'Database & Sync', href: '#database-setup', icon: Database },
         { title: 'Env Variables', href: '#env-variables', icon: Settings },
-      ],
-    },
-    {
-      label: 'Usage',
-      items: [
-        { title: 'Tracking Script', href: '#tracking', icon: MousePointer2 },
       ],
     },
   ];
