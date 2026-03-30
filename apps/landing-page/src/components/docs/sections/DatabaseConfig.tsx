@@ -48,8 +48,8 @@ export default function DatabaseConfig() {
             <table className="w-full text-left text-xs">
               <thead className="bg-indigo-100/50 text-[9px] font-black tracking-widest whitespace-nowrap text-indigo-900/50 uppercase">
                 <tr>
-                  <th className="min-w-[160px] px-4 py-3">Prompt Name</th>
-                  <th className="min-w-[200px] px-4 py-3">Value to Paste</th>
+                  <th className="min-w-40 px-4 py-3">Prompt Name</th>
+                  <th className="min-w-50 px-4 py-3">Value to Paste</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-indigo-50">
