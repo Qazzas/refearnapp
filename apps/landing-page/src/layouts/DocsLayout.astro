@@ -9,14 +9,44 @@ const currentPath = Astro.url.pathname;
 
 <Layout title={title}>
   <div class="flex min-h-screen bg-slate-50/50">
+    {/* 1. Desktop Sidebar Container (Hidden on mobile) */}
     <div
       class="sticky top-0 hidden h-screen w-72 flex-col border-r border-slate-200 bg-white p-6 lg:flex"
     >
       <div class="mb-8 flex items-center gap-2 px-4">
         <Logo sizeClass="h-8" />
       </div>
-      <Sidebar client:load currentPath={currentPath} />
+      <Sidebar client:load />
     </div>
+
+    {
+      /* 2. Mobile Sidebar Instance (Active on mobile, doesn't render visual desktop UI) */
+    }
+    <div class="lg:hidden">
+      <Sidebar client:load />
+    </div>
+
+    {/* 3. Mobile Toggle Button */}
+    <button
+      id="mobile-menu-trigger"
+      class="fixed top-2 left-6 z-50 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-600 shadow-sm backdrop-blur-sm transition-all active:scale-95 lg:hidden"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
 
     <main class="flex-1 overflow-y-auto">
       <div class="mx-auto max-w-5xl px-6 py-12 lg:px-12">
@@ -26,4 +56,19 @@ const currentPath = Astro.url.pathname;
       </div>
     </main>
   </div>
+
+  <script>
+    // Bridge Astro to React
+    const setupTrigger = () => {
+      const trigger = document.getElementById('mobile-menu-trigger');
+      trigger?.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('open-docs-menu'));
+      });
+    };
+
+    // Run on initial load
+    setupTrigger();
+    // Run on view transitions if you use them
+    document.addEventListener('astro:after-swap', setupTrigger);
+  </script>
 </Layout>
