@@ -5,7 +5,6 @@ import {
   Globe,
   Settings,
   ShieldCheck,
-  MousePointer2,
   Zap,
   Database,
 } from 'lucide-react';

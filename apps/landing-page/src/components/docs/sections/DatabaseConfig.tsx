@@ -38,80 +38,71 @@ export default function DatabaseConfig() {
         </div>
 
         {/* Step 2: Mapping Table */}
-        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/30 p-6">
+        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/30 p-4 md:p-6">
           <div className="mb-4 flex items-center gap-2 font-bold text-indigo-900">
             <Key size={18} />
             <h3 className="text-sm">Script Prompt Reference</h3>
           </div>
-          <div className="overflow-hidden rounded-xl border border-indigo-100 bg-white shadow-sm">
+          {/* Horizontal Scroll Wrapper */}
+          <div className="scrollbar-thin scrollbar-thumb-indigo-100 overflow-x-auto rounded-xl border border-indigo-100 bg-white shadow-sm">
             <table className="w-full text-left text-xs">
-              <thead className="bg-indigo-100/50 text-[9px] font-black tracking-widest text-indigo-900/50 uppercase">
+              <thead className="bg-indigo-100/50 text-[9px] font-black tracking-widest whitespace-nowrap text-indigo-900/50 uppercase">
                 <tr>
-                  <th className="px-4 py-3">Prompt Name</th>
-                  <th className="px-4 py-3">Value to Paste</th>
+                  <th className="min-w-[160px] px-4 py-3">Prompt Name</th>
+                  <th className="min-w-[200px] px-4 py-3">Value to Paste</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-indigo-50">
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    Database Connection String
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    DATABASE_URL
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    CURRENCY_API_KEY
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    CURRENCY_API_KEY
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    UPSTASH_REDIS_REST_URL
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    UPSTASH_REDIS_REST_URL
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    UPSTASH_REDIS_REST_TOKEN
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    UPSTASH_REDIS_REST_TOKEN
-                  </td>
-                </tr>
+                {[
+                  { name: 'Database Connection String', val: 'DATABASE_URL' },
+                  { name: 'CURRENCY_API_KEY', val: 'CURRENCY_API_KEY' },
+                  {
+                    name: 'UPSTASH_REDIS_REST_URL',
+                    val: 'UPSTASH_REDIS_REST_URL',
+                  },
+                  {
+                    name: 'UPSTASH_REDIS_REST_TOKEN',
+                    val: 'UPSTASH_REDIS_REST_TOKEN',
+                  },
+                ].map((item) => (
+                  <tr key={item.val}>
+                    <td className="px-4 py-3 font-medium whitespace-nowrap text-slate-700">
+                      {item.name}
+                    </td>
+                    <td className="px-4 py-3 font-mono whitespace-nowrap text-indigo-600">
+                      {item.val}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
 
         {/* Step 3: Action Button: Redeploy Coolify */}
-        <div className="rounded-2xl border-2 border-emerald-500 bg-white p-6 shadow-lg ring-4 shadow-emerald-500/10 ring-emerald-500/5">
-          <div className="mb-4 flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
-              <Play size={20} fill="currentColor" className="ml-1" />
+        <div className="rounded-2xl border-2 border-emerald-500 bg-white p-5 shadow-lg ring-4 shadow-emerald-500/10 ring-emerald-500/5 md:p-6">
+          <div className="mb-6 flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:text-left">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
+              <Play size={24} fill="currentColor" className="ml-1" />
             </div>
             <div>
               <h3 className="text-lg leading-tight font-bold text-slate-900">
                 Apply Changes to Dashboard
               </h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
                 The script has updated your <code>.env</code> file. To apply
-                these database settings to your live site, you must re-deploy.
+                these settings, you must trigger a re-deployment.
               </p>
             </div>
           </div>
 
           <a
             href="#"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 text-sm font-bold text-white transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-4 text-sm font-bold text-white transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.95]"
           >
-            Deploy Coolify Instance Again
-            <ExternalLink size={16} />
+            <Play size={16} fill="currentColor" />
+            <span>Redeploy Dashboard</span>
+            <ExternalLink size={14} className="opacity-70" />
           </a>
         </div>
 

@@ -90,63 +90,55 @@ export default function TrackerDeployment() {
         </div>
 
         {/* Step 4: Mapping Table */}
-        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/30 p-6">
+        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/30 p-4 md:p-6">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-indigo-900">
             <Key size={18} />
             Script Prompt Reference
           </h3>
-          <div className="overflow-hidden rounded-xl border border-indigo-100 bg-white shadow-sm">
+          {/* Scrollable Container */}
+          <div className="scrollbar-thin scrollbar-thumb-indigo-100 overflow-x-auto rounded-xl border border-indigo-100 bg-white shadow-sm">
             <table className="w-full text-left text-xs">
-              <thead className="bg-indigo-100/50 text-[9px] font-black tracking-widest text-indigo-900/50 uppercase">
+              <thead className="bg-indigo-100/50 text-[9px] font-black tracking-widest whitespace-nowrap text-indigo-900/50 uppercase">
                 <tr>
-                  <th className="px-4 py-3">Prompt Name</th>
-                  <th className="px-4 py-3">Variable From Dashboard</th>
+                  <th className="min-w-[140px] px-4 py-3">Prompt Name</th>
+                  <th className="min-w-[200px] px-4 py-3">
+                    Variable From Dashboard
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-indigo-50">
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    VPS App URL
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    NEXT_PUBLIC_REDIRECTION_URL
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    Public Worker Domain
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    NEXT_PUBLIC_BASE_URL
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    INTERNAL_SECRET
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    INTERNAL_SECRET
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    UPSTASH_REDIS_URL
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    UPSTASH_REDIS_REST_URL
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-medium text-slate-700">
-                    UPSTASH_REDIS_TOKEN
-                  </td>
-                  <td className="px-4 py-3 font-mono text-indigo-600">
-                    UPSTASH_REDIS_REST_TOKEN
-                  </td>
-                </tr>
+                {[
+                  { prompt: 'VPS App URL', env: 'NEXT_PUBLIC_REDIRECTION_URL' },
+                  {
+                    prompt: 'Public Worker Domain',
+                    env: 'NEXT_PUBLIC_BASE_URL',
+                  },
+                  { prompt: 'INTERNAL_SECRET', env: 'INTERNAL_SECRET' },
+                  {
+                    prompt: 'UPSTASH_REDIS_URL',
+                    env: 'UPSTASH_REDIS_REST_URL',
+                  },
+                  {
+                    prompt: 'UPSTASH_REDIS_TOKEN',
+                    env: 'UPSTASH_REDIS_REST_TOKEN',
+                  },
+                ].map((row) => (
+                  <tr key={row.env}>
+                    <td className="px-4 py-3 font-medium whitespace-nowrap text-slate-700">
+                      {row.prompt}
+                    </td>
+                    <td className="px-4 py-3 font-mono whitespace-nowrap text-indigo-600">
+                      {row.env}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
+          {/* Mobile Hint */}
+          <p className="mt-2 text-center text-[10px] text-slate-400 italic md:hidden">
+            ← Swipe table to see full variables →
+          </p>
         </div>
 
         {/* Step 5: Final Custom Domain Step */}
