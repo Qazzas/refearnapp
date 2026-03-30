@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react';
-import EnvTabs from './EnvTabs';
-import { EnvGroup, EnvItem } from './EnvGroup';
+import EnvTabs from '../EnvTabs.tsx';
+import { EnvGroup, EnvItem } from '../EnvGroup.tsx';
 const WarningBox = ({ children }: { children: React.ReactNode }) => (
   <div className="mb-6 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
     <span className="text-lg">⚠️</span>

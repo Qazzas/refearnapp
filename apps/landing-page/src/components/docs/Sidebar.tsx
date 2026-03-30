@@ -6,6 +6,7 @@ import {
   Settings,
   ShieldCheck,
   MousePointer2,
+  Zap,
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -22,8 +23,10 @@ export default function Sidebar() {
     {
       label: 'Configuration',
       items: [
-        { title: 'Env Variables', href: '#env-variables', icon: Settings },
+        { title: 'VPS & Dashboard', href: '#vps-setup', icon: ShieldCheck },
         { title: 'Self-Hosting', href: '#self-hosting', icon: ShieldCheck },
+        { title: 'Worker Deployment', href: '#tracker-setup', icon: Zap },
+        { title: 'Env Variables', href: '#env-variables', icon: Settings },
       ],
     },
     {
