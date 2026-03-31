@@ -67,16 +67,14 @@ Integrate Cloudflare Workers alongside your Docker setup to handle global click 
 * **Privacy-First Tracking:** Our tracking workers are designed to be lightweight, cookie-compliant, and respect modern privacy standards.
 
 ---
-## Star History
 
-<a href="https://www.star-history.com/?repos=ZAK123DSFDF%2Frefearnapp&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=ZAK123DSFDF/refearnapp&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=ZAK123DSFDF/refearnapp&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=ZAK123DSFDF/refearnapp&type=date&legend=top-left" />
- </picture>
-</a>
+## 📈 Star History
 
+<p align="center">
+  <a href="https://star-history.com/#ZAK123DSFDF/refearnapp&Date">
+    <img src="https://api.star-history.com/svg?repos=ZAK123DSFDF/refearnapp&theme=dark" alt="Star History Chart" width="100%" />
+  </a>
+</p>
 ---
 
 ## ⚖️ License
@@ -85,8 +83,13 @@ This repository's source code is available under the **AGPL-3.0 license**.
 
 ---
 
-**Built with ❤️ by the RefearnApp Community.**
-# 🚀 RefearnApp: Performant High-Scale Affiliate Tracking Tool
+<p align="center">
+  <img src="https://assets.refearnapp.com/refearnapp.svg" width="40px" />
+  <br />
+  <strong>Built with ❤️ by the RefearnApp Community.</strong>
+</p>
+
+---
 
 ![License](https://img.shields.io/github/license/ZAK123DSFDF/refearnapp?color=indigo)
 ![Stars](https://img.shields.io/github/stars/ZAK123DSFDF/refearnapp?style=social)
