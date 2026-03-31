@@ -68,13 +68,9 @@ Integrate Cloudflare Workers alongside your Docker setup to handle global click 
 
 ---
 
-## 📈 Star History
+## Star History
 
-<p align="center">
-  <a href="https://star-history.com/#ZAK123DSFDF/refearnapp&Date">
-    <img src="https://api.star-history.com/svg?repos=ZAK123DSFDF/refearnapp&theme=dark" alt="Star History Chart" width="100%" />
-  </a>
-</p>
+[![Star History Chart](https://api.star-history.com/image?repos=ZAK123DSFDF/refearnapp&type=date&legend=top-left)](https://www.star-history.com/?repos=ZAK123DSFDF%2Frefearnapp&type=date&legend=top-left)
 ---
 
 ## ⚖️ License
