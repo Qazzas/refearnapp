@@ -1,10 +1,26 @@
-# 🚀 RefearnApp: Performant High-Scale Affiliate Tracking Tool
+<p align="center">
+  <img src="https://assets.refearnapp.com/refearnapp.svg" alt="RefearnApp Logo" width="120px" />
+</p>
 
-RefearnApp is an open-source, high-performance platform designed to help you build, track, and scale referral programs with maximum efficiency.
+<h1 align="center">RefearnApp: Performant High-Scale Affiliate Tracking Tool</h1>
 
-**An open-source and self-hostable alternative to:** Rewardful, FirstPromoter, and Tolt.
+<p align="center">
+  <img src="https://img.shields.io/github/license/ZAK123DSFDF/refearnapp?color=indigo" alt="License" />
+  <img src="https://img.shields.io/github/stars/ZAK123DSFDF/refearnapp?style=social" alt="Stars" />
+</p>
 
-[Explore the Docs »](https://refearnapp.com/docs) | [Discord Support](https://discord.gg/fHw9j7P3w9)
+<p align="center">
+  RefearnApp is an open-source, high-performance platform designed to help you build, track, and scale referral programs with maximum efficiency.
+</p>
+
+<p align="center">
+  <strong>An open-source and self-hostable alternative to:</strong> Rewardful, FirstPromoter, and Tolt.
+</p>
+
+<p align="center">
+  <a href="https://refearnapp.com/docs">Explore the Docs »</a> | 
+  <a href="https://discord.gg/fHw9j7P3w9">Discord Support</a>
+</p>
 
 ---
 
@@ -51,10 +67,15 @@ Integrate Cloudflare Workers alongside your Docker setup to handle global click 
 * **Privacy-First Tracking:** Our tracking workers are designed to be lightweight, cookie-compliant, and respect modern privacy standards.
 
 ---
+## Star History
 
-## 📈 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ZAK123DSFDF/refearnapp&theme=dark)](https://star-history.com/#ZAK123DSFDF/refearnapp&Date)
+<a href="https://www.star-history.com/?repos=ZAK123DSFDF%2Frefearnapp&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=ZAK123DSFDF/refearnapp&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=ZAK123DSFDF/refearnapp&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=ZAK123DSFDF/refearnapp&type=date&legend=top-left" />
+ </picture>
+</a>
 
 ---
 
