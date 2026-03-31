@@ -6,38 +6,43 @@ export const EnvItem = ({
   name,
   description,
   example,
-  codeSnippet,
+  link,
+  children,
 }: any) => (
   <div
     id={id}
     className="scroll-mt-24 p-5 transition-colors hover:bg-slate-50/50 md:p-6"
   >
-    {/* Variable Name Container */}
-    <div className="no-scrollbar w-full min-w-0 overflow-x-auto">
-      <code className="inline-block text-xs font-bold whitespace-nowrap text-indigo-600 md:text-sm">
-        {name}
-      </code>
-    </div>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-4">
+        <code className="text-xs font-bold text-indigo-600 md:text-sm">
+          {name}
+        </code>
+        {link && (
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] font-bold text-indigo-500 underline hover:text-indigo-700 md:text-xs"
+          >
+            Get Key Here ↗
+          </a>
+        )}
+      </div>
 
-    <p className="mt-2 text-xs leading-relaxed font-medium text-slate-700 md:text-sm">
-      {description}
-    </p>
+      <p className="text-xs leading-relaxed font-medium text-slate-700 md:text-sm">
+        {description}
+      </p>
 
-    {example && (
-      <div className="no-scrollbar mt-2 w-full min-w-0 overflow-x-auto">
-        <p className="text-[10px] whitespace-nowrap text-slate-400 italic md:text-xs">
+      {/* This is where the Frame/Image will render if passed */}
+      {children}
+
+      {example && (
+        <p className="mt-2 text-[10px] text-slate-400 italic md:text-xs">
           Example: <span className="font-mono text-slate-500">{example}</span>
         </p>
-      </div>
-    )}
-
-    {codeSnippet && (
-      <div className="mt-3 w-full overflow-x-auto rounded-lg border border-slate-100 bg-slate-50 p-3">
-        <pre className="font-mono text-[10px] whitespace-pre text-slate-600">
-          {codeSnippet}
-        </pre>
-      </div>
-    )}
+      )}
+    </div>
   </div>
 );
 

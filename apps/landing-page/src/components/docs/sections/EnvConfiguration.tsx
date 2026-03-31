@@ -2,6 +2,7 @@
 import React from 'react';
 import EnvTabs from '../EnvTabs.tsx';
 import { EnvGroup, EnvItem } from '../EnvGroup.tsx';
+import Frame from '../Frame.tsx';
 const WarningBox = ({ children }: { children: React.ReactNode }) => (
   <div className="mb-6 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
     <span className="text-lg">⚠️</span>
@@ -318,24 +319,120 @@ export default function EnvConfiguration() {
       label: 'Stripe',
       icon: '💳',
       content: (
-        <EnvGroup title="Payment Gateway (Stripe)" icon="💳">
-          <EnvItem
-            id="s-id"
-            name="STRIPE_CLIENT_ID"
-            description="Stripe Connect Client ID for platform features."
-          />
-          <EnvItem
-            id="s-key"
-            name="STRIPE_SECRET_KEY"
-            description="Your Stripe Secret Key (sk_test_... or sk_live_...)."
-          />
-          <EnvItem
-            id="s-wh"
-            name="STRIPE_WEBHOOK_SECRET"
-            description="Webhook signing secret to verify Stripe events."
-            example="whsec_..."
-          />
-        </EnvGroup>
+        <div className="space-y-10">
+          {/* 1. Connect Client ID */}
+          <EnvGroup title="1. Stripe Connect (Platform Setup)" icon="🔗">
+            <WarningBox>
+              <p className="font-bold">Important: Central Account Logic</p>
+              <p className="mt-1 opacity-90">
+                To manage multiple sub-accounts, you must designate one
+                **Central Stripe Account**. Log into that account, go to the
+                Connect tab, and click <strong>"Get Started"</strong> to enable
+                platform features.
+              </p>
+            </WarningBox>
+
+            <EnvItem
+              id="s-id"
+              name="STRIPE_CLIENT_ID"
+              description="Found in Settings > Connect > Settings. Scroll to 'Integration' to find your 'Test mode client ID'."
+              link="https://dashboard.stripe.com/settings/connect"
+              example="ca_..."
+            >
+              <div className="mt-4 space-y-4 text-sm text-slate-600">
+                <p>
+                  <strong>Required Action:</strong> You must add your OAuth
+                  Redirect URL in the same settings page under "Redirect URIs":
+                </p>
+                <code className="block rounded bg-slate-100 p-2 text-indigo-600">
+                  {`NEXT_PUBLIC_BASE_URL`}/api/stripe/oauth/callback
+                </code>
+              </div>
+              <Frame
+                src="/Stripe/STRIPE_CLIENT_ID.png"
+                caption="Enable OAuth in Connect Settings and copy your Client ID."
+              />
+            </EnvItem>
+          </EnvGroup>
+
+          {/* 2. API Keys */}
+          <EnvGroup title="2. Standard API Keys" icon="🔑">
+            <EnvItem
+              id="s-key"
+              name="STRIPE_SECRET_KEY"
+              description="Your main Secret Key. Found on the Stripe Home/Developers dashboard."
+              link="https://dashboard.stripe.com/apikeys"
+              example="sk_live_..."
+            >
+              <Frame
+                src="/Stripe/STRIPE_SECRET_KEY.png"
+                caption="Copy your Secret Key from the API Keys tab in the Developers section."
+              />
+            </EnvItem>
+          </EnvGroup>
+
+          {/* 3. Webhooks */}
+          <EnvGroup title="3. Webhook Configuration" icon="⚡">
+            <EnvItem
+              id="s-wh"
+              name="STRIPE_WEBHOOK_SECRET"
+              description="Used to verify incoming events from Stripe."
+              link="https://dashboard.stripe.com/webhooks"
+              example="whsec_..."
+            >
+              <div className="mt-4 space-y-3">
+                <WarningBox>
+                  <p className="font-bold">Select Correct Event Source</p>
+                  <p className="mt-1 opacity-90">
+                    In the "Listen to" dropdown, you <strong>must</strong>{' '}
+                    select: <br />
+                    <span className="font-bold">
+                      "Events on connected accounts"
+                    </span>{' '}
+                    (not "Events on your account").
+                  </p>
+                </WarningBox>
+
+                <p className="text-sm font-bold text-slate-700">
+                  Endpoint URL to add:
+                </p>
+                <code className="block rounded bg-slate-100 p-2 text-indigo-600">
+                  {`NEXT_PUBLIC_REDIRECTION_URL`}/api/webhooks/stripe
+                </code>
+
+                <p className="mt-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
+                  Select All 11 Required Events:
+                </p>
+                <ul className="grid grid-cols-1 gap-2 text-[10px] md:grid-cols-2 lg:grid-cols-3">
+                  {[
+                    'charge.refunded',
+                    'charge.succeeded',
+                    'checkout.session.completed',
+                    'coupon.deleted',
+                    'customer.subscription.created',
+                    'customer.subscription.updated',
+                    'invoice.paid',
+                    'invoice.payment_succeeded',
+                    'payment_intent.succeeded',
+                    'promotion_code.created',
+                    'promotion_code.updated',
+                  ].map((event) => (
+                    <li
+                      key={event}
+                      className="rounded border border-slate-100 bg-slate-50 p-2 font-mono text-indigo-600"
+                    >
+                      {event}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Frame
+                src="/Stripe/STRIPE_WEBHOOK_SECRET.png"
+                caption="Ensure 'Listen to events on connected accounts' is selected and all 11 events are checked."
+              />
+            </EnvItem>
+          </EnvGroup>
+        </div>
       ),
     },
     {
@@ -347,9 +444,17 @@ export default function EnvConfiguration() {
           <EnvItem
             id="currency-api"
             name="CURRENCY_API_KEY"
-            description="API Key for real-time currency conversion rates."
+            description="Used for real-time currency conversion. RefearnApp uses CurrencyAPI to ensure your affiliate payouts are accurate across different currencies."
+            link="https://app.currencyapi.com/" // Direct link to their dashboard
             example="cur_live_..."
-          />
+          >
+            {/* Step-by-step Image Guide */}
+            <Frame
+              src="/Api-keys/CURRENCY_API_KEY.png"
+              caption="Log in to CurrencyAPI, go to your Dashboard, and copy the API Key shown in the 'API Key' section."
+              alt="Where to find CurrencyAPI key"
+            />
+          </EnvItem>
         </EnvGroup>
       ),
     },
