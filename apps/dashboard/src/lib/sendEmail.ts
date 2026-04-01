@@ -107,7 +107,11 @@ export const sendEmail = async ({
       replyTo,
     })
   }
-
+  if (!process.env.ZEPTO_TOKEN) {
+    throw new Error(
+      "No email provider configured. Please set EMAIL_PROVIDER or provide ZEPTO_TOKEN."
+    )
+  }
   // --- 4. ZEPTOMAIL (Cleaned up to use finalFromEmail) ---
   const client = new SendMailClient({
     url: "https://api.zeptomail.com/v1.1/email",

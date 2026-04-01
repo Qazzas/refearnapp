@@ -7,6 +7,7 @@ export const EnvItem = ({
   description,
   example,
   link,
+  codeSnippet,
   children,
 }: any) => (
   <div
@@ -34,13 +35,21 @@ export const EnvItem = ({
         {description}
       </p>
 
-      {/* This is where the Frame/Image will render if passed */}
+      {/* Renders custom frames/images if passed */}
       {children}
 
       {example && (
         <p className="mt-2 text-[10px] text-slate-400 italic md:text-xs">
           Example: <span className="font-mono text-slate-500">{example}</span>
         </p>
+      )}
+
+      {codeSnippet && (
+        <div className="mt-3 w-full overflow-x-auto rounded-lg border border-slate-100 bg-slate-50 p-3">
+          <pre className="font-mono text-[10px] whitespace-pre text-slate-600">
+            {codeSnippet}
+          </pre>
+        </div>
       )}
     </div>
   </div>
