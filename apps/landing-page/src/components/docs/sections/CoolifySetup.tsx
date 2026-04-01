@@ -11,6 +11,7 @@ import {
   ExternalLink,
   ChevronDown,
 } from 'lucide-react';
+import Frame from '../Frame'; // Ensure path is correct
 
 export default function CoolifySetup() {
   const repoUrl = 'https://github.com/ZAK123DSFDF/refearnapp';
@@ -28,7 +29,7 @@ export default function CoolifySetup() {
       <div className="space-y-12">
         {/* Step 1: Installation */}
         <div className="relative border-l-2 border-slate-200 pl-6 md:pl-8">
-          <div className="absolute top-0 -left-[9px] h-4 w-4 rounded-full border-4 border-white bg-indigo-600 shadow-sm" />
+          <div className="absolute top-0 -left-2.25 h-4 w-4 rounded-full border-4 border-white bg-indigo-600 shadow-sm" />
           <h3 className="mb-3 text-lg font-bold text-slate-900 md:text-xl">
             1. Install Coolify on VPS
           </h3>
@@ -41,9 +42,9 @@ export default function CoolifySetup() {
           </div>
         </div>
 
-        {/* Step 2: Repository (The Yellow/Amber Element) */}
+        {/* Step 2: Repository */}
         <div className="relative border-l-2 border-slate-200 pl-6 md:pl-8">
-          <div className="absolute top-0 -left-[9px] h-4 w-4 rounded-full border-4 border-white bg-slate-300" />
+          <div className="absolute top-0 -left-2.25 h-4 w-4 rounded-full border-4 border-white bg-slate-300" />
           <h3 className="mb-3 text-lg font-bold text-slate-900 md:text-xl">
             2. Connect Forked Repository
           </h3>
@@ -76,9 +77,9 @@ export default function CoolifySetup() {
           </div>
         </div>
 
-        {/* Step 3: Configuration (The Env/Bridge Element) */}
+        {/* Step 3: Configuration */}
         <div className="relative border-l-2 border-slate-200 pl-6 md:pl-8">
-          <div className="absolute top-0 -left-[9px] h-4 w-4 rounded-full border-4 border-white bg-slate-300" />
+          <div className="absolute top-0 -left-2.25 h-4 w-4 rounded-full border-4 border-white bg-slate-300" />
           <h3 className="mb-3 text-lg font-bold text-slate-900 md:text-xl">
             3. Configure Environment & Domain
           </h3>
@@ -98,10 +99,16 @@ export default function CoolifySetup() {
               </a>{' '}
               below.
             </p>
+
+            {/* Image 1: Environment Variables */}
+            <Frame
+              src="/Sections/coolify-environment-variables.png"
+              alt="Coolify Environment Variables Setup"
+              caption="Paste your environment variables into the 'Environment Variables' tab."
+            />
           </div>
 
           <div className="space-y-4">
-            {/* The Blue Bridge - Fixed for Mobile */}
             <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 shadow-sm md:p-6">
               <div className="mb-4 flex flex-col gap-2">
                 <div className="flex items-center gap-2 font-bold text-indigo-900">
@@ -123,7 +130,6 @@ export default function CoolifySetup() {
                   </code>
                 </div>
 
-                {/* Arrow changes to Chevron on mobile */}
                 <div className="flex justify-center text-slate-300">
                   <ArrowRight size={20} className="hidden md:block" />
                   <ChevronDown size={20} className="block md:hidden" />
@@ -138,21 +144,37 @@ export default function CoolifySetup() {
                   </code>
                 </div>
               </div>
+
+              {/* Image 2: Domain Setup */}
+              <Frame
+                src="/Sections/coolify-domains.png"
+                alt="Coolify Domain Configuration"
+                caption="Ensure the domain matches your NEXT_PUBLIC_REDIRECTION_URL exactly."
+              />
             </div>
 
-            <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-xs text-slate-600 md:text-sm">
-              <FileCode size={18} className="shrink-0 text-indigo-500" />
-              <p>
-                Set <strong>Dockerfile</strong> and{' '}
-                <strong>Root Directory</strong> to <code>/</code>.
-              </p>
+            <div className="flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+              <div className="flex items-start gap-3 text-xs text-slate-600 md:text-sm">
+                <FileCode size={18} className="shrink-0 text-indigo-500" />
+                <p>
+                  Set <strong>Dockerfile</strong> and{' '}
+                  <strong>Root Directory</strong> to <code>/</code>.
+                </p>
+              </div>
+
+              {/* Image 3: Docker Setup */}
+              <Frame
+                src="/Sections/coolify-docker-setup.png"
+                alt="Coolify Build Settings"
+                caption="Select Dockerfile as the build pack in the 'General' settings."
+              />
             </div>
           </div>
         </div>
 
         {/* Step 4: Deploy */}
         <div className="relative border-l-2 border-slate-200 pl-6 md:pl-8">
-          <div className="absolute top-0 -left-[9px] h-4 w-4 rounded-full border-4 border-white bg-emerald-500 shadow-sm" />
+          <div className="absolute top-0 -left-2.25 h-4 w-4 rounded-full border-4 border-white bg-emerald-500 shadow-sm" />
           <h3 className="mb-3 text-lg font-bold text-slate-900 md:text-xl">
             4. Launch
           </h3>

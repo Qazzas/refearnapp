@@ -11,6 +11,7 @@ import {
   Globe,
   RefreshCcw,
 } from 'lucide-react';
+import Frame from '../Frame'; // Ensure this path is correct
 
 export default function TrackerDeployment() {
   return (
@@ -95,13 +96,12 @@ export default function TrackerDeployment() {
             <Key size={18} />
             Script Prompt Reference
           </h3>
-          {/* Scrollable Container */}
           <div className="scrollbar-thin scrollbar-thumb-indigo-100 overflow-x-auto rounded-xl border border-indigo-100 bg-white shadow-sm">
             <table className="w-full text-left text-xs">
               <thead className="bg-indigo-100/50 text-[9px] font-black tracking-widest whitespace-nowrap text-indigo-900/50 uppercase">
                 <tr>
-                  <th className="min-w-[140px] px-4 py-3">Prompt Name</th>
-                  <th className="min-w-[200px] px-4 py-3">
+                  <th className="min-w-35 px-4 py-3">Prompt Name</th>
+                  <th className="min-w-50 px-4 py-3">
                     Variable From Dashboard
                   </th>
                 </tr>
@@ -135,7 +135,6 @@ export default function TrackerDeployment() {
               </tbody>
             </table>
           </div>
-          {/* Mobile Hint */}
           <p className="mt-2 text-center text-[10px] text-slate-400 italic md:hidden">
             ← Swipe table to see full variables →
           </p>
@@ -180,6 +179,13 @@ export default function TrackerDeployment() {
                 </li>
               </ul>
             </div>
+
+            {/* Added Frame here */}
+            <Frame
+              src="/Sections/cloudflare-worker-custom-domain.png"
+              alt="Cloudflare Worker Custom Domain Settings"
+              caption="Configure your Custom Domains within the Worker settings to enable public tracking."
+            />
           </div>
         </div>
 

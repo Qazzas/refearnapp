@@ -1,5 +1,6 @@
 /** @jsxImportSource react */
 import { ShieldCheck, Info, Edit3 } from 'lucide-react';
+import Frame from '../Frame'; // Adjust path if necessary
 
 export default function VPSConfig() {
   return (
@@ -29,7 +30,14 @@ export default function VPSConfig() {
             like.
           </p>
 
-          {/* Simulated DNS Dashboard - Responsive Optimized */}
+          {/* New Image Frame Added Here */}
+          <Frame
+            src="/Sections/cloudflare-dns.png"
+            alt="Cloudflare DNS A Record Setup"
+            caption="Add an 'A' record pointing your subdomain to your VPS IPv4 address."
+          />
+
+          {/* Simulated DNS Dashboard - Styling preserved */}
           <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900 font-mono shadow-lg">
             <div className="flex items-center justify-between border-b border-slate-800 bg-slate-800/50 px-4 py-2 text-[9px] font-bold tracking-widest text-slate-400 uppercase md:text-xs">
               <span>Cloudflare DNS Dashboard</span>
@@ -39,16 +47,13 @@ export default function VPSConfig() {
             </div>
 
             <div className="p-4 md:p-5">
-              {/* Desktop Header (Hidden on Mobile) */}
               <div className="hidden grid-cols-3 gap-2 border-b border-slate-700 pb-2 text-[10px] font-black text-slate-500 uppercase md:grid">
                 <span>Type</span>
                 <span>Name (Subdomain)</span>
                 <span>IPv4 Content</span>
               </div>
 
-              {/* Responsive Row: Vertical on Mobile, Horizontal on Desktop */}
               <div className="flex flex-col gap-4 py-1 text-xs md:grid md:grid-cols-3 md:items-center md:gap-2 md:text-sm">
-                {/* Type Column */}
                 <div className="flex items-center justify-between md:block">
                   <span className="text-[8px] font-black text-slate-500 uppercase md:hidden">
                     Type
@@ -56,7 +61,6 @@ export default function VPSConfig() {
                   <span className="font-bold text-indigo-400">A</span>
                 </div>
 
-                {/* Name Column */}
                 <div className="flex flex-col gap-1 md:block">
                   <span className="text-[8px] font-black text-slate-500 uppercase md:hidden">
                     Name (Subdomain)
@@ -69,7 +73,6 @@ export default function VPSConfig() {
                   </span>
                 </div>
 
-                {/* Content Column */}
                 <div className="flex flex-col gap-1 md:block">
                   <span className="text-[8px] font-black text-slate-500 uppercase md:hidden">
                     IPv4 Content
@@ -83,7 +86,7 @@ export default function VPSConfig() {
           </div>
         </div>
 
-        {/* Step 2: The "Later" Context */}
+        {/* Step 2: The "Later" Context - Styling preserved */}
         <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-5 md:p-6">
           <div className="mb-3 flex items-center gap-2 text-blue-800">
             <Info size={20} className="shrink-0" />

@@ -1,6 +1,6 @@
 {
   "name": "@repo/dashboard",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -85,8 +85,8 @@
     "lodash": "4.17.23",
     "lucide-react": "^0.484.0",
     "nanoid": "^5.1.6",
-    "next": "16.1.5",
-    "nodemailer": "^7.0.13",
+    "next": "16.1.7",
+    "nodemailer": "8.0.4",
     "p-limit": "^7.3.0",
     "papaparse": "^5.5.3",
     "postgres": "^3.4.8",

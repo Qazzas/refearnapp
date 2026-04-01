@@ -1,5 +1,6 @@
 /** @jsxImportSource react */
 import { CheckCircle2, Globe } from 'lucide-react';
+import Frame from '../Frame'; // Adjust this path based on your folder structure
 
 export default function CloudflareConnect() {
   return (
@@ -17,10 +18,17 @@ export default function CloudflareConnect() {
           <h3 className="mt-0 text-lg font-bold text-slate-900">
             Connecting your Domain
           </h3>
-          <p className="text-slate-600">
+          <p className="mb-6 text-slate-600">
             RefearnApp utilizes Cloudflare Workers. Your domain must be managed
             by Cloudflare to route traffic correctly.
           </p>
+
+          {/* The Screenshot Frame */}
+          <Frame
+            src="/Sections/cloudflare-domains.png"
+            alt="Cloudflare DNS Configuration"
+            caption="Ensure your domain status is 'Active' in the Cloudflare dashboard."
+          />
 
           <ul className="list-none space-y-4 pl-0">
             <li className="flex gap-3">

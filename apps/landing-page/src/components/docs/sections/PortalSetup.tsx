@@ -1,11 +1,6 @@
 /** @jsxImportSource react */
-import {
-  Building2,
-  Copy,
-  ExternalLink,
-  LayoutDashboard,
-  ArrowRight,
-} from 'lucide-react';
+import { Copy, ExternalLink, LayoutDashboard, ArrowRight } from 'lucide-react';
+import Frame from '../Frame'; // Ensure this path is correct
 
 export default function PortalSetup() {
   return (
@@ -44,12 +39,12 @@ export default function PortalSetup() {
           <div className="space-y-4">
             {/* Step A: Inside Refearn */}
             <div className="rounded-xl border border-amber-200 bg-white p-4 shadow-sm">
-              <div className="mb-2 flex items-center justify-between">
+              <div className="mb-2 flex items-center justify-between border-b border-amber-50 pb-2">
                 <span className="text-[10px] font-black text-amber-600 uppercase">
                   Inside RefearnApp
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-4">
+              <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-xs font-bold text-slate-700">
                   Manage Domains &gt; Copy Active Domain
                 </p>
@@ -57,37 +52,57 @@ export default function PortalSetup() {
                   <Copy size={12} /> app.yourdomain.com
                 </div>
               </div>
+
+              {/* Image A: Manage Domains UI */}
+              <Frame
+                src="/Sections/coolify-manage-domains.png"
+                alt="RefearnApp Domain Management"
+                caption="Copy your active tracking domain from the dashboard settings."
+              />
             </div>
 
             <div className="flex justify-center py-1">
-              <ArrowRight className="rotate-90 text-amber-300 md:rotate-0" />
+              <ArrowRight
+                className="rotate-90 text-amber-300 md:rotate-0"
+                size={24}
+              />
             </div>
 
             {/* Step B: Inside Coolify */}
             <div className="rounded-xl border border-indigo-200 bg-white p-4 shadow-sm">
-              <div className="mb-2 flex items-center justify-between">
+              <div className="mb-2 flex items-center justify-between border-b border-indigo-50 pb-2">
                 <span className="text-[10px] font-black text-indigo-600 uppercase">
                   Inside Coolify
                 </span>
               </div>
-              <p className="mb-2 text-xs font-bold text-slate-700">
+              <p className="mt-4 text-xs font-bold text-slate-700">
                 Configuration &gt; General &gt; Domains
               </p>
-              <div className="rounded border-2 border-dashed border-indigo-100 p-2 text-center font-mono text-[10px] font-bold text-indigo-600">
+              <div className="mt-2 rounded border-2 border-dashed border-indigo-100 p-2 text-center font-mono text-[10px] font-bold text-indigo-600">
                 PASTE DOMAIN HERE
               </div>
+
+              {/* Image B: Coolify Domain Configuration */}
+              <Frame
+                src="/Sections/coolify-domains.png"
+                alt="Coolify Domain Entry"
+                caption="Paste the copied domain into Coolify's general settings to finalize the routing."
+              />
             </div>
           </div>
         </div>
 
         {/* Result Callout */}
-        <div className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+        <div className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 shadow-sm">
           <ExternalLink size={20} className="mt-1 shrink-0 text-emerald-600" />
-          <p className="text-sm text-emerald-900">
-            <strong>Success!</strong> After clicking save in Coolify, your
-            affiliate portal is now correctly routed to your VPS. Your
-            affiliates can now sign up via your custom subdomain.
-          </p>
+          <div className="text-sm text-emerald-900">
+            <p className="font-bold">Portal Live!</p>
+            <p className="opacity-90">
+              After clicking save in Coolify, your affiliate portal is now
+              correctly routed to your VPS. Your affiliates can now sign up via
+              your custom subdomain.
+            </p>
+          </div>
         </div>
       </div>
     </section>

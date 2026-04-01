@@ -563,9 +563,16 @@ function EmailTabContent() {
               ? 'Enter your ZeptoMail verified domain. Ensure DNS records (SPF/DKIM) are added to Cloudflare.'
               : activeProvider === 'resend'
                 ? "Enter your Resend domain. Resend handles most DNS, but ensure it's verified in Cloudflare."
-                : 'Enter your SMTP sending domain. Manual DNS configuration in Cloudflare is required.'
+                : 'Enter your SMTP sending domain. In this example we use Mailtrap, but any provider works. Manual DNS configuration in Cloudflare is required.'
           }
           example="mail.voteflow.xyz"
+          link={
+            activeProvider === 'zepto'
+              ? 'https://zeptomail.zoho.com/'
+              : activeProvider === 'resend'
+                ? 'https://resend.com/domains'
+                : 'https://mailtrap.io/inboxes'
+          }
         >
           {/* Swapping image based on provider */}
           <Frame
@@ -609,6 +616,7 @@ function EmailTabContent() {
                     id="zepto-token"
                     name="ZEPTO_TOKEN"
                     description="Your ZeptoMail Send Mail Token."
+                    link="https://zeptomail.zoho.com/"
                   >
                     <Frame src="/Email/ZEPTO_TOKEN.png" />
                   </EnvItem>
@@ -625,6 +633,7 @@ function EmailTabContent() {
                     id="resend-api"
                     name="RESEND_API_KEY"
                     description="Your Resend API Key (re_...)."
+                    link="https://resend.com/api-keys"
                   >
                     <Frame src="/Email/RESEND_API_KEY.png" />
                   </EnvItem>
@@ -642,6 +651,7 @@ function EmailTabContent() {
                     name="SMTP_HOST"
                     description="SMTP Server hostname."
                     example="smtp.zoho.com"
+                    link="https://mailtrap.io/inboxes"
                   >
                     <Frame src="/Email/SMTP_HOST.png" />
                   </EnvItem>
