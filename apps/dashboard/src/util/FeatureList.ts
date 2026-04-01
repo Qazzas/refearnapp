@@ -19,7 +19,6 @@ const COMMON_FEATURES: FeatureList[] = [
     pro: true,
     ultimate: true,
   },
-  { name: "Private Discord VIP & Support access", pro: true, ultimate: true },
 ]
 
 const CLOUD_FEATURES: FeatureList[] = [
@@ -27,11 +26,15 @@ const CLOUD_FEATURES: FeatureList[] = [
   { name: "Unlimited organizations", pro: false, ultimate: true },
   { name: "Up to 3 team member invitations", pro: true, ultimate: false },
   { name: "Unlimited team member invitations", pro: false, ultimate: true },
+  { name: "Private Discord Pro Support", pro: true, ultimate: false },
+  { name: "Private Discord Ultimate VIP Access", pro: false, ultimate: true },
 ]
 
 const SELF_HOSTED_FEATURES: FeatureList[] = [
   { name: "Coupon code tracking", pro: false, ultimate: true },
   { name: "Team management", pro: false, ultimate: true },
+  { name: "Private Pro Discord Support", pro: true, ultimate: false },
+  { name: "Private Ultimate VIP Community", pro: false, ultimate: true },
 ]
 
 const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
