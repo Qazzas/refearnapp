@@ -25,7 +25,7 @@ export default function CloudflareConnect() {
 
           {/* The Screenshot Frame */}
           <Frame
-            src="/Sections/cloudflare-domains.png"
+            src="/Sections/cloudflare-domains-connect.png"
             alt="Cloudflare DNS Configuration"
             caption="Ensure your domain status is 'Active' in the Cloudflare dashboard."
           />

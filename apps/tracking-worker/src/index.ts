@@ -57,9 +57,9 @@ export default {
 
 			// Sections (From your Portal Setup)
 			'/Sections/cloudflare-dns.png',
-			'/Sections/cloudflare-domains.png',
+			'/Sections/cloudflare-domains-connect.png',
 			'/Sections/cloudflare-worker-custom-domain.png',
-			'/Sections/coolify-docker-setup.png',
+			'/Sections/coolify-docker-setup-init.png',
 			'/Sections/coolify-domains.png',
 			'/Sections/coolify-environment-variables.png',
 			'/Sections/coolify-manage-domains.png',

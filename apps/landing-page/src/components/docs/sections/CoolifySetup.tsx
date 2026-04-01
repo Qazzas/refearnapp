@@ -164,7 +164,7 @@ export default function CoolifySetup() {
 
               {/* Image 3: Docker Setup */}
               <Frame
-                src="/Sections/coolify-docker-setup.png"
+                src="/Sections/coolify-docker-setup-init.png"
                 alt="Coolify Build Settings"
                 caption="Select Dockerfile as the build pack in the 'General' settings."
               />
