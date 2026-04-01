@@ -8,12 +8,16 @@ import {
   Zap,
   Database,
   X,
+  Mail,
+  MessageCircle,
+  ExternalLink,
+  LayoutDashboard,
 } from 'lucide-react';
 
 export default function Sidebar() {
   const [activeId, setActiveId] = useState('getting-started');
   const [isOpen, setIsOpen] = useState(false);
-
+  const discordUrl = 'https://discord.gg/fHw9j7P3w9';
   const groups = [
     {
       label: 'Setup',
@@ -29,6 +33,8 @@ export default function Sidebar() {
         { title: 'Self-Hosting', href: '#self-hosting', icon: ShieldCheck },
         { title: 'Worker Deployment', href: '#tracker-setup', icon: Zap },
         { title: 'Database & Sync', href: '#database-setup', icon: Database },
+        { title: 'Email Config', href: '#email-setup', icon: Mail },
+        { title: 'Portal Sync', href: '#portal-setup', icon: LayoutDashboard },
         { title: 'Env Variables', href: '#env-variables', icon: Settings },
       ],
     },
@@ -67,41 +73,65 @@ export default function Sidebar() {
   }, []);
 
   const NavLinks = ({ onLinkClick }: { onLinkClick?: () => void }) => (
-    <div className="flex flex-col gap-6">
-      {groups.map((group) => (
-        <div key={group.label} className="flex flex-col gap-1">
-          <h3 className="px-4 py-2 text-[10px] font-black tracking-widest text-slate-400/80 uppercase">
-            {group.label}
-          </h3>
-          <nav className="flex flex-col gap-1">
-            {group.items.map((item) => {
-              const isActive = activeId === item.href.replace('#', '');
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={onLinkClick}
-                  className={`group flex items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-600 shadow-sm'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'
-                  }`}
-                >
-                  <item.icon
-                    size={16}
-                    className={
+    <div className="flex h-full flex-col justify-between gap-6">
+      <div className="flex flex-col gap-6">
+        {groups.map((group) => (
+          <div key={group.label} className="flex flex-col gap-1">
+            <h3 className="px-4 py-2 text-[10px] font-black tracking-widest text-slate-400/80 uppercase">
+              {group.label}
+            </h3>
+            <nav className="flex flex-col gap-1">
+              {group.items.map((item) => {
+                const isActive = activeId === item.href.replace('#', '');
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={onLinkClick}
+                    className={`group flex items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                       isActive
-                        ? 'text-indigo-600'
-                        : 'text-slate-400 group-hover:text-indigo-600'
-                    }
-                  />
-                  {item.title}
-                </a>
-              );
-            })}
-          </nav>
-        </div>
-      ))}
+                        ? 'bg-indigo-50 text-indigo-600 shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'
+                    }`}
+                  >
+                    <item.icon
+                      size={16}
+                      className={
+                        isActive
+                          ? 'text-indigo-600'
+                          : 'text-slate-400 group-hover:text-indigo-600'
+                      }
+                    />
+                    {item.title}
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
+        ))}
+      </div>
+
+      {/* Discord Support Card in Sidebar */}
+      <div className="mt-auto px-2 pb-4">
+        <a
+          href={discordUrl}
+          target="_blank"
+          className="flex flex-col gap-2 rounded-xl bg-slate-900 p-4 transition-transform hover:scale-[1.02]"
+        >
+          <div className="flex items-center gap-2 text-indigo-400">
+            <MessageCircle size={18} />
+            <span className="text-xs font-bold tracking-wider uppercase">
+              Community Support
+            </span>
+          </div>
+          <p className="text-[11px] leading-relaxed text-slate-400">
+            Stuck? Join our Discord for direct help from the team.
+          </p>
+          <div className="flex items-center gap-1 text-[11px] font-bold text-white underline decoration-indigo-500">
+            Join Discord <ExternalLink size={10} />
+          </div>
+        </a>
+      </div>
     </div>
   );
 

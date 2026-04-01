@@ -103,18 +103,23 @@ export default function CoolifySetup() {
           <div className="space-y-4">
             {/* The Blue Bridge - Fixed for Mobile */}
             <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 shadow-sm md:p-6">
-              <div className="mb-4 flex items-center gap-2 font-bold text-indigo-900">
-                <Link size={18} className="shrink-0" />
-                <h4 className="text-sm md:text-base">Sync Redirection URL</h4>
+              <div className="mb-4 flex flex-col gap-2">
+                <div className="flex items-center gap-2 font-bold text-indigo-900">
+                  <Link size={18} className="shrink-0" />
+                  <h4 className="text-sm md:text-base">Link Redirection URL</h4>
+                </div>
+                <p className="text-[10px] font-bold tracking-tight text-indigo-600/70 uppercase">
+                  Coolify Path: Configuration &gt; General &gt; Domains
+                </p>
               </div>
 
               <div className="flex flex-col gap-4 rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm md:flex-row md:items-center">
                 <div className="min-w-0 flex-1">
                   <p className="mb-1 text-[9px] font-black tracking-widest text-slate-400 uppercase">
-                    Env Variable
+                    1. Cloudflare Name
                   </p>
-                  <code className="text-[10px] font-bold text-indigo-600 md:text-xs">
-                    NEXT_PUBLIC_REDIRECTION_URL
+                  <code className="text-[10px] font-bold text-slate-800 md:text-xs">
+                    https://[ANY-NAME].yourdomain.com
                   </code>
                 </div>
 
@@ -126,10 +131,10 @@ export default function CoolifySetup() {
 
                 <div className="min-w-0 flex-1">
                   <p className="mb-1 text-[9px] font-black tracking-widest text-slate-400 uppercase">
-                    Coolify Domain Setup
+                    2. Paste into "Domains"
                   </p>
-                  <code className="block text-[10px] font-bold break-all text-slate-800 italic md:truncate md:text-xs">
-                    https://[YOUR-SUBDOMAIN].yourdomain.com
+                  <code className="block text-[10px] font-bold break-all text-indigo-600 italic md:truncate md:text-xs">
+                    NEXT_PUBLIC_REDIRECTION_URL
                   </code>
                 </div>
               </div>
