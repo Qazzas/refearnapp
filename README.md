@@ -8,7 +8,11 @@
   <img src="https://img.shields.io/github/license/ZAK123DSFDF/refearnapp?color=indigo" alt="License" />
   <img src="https://img.shields.io/github/stars/ZAK123DSFDF/refearnapp?style=social" alt="Stars" />
 </p>
-
+<p align="center">
+  <a href="https://www.producthunt.com/posts/refearnapp" target="_blank">
+    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=refearnapp&theme=light" alt="RefearnApp - Open Source Affiliate Tracking | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
+  </a>
+</p>
 <p align="center">
   RefearnApp is an open-source, high-performance platform designed to help you build, track, and scale referral programs with maximum efficiency.
 </p>
