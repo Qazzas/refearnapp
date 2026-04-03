@@ -7,11 +7,11 @@ interface FrameProps {
   alt?: string;
   caption?: string;
 }
-
+const CDN_URL = 'https://assets.refearnapp.com';
 export default function Frame({ src, alt, caption }: FrameProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-
+  const fullSrc = src.startsWith('/') ? `${CDN_URL}${src}` : src;
   // Sync animation state with open state
   useEffect(() => {
     if (isOpen) {
@@ -42,7 +42,7 @@ export default function Frame({ src, alt, caption }: FrameProps) {
           </div>
 
           <img
-            src={src}
+            src={fullSrc}
             alt={alt || caption || 'Documentation screenshot'}
             className="block h-auto w-full transition-transform duration-300 group-hover:scale-[1.01]"
             loading="lazy"

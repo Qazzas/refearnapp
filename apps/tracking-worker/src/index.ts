@@ -28,52 +28,6 @@ export default {
 			'/sitemap-index.xml',
 			'/sitemap-0.xml',
 			'/sitemap.xml',
-			// Api-keys
-			'/Api-keys/CURRENCY_API_KEY.png',
-
-			// Email
-			'/Email/ZEPTO_EMAIL_DOMAIN.png',
-			'/Email/RESEND_EMAIL_DOMAIN.png',
-			'/Email/SMTP_EMAIL_DOMAIN.png',
-			'/Email/ZEPTO_TOKEN.png',
-			'/Email/RESEND_API_KEY.png',
-			'/Email/SMTP_HOST.png',
-			'/Email/SMTP_PORT.png',
-			'/Email/SMTP_USER.png',
-			'/Email/SMTP_PASSWORD.png',
-
-			// Google
-			'/Google/GOOGLE_CLIENT_ID.png',
-			'/Google/GOOGLE_CLIENT_SECRET.png',
-			'/Google/GOOGLE_REDIRECT_URI.png',
-
-			// R2
-			'/R2/R2_BUCKET_NAME.png',
-			'/R2/R2_ACCESS_URL.png',
-			'/R2/R2_ENDPOINT.png',
-			'/R2/R2_ACCESS_KEY_ID.png',
-			'/R2/R2_SECRET_ACCESS_KEY.png',
-			'/R2/R2_TOKEN_VALUE.png',
-
-			// Sections (From your Portal Setup)
-			'/Sections/cloudflare-dns.png',
-			'/Sections/cloudflare-domains-connect.png',
-			'/Sections/cloudflare-worker-custom-domain.png',
-			'/Sections/coolify-docker-setup-init.png',
-			'/Sections/coolify-domains.png',
-			'/Sections/coolify-environment-variables.png',
-			'/Sections/coolify-manage-domains.png',
-
-			// Stripe
-			'/Stripe/STRIPE_CLIENT_ID.png',
-			'/Stripe/STRIPE_SECRET_KEY.png',
-			'/Stripe/STRIPE_WEBHOOK_SECRET.png',
-
-			// Upstash
-			'/Upstash/UPSTASH_REDIS_REST_URL.png',
-			'/Upstash/UPSTASH_REDIS_REST_TOKEN.png',
-			'/Upstash/QSTASH_URL.png',
-			'/Upstash/QSTASH_TOKEN.png',
 		];
 		const isNextAsset = url.pathname.startsWith('/_next/');
 		const isStaticImage = /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname);
