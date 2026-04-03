@@ -71,7 +71,7 @@ export default function Frame({ src, alt, caption }: FrameProps) {
           </button>
 
           <img
-            src={src}
+            src={fullSrc}
             alt={alt || caption}
             className={`max-h-[90vh] max-w-[95vw] rounded-lg object-contain shadow-2xl transition-all duration-200 ease-out ${
               isAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
