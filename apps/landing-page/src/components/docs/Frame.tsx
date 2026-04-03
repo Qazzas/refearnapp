@@ -58,7 +58,7 @@ export default function Frame({ src, alt, caption }: FrameProps) {
       {/* Lightbox Modal */}
       {isOpen && (
         <div
-          className={`fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 p-4 backdrop-blur-sm transition-all duration-200 ease-out ${
+          className={`fixed inset-0 z-100 flex items-center justify-center bg-slate-900/90 p-4 backdrop-blur-sm transition-all duration-200 ease-out ${
             isAnimating ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={handleClose}
