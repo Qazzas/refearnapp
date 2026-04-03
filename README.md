@@ -26,6 +26,9 @@
   <a href="https://discord.gg/fHw9j7P3w9">Discord Support</a>
 </p>
 
+<p align="center">
+  <img src="https://assets.refearnapp.com/demo.gif" alt="RefearnApp Dashboard Demo" width="100%" />
+</p>
 ---
 
 ## ✨ Core Features
