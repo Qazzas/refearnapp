@@ -3,7 +3,6 @@ import {
   Copy,
   LayoutDashboard,
   ArrowRight,
-  Globe,
   CheckCircle2,
   ExternalLink,
   Link2,
