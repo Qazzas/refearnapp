@@ -5,150 +5,197 @@ import {
   ArrowRight,
   Globe,
   CheckCircle2,
+  ExternalLink,
+  Link2,
 } from 'lucide-react';
 import Frame from '../Frame';
 
 export default function PortalSetup() {
   return (
     <section id="portal-setup" className="mb-24 scroll-mt-20 px-4 md:px-0">
-      <div className="mb-4 flex items-center gap-2 font-bold tracking-tighter text-indigo-600 uppercase">
-        <LayoutDashboard size={18} />
-        <span className="text-xs md:text-sm">Final Activation</span>
+      {/* Header */}
+      <div className="mb-4 flex items-center gap-2 text-xs font-bold tracking-tight text-indigo-600 uppercase sm:text-sm">
+        <LayoutDashboard size={18} className="fill-current" />
+        <span>Final Activation Phase</span>
       </div>
-      <h2 className="mb-6 text-2xl leading-tight font-bold text-slate-900 md:text-3xl">
-        Organization & Portal Routing
+      <h2 className="mb-8 text-2xl leading-tight font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+        Finalizing <span className="text-indigo-600">Portal Routing</span>
       </h2>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-10">
         {/* Step 1: Organization Creation */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-          <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-900 md:text-lg">
-            1. Create your Organization
-          </h3>
-          <p className="mb-6 text-sm leading-relaxed text-slate-600 md:text-base">
-            Once your dashboard is live, sign up and log in. You will be
-            prompted to create a new <strong>Organization</strong>. This is the
-            workspace for your affiliate program.
+        <div className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-indigo-200">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">
+              1
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">
+              Initialize Your Organization
+            </h3>
+          </div>
+          <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
+            With your dashboard live, execute your first login. You’ll be
+            prompted to define your <strong>Organization Workspace</strong>.
+            This acts as the central hub for all affiliate tracking and payout
+            logic.
           </p>
         </div>
 
         {/* Step 2: The Domain Sync Bridge */}
-        <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-5 md:p-6">
-          <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-amber-900 md:text-lg">
-            2. The Final Domain Sync (Refearn &lt;&gt; Coolify)
-          </h3>
-          <p className="mb-6 text-sm leading-relaxed text-amber-900/80 md:text-base">
-            To make the affiliate portal reachable, you must sync the active
-            domain from the dashboard back to Coolify.
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/30 p-6 shadow-sm ring-1 ring-amber-500/10">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-sm font-bold text-white">
+              2
+            </div>
+            <h3 className="text-lg font-bold text-amber-900">
+              Synchronize Domain Routing
+            </h3>
+          </div>
+          <p className="mb-8 text-sm leading-relaxed text-amber-900/80 sm:text-base">
+            To ensure the affiliate portal is reachable, you must bridge the
+            active domain from your Refearn Dashboard back to your Coolify
+            configuration.
           </p>
 
-          <div className="space-y-4">
-            <div className="rounded-xl border border-amber-200 bg-white p-4 shadow-sm">
-              <div className="mb-2 flex items-center justify-between border-b border-amber-50 pb-2">
-                <span className="text-[10px] font-black text-amber-600 uppercase">
-                  Inside RefearnApp
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_48px_1fr] lg:items-center">
+            {/* Source: Refearn */}
+            <div className="rounded-xl border border-amber-200 bg-white p-5 shadow-sm">
+              <div className="mb-4 flex items-center justify-between border-b border-amber-50 pb-3">
+                <span className="text-[10px] font-black tracking-widest text-amber-600 uppercase">
+                  Step A: Export
+                </span>
+                <span className="text-[10px] font-medium text-slate-400">
+                  Refearn Dashboard
                 </span>
               </div>
-              <div className="mt-4 flex items-center justify-between gap-4">
-                <p className="text-xs font-bold text-slate-700">
-                  Manage Domains &gt; Copy Active Domain
+              <div className="space-y-4">
+                <p className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                  <Link2 size={14} className="text-amber-500" /> Manage Domains
+                  &rarr; Copy
                 </p>
-                <div className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-mono text-[10px] font-bold text-slate-500">
-                  <Copy size={12} /> [subdomain].yourdomain.com
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+                  <code className="truncate font-mono text-[10px] font-bold text-indigo-600">
+                    app.yourdomain.com
+                  </code>
+                  <Copy
+                    size={14}
+                    className="shrink-0 cursor-pointer text-slate-400 hover:text-indigo-600"
+                  />
                 </div>
               </div>
-
-              <Frame
-                src="/Sections/coolify-manage-domains.png"
-                alt="RefearnApp Domain Management"
-                caption="Copy your active tracking domain (e.g., app, portal, or affiliates) from the dashboard settings."
-              />
+              <div className="mt-4">
+                <Frame
+                  src="/Sections/coolify-manage-domains.png"
+                  alt="RefearnApp Domain Management"
+                  caption="Copy the active domain prefix from your settings."
+                />
+              </div>
             </div>
 
-            <div className="flex justify-center py-1">
+            {/* Visual Connector */}
+            <div className="flex justify-center">
               <ArrowRight
-                className="rotate-90 text-amber-300 md:rotate-0"
-                size={24}
+                className="rotate-90 text-amber-300 lg:rotate-0"
+                size={32}
               />
             </div>
 
-            <div className="rounded-xl border border-indigo-200 bg-white p-4 shadow-sm">
-              <div className="mb-2 flex items-center justify-between border-b border-indigo-50 pb-2">
-                <span className="text-[10px] font-black text-indigo-600 uppercase">
-                  Inside Coolify
+            {/* Destination: Coolify */}
+            <div className="rounded-xl border border-indigo-200 bg-white p-5 shadow-sm">
+              <div className="mb-4 flex items-center justify-between border-b border-indigo-50 pb-3">
+                <span className="text-[10px] font-black tracking-widest text-indigo-600 uppercase">
+                  Step B: Import
+                </span>
+                <span className="text-[10px] font-medium text-slate-400">
+                  Coolify Control Panel
                 </span>
               </div>
-              <p className="mt-4 text-xs font-bold text-slate-700">
-                Configuration &gt; General &gt; Domains
-              </p>
-              <div className="mt-2 rounded border-2 border-dashed border-indigo-100 p-2 text-center font-mono text-[10px] font-bold text-indigo-600">
-                PASTE COPIED DOMAIN
+              <div className="space-y-4">
+                <p className="text-xs font-bold text-slate-800">
+                  Configuration &rarr; General &rarr; Domains
+                </p>
+                <div className="rounded-lg border-2 border-dashed border-indigo-100 bg-indigo-50/30 p-2 text-center text-[10px] font-black tracking-tighter text-indigo-600 uppercase">
+                  Paste Deployment URL
+                </div>
               </div>
-
-              <Frame
-                src="/Sections/coolify-domains.png"
-                alt="Coolify Domain Entry"
-                caption="Paste the exact domain into Coolify to tell your VPS which URL to listen for."
-              />
+              <div className="mt-4">
+                <Frame
+                  src="/Sections/coolify-domains.png"
+                  alt="Coolify Domain Entry"
+                  caption="Inform your VPS which URL to listen for."
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Step 3: Cloudflare Connection */}
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 md:p-6">
-          <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-900 md:text-lg">
-            <Globe size={20} className="text-indigo-600" />
-            3. Final Cloudflare DNS Mapping
-          </h3>
-          <p className="mb-6 text-sm leading-relaxed text-slate-600 md:text-base">
-            Now, create an <strong>A Record</strong> in Cloudflare. The{' '}
-            <strong>Name</strong> must be the subdomain you chose (e.g., if your
-            domain is <code>app.domain.com</code>, use <code>app</code>).
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+          <div className="mb-5 flex items-center gap-3 font-bold text-slate-900">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
+              3
+            </div>
+            <h3 className="text-lg">Global DNS Propagation</h3>
+          </div>
+          <p className="mb-6 text-sm leading-relaxed text-slate-600 sm:text-base">
+            Map your domain to your infrastructure by creating an{' '}
+            <strong>A Record</strong> within Cloudflare. Ensure the "Name" field
+            matches your chosen subdomain exactly.
           </p>
 
           <Frame
             src="/Sections/cloudflare-dns.png"
             alt="Cloudflare DNS Configuration"
-            caption="The 'Name' must match the subdomain prefix you used in the previous steps."
+            caption="The Record Name must be the prefix (e.g., 'app') of your full URL."
           />
 
-          <div className="mt-4 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
-              Required DNS Entry
-            </p>
-            <div className="grid grid-cols-3 gap-2 font-mono text-[10px] md:text-xs">
-              <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400">Type</span>
+          <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md">
+            <div className="bg-slate-900 px-4 py-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              Required DNS Record
+            </div>
+            <div className="grid grid-cols-1 divide-y divide-slate-100 p-4 font-mono text-[11px] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+              <div className="py-2 sm:px-4 sm:py-0">
+                <span className="mb-1 block text-[9px] text-slate-400">
+                  TYPE
+                </span>
                 <span className="font-bold text-indigo-600">A</span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400">Name</span>
-                <span className="font-bold text-emerald-600">
-                  your-subdomain
+              <div className="py-2 sm:px-4 sm:py-0">
+                <span className="mb-1 block text-[9px] text-slate-400">
+                  NAME (SUBDOMAIN)
                 </span>
+                <span className="font-bold text-emerald-600">app</span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400">Content</span>
+              <div className="py-2 sm:px-4 sm:py-0">
+                <span className="mb-1 block text-[9px] text-slate-400">
+                  CONTENT (IP)
+                </span>
                 <span className="font-bold text-amber-600">YOUR_VPS_IP</span>
               </div>
             </div>
-            <p className="mt-2 text-[10px] text-slate-400 italic">
-              * Replace "your-subdomain" with "app", "portal", or whatever
-              prefix you used.
-            </p>
           </div>
         </div>
 
         {/* Success Message */}
-        <div className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 shadow-sm">
-          <CheckCircle2 size={20} className="mt-1 shrink-0 text-emerald-600" />
-          <div className="text-sm text-emerald-900">
-            <p className="font-bold">Setup Complete!</p>
-            <p className="leading-relaxed opacity-90">
-              Once Cloudflare propagates, your affiliates can access the portal
-              directly.
-              <strong> You have successfully deployed RefearnApp!</strong>
-            </p>
+        <div className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8">
+          <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-emerald-200/20 blur-2xl" />
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <CheckCircle2 size={24} />
+            </div>
+            <div>
+              <h4 className="text-lg font-extrabold text-emerald-900">
+                Deployment Successful!
+              </h4>
+              <p className="mt-1 text-sm leading-relaxed text-emerald-800/80">
+                Your affiliate infrastructure is now operational. Once DNS
+                propagation completes, your portal will be accessible globally.
+              </p>
+              <div className="mt-4 flex items-center gap-2 text-sm font-bold text-emerald-600">
+                <span>Start managing affiliates</span>
+                <ExternalLink size={14} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
