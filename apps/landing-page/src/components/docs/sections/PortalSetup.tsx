@@ -1,6 +1,12 @@
 /** @jsxImportSource react */
-import { Copy, ExternalLink, LayoutDashboard, ArrowRight } from 'lucide-react';
-import Frame from '../Frame'; // Ensure this path is correct
+import {
+  Copy,
+  LayoutDashboard,
+  ArrowRight,
+  Globe,
+  CheckCircle2,
+} from 'lucide-react';
+import Frame from '../Frame';
 
 export default function PortalSetup() {
   return (
@@ -29,7 +35,7 @@ export default function PortalSetup() {
         {/* Step 2: The Domain Sync Bridge */}
         <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-5 md:p-6">
           <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-amber-900 md:text-lg">
-            2. The Final Domain Sync
+            2. The Final Domain Sync (Refearn &lt;&gt; Coolify)
           </h3>
           <p className="mb-6 text-sm leading-relaxed text-amber-900/80 md:text-base">
             To make the affiliate portal reachable, you must sync the active
@@ -37,7 +43,6 @@ export default function PortalSetup() {
           </p>
 
           <div className="space-y-4">
-            {/* Step A: Inside Refearn */}
             <div className="rounded-xl border border-amber-200 bg-white p-4 shadow-sm">
               <div className="mb-2 flex items-center justify-between border-b border-amber-50 pb-2">
                 <span className="text-[10px] font-black text-amber-600 uppercase">
@@ -49,15 +54,14 @@ export default function PortalSetup() {
                   Manage Domains &gt; Copy Active Domain
                 </p>
                 <div className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 font-mono text-[10px] font-bold text-slate-500">
-                  <Copy size={12} /> app.yourdomain.com
+                  <Copy size={12} /> [subdomain].yourdomain.com
                 </div>
               </div>
 
-              {/* Image A: Manage Domains UI */}
               <Frame
                 src="/Sections/coolify-manage-domains.png"
                 alt="RefearnApp Domain Management"
-                caption="Copy your active tracking domain from the dashboard settings."
+                caption="Copy your active tracking domain (e.g., app, portal, or affiliates) from the dashboard settings."
               />
             </div>
 
@@ -68,7 +72,6 @@ export default function PortalSetup() {
               />
             </div>
 
-            {/* Step B: Inside Coolify */}
             <div className="rounded-xl border border-indigo-200 bg-white p-4 shadow-sm">
               <div className="mb-2 flex items-center justify-between border-b border-indigo-50 pb-2">
                 <span className="text-[10px] font-black text-indigo-600 uppercase">
@@ -79,28 +82,72 @@ export default function PortalSetup() {
                 Configuration &gt; General &gt; Domains
               </p>
               <div className="mt-2 rounded border-2 border-dashed border-indigo-100 p-2 text-center font-mono text-[10px] font-bold text-indigo-600">
-                PASTE DOMAIN HERE
+                PASTE COPIED DOMAIN
               </div>
 
-              {/* Image B: Coolify Domain Configuration */}
               <Frame
                 src="/Sections/coolify-domains.png"
                 alt="Coolify Domain Entry"
-                caption="Paste the copied domain into Coolify's general settings to finalize the routing."
+                caption="Paste the exact domain into Coolify to tell your VPS which URL to listen for."
               />
             </div>
           </div>
         </div>
 
-        {/* Result Callout */}
+        {/* Step 3: Cloudflare Connection */}
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 md:p-6">
+          <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-900 md:text-lg">
+            <Globe size={20} className="text-indigo-600" />
+            3. Final Cloudflare DNS Mapping
+          </h3>
+          <p className="mb-6 text-sm leading-relaxed text-slate-600 md:text-base">
+            Now, create an <strong>A Record</strong> in Cloudflare. The{' '}
+            <strong>Name</strong> must be the subdomain you chose (e.g., if your
+            domain is <code>app.domain.com</code>, use <code>app</code>).
+          </p>
+
+          <Frame
+            src="/Sections/cloudflare-dns.png"
+            alt="Cloudflare DNS Configuration"
+            caption="The 'Name' must match the subdomain prefix you used in the previous steps."
+          />
+
+          <div className="mt-4 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+              Required DNS Entry
+            </p>
+            <div className="grid grid-cols-3 gap-2 font-mono text-[10px] md:text-xs">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-slate-400">Type</span>
+                <span className="font-bold text-indigo-600">A</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-slate-400">Name</span>
+                <span className="font-bold text-emerald-600">
+                  your-subdomain
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-slate-400">Content</span>
+                <span className="font-bold text-amber-600">YOUR_VPS_IP</span>
+              </div>
+            </div>
+            <p className="mt-2 text-[10px] text-slate-400 italic">
+              * Replace "your-subdomain" with "app", "portal", or whatever
+              prefix you used.
+            </p>
+          </div>
+        </div>
+
+        {/* Success Message */}
         <div className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 shadow-sm">
-          <ExternalLink size={20} className="mt-1 shrink-0 text-emerald-600" />
+          <CheckCircle2 size={20} className="mt-1 shrink-0 text-emerald-600" />
           <div className="text-sm text-emerald-900">
-            <p className="font-bold">Portal Live!</p>
-            <p className="opacity-90">
-              After clicking save in Coolify, your affiliate portal is now
-              correctly routed to your VPS. Your affiliates can now sign up via
-              your custom subdomain.
+            <p className="font-bold">Setup Complete!</p>
+            <p className="leading-relaxed opacity-90">
+              Once Cloudflare propagates, your affiliates can access the portal
+              directly.
+              <strong> You have successfully deployed RefearnApp!</strong>
             </p>
           </div>
         </div>
