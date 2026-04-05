@@ -32,7 +32,7 @@ export default async function PricingPage({ params }: OrgIdProps) {
       plan={plan}
       dashboard={true}
       showSubscription={showSubscription}
-      showPurchase={false}
+      showPurchase={true}
       license={licenseResult?.data ?? null}
     />
   )

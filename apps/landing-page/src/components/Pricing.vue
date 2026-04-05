@@ -8,7 +8,7 @@ const PADDLE_IDS = {
   ult_one_time: import.meta.env.PUBLIC_PADDLE_ULT_ID,
 };
 
-const availableModes = ['SUBSCRIPTION'];
+const availableModes = ['SUBSCRIPTION', 'PURCHASE'];
 
 const activePaddle = ref(null);
 onMounted(async () => {
