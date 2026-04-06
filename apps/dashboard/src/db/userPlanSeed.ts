@@ -90,6 +90,14 @@ async function devSetUserPlan({
 }
 
 async function main() {
+  const terminalId = process.argv[2]
+
+  // Decide which ID to use
+  const targetUserId = terminalId || DEV_USER_ID
+
+  console.log(
+    `🚀 Target User ID: ${targetUserId} ${terminalId ? "(from terminal)" : "(default dev id)"}`
+  )
   const { action } = await prompts({
     type: "select",
     name: "action",
@@ -120,7 +128,7 @@ async function main() {
     process.exit(0)
   }
 
-  await devSetUserPlan({ userId: DEV_USER_ID, ...action })
+  await devSetUserPlan({ userId: targetUserId, ...action })
 }
 
 main()

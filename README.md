@@ -44,6 +44,25 @@
 
 **Self-host and track your affiliates on your own platform.** RefearnApp allows you to manage all your transactions and payouts directly, without relying on third-party tracking tools. While the core engine is 100% free under **AGPL-3.0**, our Pro and Ultimate tiers offer one-time license keys for advanced features.
 
+> [!IMPORTANT]
+> 🚀 **Limited-Time Launch Offer: RefearnApp Cloud**
+>
+> Don’t want to manage servers, infrastructure, or setup?
+>
+> 👉 Get started instantly with **RefearnApp Cloud** — our fully managed solution:
+> - ⚡ No setup required
+> - 📈 Built for performance and scale
+>
+> 💰 **Early Adopter Offer (Limited Time):**
+> - One-time payment available (lifetime access)
+> - Monthly plans also available
+>
+> 👉 **Start here:** https://refearnapp.com
+>
+> *(Early pricing — will increase as more users join.)*
+
+---
+
 | Feature | Community (Free) | Pro ($199) | Ultimate ($299) | Managed Cloud |
 | :--- | :---: | :---: | :---: | :---: |
 | **Hosting** | Self-Hosted | Self-Hosted | Self-Hosted | **Zero Maintenance** |
@@ -55,9 +74,6 @@
 | **Affiliate Portal Customization** | ❌ | ✅ | ✅ | ✅ |
 | **Coupon Code Tracking** | ❌ | ❌ | ✅ | ✅ |
 | **Team Management** | ❌ | ❌ | ✅ | ✅ |
-
-> [!TIP]
-> **Looking for the Managed Cloud version?** If you don't want to manage servers, databases, or updates, check out our **[Cloud Pricing Plans](https://refearnapp.com/#pricing)**. The Cloud version includes multi-org support and team invitations out of the box.
 
 ---
 ## 🛠 Tech Stack

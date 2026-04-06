@@ -14,7 +14,7 @@
     "deploy:main": "pnpm --filter @repo/tracking-worker exec bun scripts/sync-main.js && pnpm --filter @repo/tracking-worker exec wrangler deploy --keep-vars",
     "logs:main": "pnpm --filter @repo/tracking-worker exec bun scripts/sync-main.js && pnpm --filter @repo/tracking-worker exec wrangler tail",
     "db:database:reset": "pnpm --filter @repo/dashboard db:database:reset",
-    "plan:upgrade": "pnpm --filter @repo/dashboard run plan:upgrade",
+    "plan:upgrade": "pnpm --filter @repo/dashboard run plan:upgrade --",
     "lint": "turbo run lint",
     "lint:unused": "eslint . --config eslint.unused.config.mjs",
     "lint:unused:fix": "eslint . --config eslint.unused.config.mjs --fix",
