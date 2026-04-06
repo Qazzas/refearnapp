@@ -15,11 +15,6 @@ const faqData = [
       'Absolutely. We believe in data sovereignty. If you start on our Managed Cloud and decide to move to your own servers later, we will help you migrate your data to your own infrastructure at any time—no lock-in, no hidden fees.',
   },
   {
-    question: 'Can I migrate from Managed Cloud to Self-Hosted later?',
-    answer:
-      'Absolutely. We believe in data sovereignty. If you start on our Managed Cloud and decide to move to your own servers later, we will help you migrate your data and infrastructure setup at any time—no lock-in, no hidden fees.',
-  },
-  {
     question: 'Can I try RefearnApp for free?',
     answer:
       'Yes! You can start a 14-day free trial on any of our subscription plans to explore all features—no credit card required. Please note that the Lifetime (One-Time) deals do not include a trial period; they are limited-time offers available for immediate purchase to secure permanent access at a single price.',
