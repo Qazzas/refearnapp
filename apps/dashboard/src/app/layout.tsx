@@ -31,17 +31,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-WHQRG09NZ7"
+          async
+          src="https://cloud.umami.is/script.js"
+          data-website-id="686006ca-0f3c-4030-ac69-8516be31096a"
           strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-WHQRG09NZ7');
-          `}
-        </Script>
         <QueryProvider>{children}</QueryProvider>
         <Toaster />
         <Analytics />
