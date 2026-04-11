@@ -42,7 +42,9 @@ export default {
 		// Your Vercel app likely doesn't use this specific folder name.
 		const isCompiledAsset = url.pathname.startsWith('/_astro/');
 		const isDocsPage = url.pathname.startsWith('/docs');
+		const isBlogPage = url.pathname.startsWith('/blog');
 		const shouldServeAstro =
+			isBlogPage ||
 			isExplicitAsset ||
 			isCompiledAsset ||
 			(!isSelfHosted && (isHome || isLegalPage || isContactPage || isToolPage || isComparePage || isDocsPage));

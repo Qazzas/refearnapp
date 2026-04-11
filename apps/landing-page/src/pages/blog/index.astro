@@ -1,0 +1,103 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const CDN_URL = 'https://assets.refearnapp.com';
+const allPosts = (await getCollection('blog')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+
+const [featuredPost, ...otherPosts] = allPosts;
+---
+
+<Layout title="Blog | RefearnApp">
+  <main class="mx-auto max-w-6xl px-6 py-16">
+    <header class="mb-12">
+      <h1 class="text-4xl font-extrabold text-slate-900">
+        RefearnApp Insights
+      </h1>
+      <p class="mt-4 text-lg text-slate-600">
+        Guides, updates, and strategies for your referral program.
+      </p>
+    </header>
+
+    {/* Featured Post Section */}
+    {
+      featuredPost && (
+        <section class="mb-16">
+          <a
+            href={`/blog/${featuredPost.slug}`}
+            class="group grid items-center gap-8 md:grid-cols-2"
+          >
+            <div class="aspect-video overflow-hidden rounded-3xl bg-slate-100 shadow-sm ring-1 ring-slate-200 transition-shadow group-hover:shadow-md">
+              <img
+                src={`${CDN_URL}${featuredPost.data.image}`}
+                alt={featuredPost.data.title}
+                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              />
+            </div>
+            <div>
+              <span class="text-sm font-semibold tracking-wider text-indigo-600 uppercase">
+                Latest Post
+              </span>
+              <h2 class="mt-4 text-3xl font-bold text-slate-900 transition-colors group-hover:text-indigo-600">
+                {featuredPost.data.title}
+              </h2>
+              <p class="mt-4 line-clamp-3 text-lg leading-relaxed text-slate-600">
+                {featuredPost.data.description}
+              </p>
+              <div class="mt-6 flex items-center font-bold text-indigo-600">
+                Read Featured Article{' '}
+                <span class="ml-2 transition-transform group-hover:translate-x-1">
+                  →
+                </span>
+              </div>
+            </div>
+          </a>
+        </section>
+      )
+    }
+
+    <hr class="mb-16 border-slate-200" />
+
+    {/* Blog Grid Section */}
+    <div class="grid gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
+      {
+        otherPosts.map((post) => (
+          <article class="group flex flex-col">
+            <a href={`/blog/${post.slug}`} class="flex flex-1 flex-col">
+              <div class="mb-6 aspect-video overflow-hidden rounded-2xl bg-slate-100 shadow-sm ring-1 ring-slate-200 transition-shadow group-hover:shadow-md">
+                <img
+                  src={`${CDN_URL}${post.data.image}`}
+                  alt={post.data.title}
+                  class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="flex flex-1 flex-col">
+                <div class="mb-3 text-sm text-slate-500">{post.data.date}</div>
+
+                <h3 class="mb-3 text-xl font-bold text-slate-900 transition-colors group-hover:text-indigo-600">
+                  {post.data.title}
+                </h3>
+
+                <p class="mb-6 line-clamp-3 text-sm leading-relaxed text-slate-600">
+                  {post.data.description}
+                </p>
+
+                {/* Added the "Read more" section here to match the first one */}
+                <div class="mt-auto flex items-center text-sm font-bold text-indigo-600">
+                  Read article{' '}
+                  <span class="ml-2 transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </div>
+              </div>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Frame from '../../components/docs/Frame';
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog');
+  return blogEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<Layout title={`${entry.data.title} | RefearnApp Blog`}>
+  <article class="mx-auto max-w-3xl px-6 py-16">
+    <nav class="mb-8">
+      <a
+        href="/blog"
+        class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+      >
+        ← Back to all posts
+      </a>
+    </nav>
+
+    <header class="mb-8">
+      <div class="mb-2 text-sm text-slate-500">
+        {entry.data.date} • Tutorial
+      </div>
+      <h1
+        class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl"
+      >
+        {entry.data.title}
+      </h1>
+    </header>
+
+    <Frame
+      client:load
+      src={entry.data.image}
+      alt={entry.data.title}
+      caption={`Tutorial: ${entry.data.title}`}
+    />
+
+    <div class="prose prose-slate prose-indigo mt-12 max-w-none">
+      <Content />
+    </div>
+  </article>
+</Layout>

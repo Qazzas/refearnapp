@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
 import vue from '@astrojs/vue';
 import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   vite: {
@@ -11,8 +12,6 @@ export default defineConfig({
   },
 
   adapter: cloudflare(),
-  integrations: [
-    vue(),
-    react(), // 2. Add React here
-  ],
+  integrations: [vue(), // 2. Add React here
+  react(), mdx()],
 });
