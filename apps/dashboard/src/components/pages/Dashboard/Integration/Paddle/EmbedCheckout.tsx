@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
+import { InfoCard } from "@/components/ui-custom/InfoCard"
 
 const EmbedCheckout = () => {
   return (
@@ -44,6 +45,22 @@ const EmbedCheckout = () => {
           <ClientIntegration />
         </TabsContent>
       </Tabs>
+      <InfoCard
+        title="Developer Strategy: AI Credit Protection"
+        variant="warning"
+      >
+        To avoid paying commissions on low-margin items like{" "}
+        <span className="text-blue-600 font-semibold">one-time AI credits</span>
+        , simply omit the{" "}
+        <code className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800">
+          refearnapp_affiliate_code
+        </code>{" "}
+        from the{" "}
+        <code className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800">
+          customData
+        </code>{" "}
+        field for those specific checkout sessions.
+      </InfoCard>
     </Card>
   )
 }

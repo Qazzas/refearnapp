@@ -13,6 +13,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"
+import { Info } from "lucide-react"
+import { InfoCard } from "@/components/ui-custom/InfoCard"
 
 const EmbedStripeCheckout = () => {
   const snippets = {
@@ -224,6 +226,22 @@ export default defineEventHandler(async (event) => {
           </TabsContent>
         ))}
       </Tabs>
+      <InfoCard
+        title="Developer Strategy: AI Credit Protection"
+        variant="warning"
+      >
+        To avoid paying commissions on low-margin items like{" "}
+        <span className="text-blue-600 font-semibold">one-time AI credits</span>
+        , simply omit the{" "}
+        <code className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800">
+          refearnapp_affiliate_code
+        </code>{" "}
+        from the{" "}
+        <code className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800">
+          metadata
+        </code>{" "}
+        field for those specific checkout sessions.
+      </InfoCard>
     </Card>
   )
 }
