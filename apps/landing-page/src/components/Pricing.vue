@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { initializePaddle } from '@paddle/paddle-js';
+import { AVAILABLE_MODES, CURRENT_BILLING_MODE } from '../lib/pricing';
 const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN;
 const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV;
 const PADDLE_IDS = {
@@ -8,7 +9,8 @@ const PADDLE_IDS = {
   ult_one_time: import.meta.env.PUBLIC_PADDLE_ULT_ID,
 };
 
-const availableModes = ['PURCHASE', 'SUBSCRIPTION'];
+const availableModes = AVAILABLE_MODES;
+const billingMode = ref(CURRENT_BILLING_MODE);
 
 const activePaddle = ref(null);
 onMounted(async () => {
@@ -49,7 +51,6 @@ const handleAction = (plan) => {
     window.location.href = '/signup';
   }
 };
-const billingMode = ref(availableModes[0]);
 const cycle = ref('MONTHLY');
 
 const featuresList = [

@@ -12,6 +12,6 @@ export default defineConfig({
   },
 
   adapter: cloudflare(),
-  integrations: [vue(), // 2. Add React here
-  react(), mdx()],
+  integrations: [vue(), react(), mdx()],
+  output: 'static',
 });

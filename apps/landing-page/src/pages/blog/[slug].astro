@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
-import Frame from '../../components/docs/Frame';
-
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import PricingCTA from '../../components/blog/PricingCTA';
+import Footer from '../../components/Footer.astro';
 export async function getStaticPaths() {
   const blogEntries = await getCollection('blog');
   return blogEntries.map((entry) => ({
@@ -12,40 +12,39 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
+
+// Filter for H2s to keep the Sidebar clean
+const sections = headings
+  .filter((h) => h.depth === 2)
+  .map((h) => ({ slug: h.slug, text: h.text }));
+
+const CDN_URL = 'https://assets.refearnapp.com';
 ---
 
-<Layout title={`${entry.data.title} | RefearnApp Blog`}>
-  <article class="mx-auto max-w-3xl px-6 py-16">
-    <nav class="mb-8">
-      <a
-        href="/blog"
-        class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-      >
-        ← Back to all posts
-      </a>
-    </nav>
+<BlogLayout title={`${entry.data.title} | RefearnApp`} sections={sections}>
+  <header class="mb-10">
+    <h1 class="mb-2 text-2xl font-black text-slate-900 sm:text-4xl">
+      {entry.data.title}
+    </h1>
+    <time class="text-sm font-medium text-slate-500">{entry.data.date}</time>
+  </header>
 
-    <header class="mb-8">
-      <div class="mb-2 text-sm text-slate-500">
-        {entry.data.date} • Tutorial
-      </div>
-      <h1
-        class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl"
-      >
-        {entry.data.title}
-      </h1>
-    </header>
-
-    <Frame
-      client:load
-      src={entry.data.image}
+  <div
+    class="mb-16 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm"
+  >
+    <img
+      src={`${CDN_URL}${entry.data.image}`}
       alt={entry.data.title}
-      caption={`Tutorial: ${entry.data.title}`}
+      class="block aspect-video h-auto w-full object-cover"
     />
+  </div>
 
-    <div class="prose prose-slate prose-indigo mt-12 max-w-none">
-      <Content />
-    </div>
-  </article>
-</Layout>
+  <div class="prose prose-slate prose-indigo max-w-none">
+    <Content />
+  </div>
+</BlogLayout>
+<div class="mx-auto max-w-7xl px-6 pb-24 lg:px-8">
+  <PricingCTA client:load variant="footer" />
+</div>
+<Footer />
