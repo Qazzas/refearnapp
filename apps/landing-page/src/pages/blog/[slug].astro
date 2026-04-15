@@ -16,8 +16,12 @@ const { Content, headings } = await entry.render();
 
 // Filter for H2s to keep the Sidebar clean
 const sections = headings
-  .filter((h) => h.depth === 2)
-  .map((h) => ({ slug: h.slug, text: h.text }));
+  .filter((h) => h.depth === 2 || h.depth === 3)
+  .map((h) => ({
+    slug: h.slug,
+    text: h.text,
+    level: h.depth,
+  }));
 
 const CDN_URL = 'https://assets.refearnapp.com';
 ---

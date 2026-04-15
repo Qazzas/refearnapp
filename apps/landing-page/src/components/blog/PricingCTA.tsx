@@ -1,4 +1,10 @@
 import React from 'react';
+import {
+  CURRENT_BILLING_MODE,
+  PRICING_TEXT,
+  CURRENT_CONFIG_MODE,
+  PRICING_CONFIG,
+} from '../../lib/pricing';
 
 interface PricingCTAProps {
   variant: 'sidebar' | 'footer';
@@ -6,6 +12,8 @@ interface PricingCTAProps {
 
 const PricingCTA: React.FC<PricingCTAProps> = ({ variant }) => {
   const isSidebar = variant === 'sidebar';
+  const pricingContent = PRICING_TEXT[CURRENT_BILLING_MODE];
+  const isHybridMode = CURRENT_CONFIG_MODE === PRICING_CONFIG.HYBRID;
 
   return (
     <div
@@ -15,10 +23,8 @@ const PricingCTA: React.FC<PricingCTAProps> = ({ variant }) => {
           : 'my-16 rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm md:p-16'
       }`}
     >
-      {/* Visual Accent - Consistent across both now */}
       <div className="absolute top-0 left-0 h-1.5 w-full bg-indigo-600" />
 
-      {/* Title */}
       <h3
         className={`font-black tracking-tight text-slate-900 ${
           isSidebar
@@ -31,7 +37,6 @@ const PricingCTA: React.FC<PricingCTAProps> = ({ variant }) => {
           : 'Launch your affiliate program today'}
       </h3>
 
-      {/* Description - Now shown in footer with slate text */}
       {!isSidebar && (
         <p className="mx-auto mb-8 max-w-2xl text-lg font-medium text-slate-500">
           Create an affiliate program for your SaaS or digital product in
@@ -39,45 +44,48 @@ const PricingCTA: React.FC<PricingCTAProps> = ({ variant }) => {
         </p>
       )}
 
-      {/* Button Stack */}
       <div
         className={`flex flex-col ${isSidebar ? 'w-full' : 'mx-auto w-full max-w-sm items-stretch'}`}
       >
-        {/* Label for the Lifetime Deal */}
-        <span
-          className={`mb-1.5 font-black tracking-widest text-indigo-600 uppercase ${isSidebar ? 'ml-1 text-[9px]' : 'text-[11px]'}`}
-        >
-          Limited Time Offer
-        </span>
+        {/* Badge */}
+        {pricingContent.badge && (
+          <span
+            className={`mb-1.5 font-black tracking-widest text-indigo-600 uppercase ${isSidebar ? 'ml-1 text-[9px]' : 'text-[11px]'}`}
+          >
+            {pricingContent.badge}
+          </span>
+        )}
 
+        {/* Primary Action Button */}
         <a
           href="/pricing"
           className={`inline-block rounded-md bg-slate-900 text-center font-bold text-white transition-all hover:bg-slate-800 active:scale-95 ${
             isSidebar ? 'py-3 text-xs' : 'py-4 text-base'
           }`}
         >
-          Buy Lifetime Deal
+          {pricingContent.button}
         </a>
+        {/* Hybrid Logic */}
+        {isHybridMode && (
+          <>
+            <div className="my-3 text-center text-[10px] font-bold text-slate-300 uppercase">
+              or
+            </div>
 
-        {/* Divider */}
-        <div className="my-2 text-center text-[10px] font-bold text-slate-300 uppercase">
-          or
-        </div>
+            <a
+              href="/pricing"
+              className={`inline-block rounded-md bg-indigo-50 text-center font-bold text-indigo-600 transition-all hover:bg-indigo-100 active:scale-95 ${
+                isSidebar ? 'py-3 text-xs' : 'py-4 text-base'
+              }`}
+            >
+              Start for Free
+            </a>
 
-        <a
-          href="/pricing"
-          className={`inline-block rounded-md bg-indigo-50 text-center font-bold text-indigo-600 transition-all hover:bg-indigo-100 active:scale-95 ${
-            isSidebar ? 'py-3 text-xs' : 'py-4 text-base'
-          }`}
-        >
-          Start for Free
-        </a>
-
-        {/* Trust text for Footer only */}
-        {!isSidebar && (
-          <p className="mt-4 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-            14-day free trial. No credit card required.
-          </p>
+            {/* Specific trust text for the free option in hybrid mode */}
+            <p className="mt-2 text-center text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+              No credit card required
+            </p>
+          </>
         )}
       </div>
     </div>

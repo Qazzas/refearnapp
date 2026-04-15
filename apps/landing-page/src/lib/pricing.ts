@@ -1,12 +1,44 @@
 // src/lib/pricing.ts
 
-export const AVAILABLE_MODES = ['PURCHASE', 'SUBSCRIPTION'] as const;
+export const PRICING_CONFIG = {
+  SUBSCRIPTION_ONLY: 1,
+  PURCHASE_ONLY: 2,
+  HYBRID: 3,
+} as const;
 
-// This is your global "Toggle"
-// Set this to 'PURCHASE' or 'SUBSCRIPTION'
-export const CURRENT_BILLING_MODE: (typeof AVAILABLE_MODES)[number] =
-  'PURCHASE';
+// 1. Create a type based on the values (1 | 2 | 3)
+export type ConfigMode = (typeof PRICING_CONFIG)[keyof typeof PRICING_CONFIG];
 
+// 2. Billing mode type
+export type BillingMode = 'PURCHASE' | 'SUBSCRIPTION';
+
+// 3. CHANGE THIS TO SWITCH MODES
+export const CURRENT_CONFIG_MODE: ConfigMode = PRICING_CONFIG.HYBRID;
+
+// 4. Centralized config map (🔥 no conditionals anymore)
+const MODE_CONFIG = {
+  [PRICING_CONFIG.SUBSCRIPTION_ONLY]: {
+    available: ['SUBSCRIPTION'] as const,
+    default: 'SUBSCRIPTION' as const,
+  },
+  [PRICING_CONFIG.PURCHASE_ONLY]: {
+    available: ['PURCHASE'] as const,
+    default: 'PURCHASE' as const,
+  },
+  [PRICING_CONFIG.HYBRID]: {
+    available: ['PURCHASE', 'SUBSCRIPTION'] as const,
+    default: 'PURCHASE' as const,
+  },
+} as const;
+
+// 5. Derive values from config
+const CURRENT_MODE_CONFIG = MODE_CONFIG[CURRENT_CONFIG_MODE];
+
+export const AVAILABLE_MODES = CURRENT_MODE_CONFIG.available;
+
+export const CURRENT_BILLING_MODE = CURRENT_MODE_CONFIG.default;
+
+// 6. UI text config (unchanged)
 export const PRICING_TEXT = {
   PURCHASE: {
     badge: 'LIFETIME DEAL',
@@ -14,8 +46,8 @@ export const PRICING_TEXT = {
     footer: 'Pay once. No recurring fees.',
   },
   SUBSCRIPTION: {
-    badge: 'LIMITED TIME OFFER',
+    badge: '',
     button: 'Start 14-Day Free Trial',
     footer: 'Cancel anytime. No hidden fees.',
   },
-};
+} as const;
