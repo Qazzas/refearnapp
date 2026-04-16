@@ -58,7 +58,7 @@ const PricingCTA: React.FC<PricingCTAProps> = ({ variant }) => {
 
         {/* Primary Action Button */}
         <a
-          href="/pricing"
+          href="/#pricing"
           className={`inline-block rounded-md bg-slate-900 text-center font-bold text-white transition-all hover:bg-slate-800 active:scale-95 ${
             isSidebar ? 'py-3 text-xs' : 'py-4 text-base'
           }`}
@@ -73,7 +73,7 @@ const PricingCTA: React.FC<PricingCTAProps> = ({ variant }) => {
             </div>
 
             <a
-              href="/pricing"
+              href="/signup"
               className={`inline-block rounded-md bg-indigo-50 text-center font-bold text-indigo-600 transition-all hover:bg-indigo-100 active:scale-95 ${
                 isSidebar ? 'py-3 text-xs' : 'py-4 text-base'
               }`}

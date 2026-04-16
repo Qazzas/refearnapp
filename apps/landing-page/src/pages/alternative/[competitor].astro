@@ -3,6 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { competitors } from '../../data/competitors';
+import PricingCTA from '../../components/blog/PricingCTA';
+import { PRICES, CURRENT_CONFIG_MODE, PRICING_CONFIG } from '../../lib/pricing';
 
 export async function getStaticPaths() {
   return competitors.map((c) => ({
@@ -12,11 +14,23 @@ export async function getStaticPaths() {
 }
 
 const { info } = Astro.props;
+
+const otherCompetitors = competitors
+  .filter((c) => c.slug !== info.slug)
+  .slice(0, 8);
+
+const pricingModelLabel =
+  CURRENT_CONFIG_MODE === PRICING_CONFIG.HYBRID
+    ? 'Subscription & Lifetime (Limited)'
+    : 'Fair Subscription';
+
+const checkIcon = `<svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+const crossIcon = `<svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
 ---
 
 <Layout
-  title={`${info.name} Alternative: Professional Affiliate Tracking for SaaS`}
-  description={`Switching from ${info.name}? Get advanced fraud detection, coupon tracking, and private programs starting at just $35/mo.`}
+  title={`${info.name} Alternative: Open Source Affiliate Tracking for SaaS`}
+  description={`Switching from ${info.name}? Get a modern, open-source, and self-hostable affiliate platform with coupon tracking and private programs.`}
 >
   <Header />
 
@@ -29,11 +43,14 @@ const { info } = Astro.props;
       <h1
         class="mt-4 mb-6 text-4xl font-extrabold tracking-tight text-slate-900 md:text-6xl"
       >
-        The Best <span class="text-primary">{info.name} Alternative</span>
+        The <span class="text-primary">{info.name} Alternative</span> You Actually
+        Own
       </h1>
       <p class="mx-auto max-w-2xl text-xl leading-relaxed text-slate-600">
-        Stop paying <strong>{info.price}</strong> for legacy tracking. Switch to RefearnApp
-        for professional-grade tools starting at just <strong>$35/mo</strong>.
+        Get the reliability of a managed platform with the freedom of open
+        source. Start on our <strong>managed cloud</strong> today and <strong
+          >migrate to your own servers</strong
+        > whenever you're ready—no lock-in, no data hostage, just total control.
       </p>
     </div>
 
@@ -69,7 +86,7 @@ const { info } = Astro.props;
         <ul class="space-y-4 text-blue-900/80">
           <li class="flex items-start gap-3">
             <span class="font-bold text-blue-600">✓</span>
-            Built-in fraud detection with IP matching and self-referral blocking.
+            Unlimited affiliate partners and team members on every plan.
           </li>
           <li class="flex items-start gap-3">
             <span class="font-bold text-blue-600">✓</span>
@@ -86,81 +103,103 @@ const { info } = Astro.props;
 
     <div class="mb-20">
       <div
-        class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-2xl"
+        class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-xl"
       >
         <table
-          class="w-full min-w-[600px] border-collapse text-left text-sm md:text-base"
+          class="w-full min-w-[700px] border-collapse text-left text-sm md:text-base"
         >
           <thead>
             <tr class="border-b border-slate-200 bg-slate-50/50">
-              <th class="p-6 font-bold text-slate-900">Feature</th>
-              <th class="p-6 font-bold text-slate-400">{info.name}</th>
-              <th class="bg-primary/5 text-primary p-6 font-bold">RefearnApp</th
+              <th class="p-6 font-bold tracking-wider text-slate-500 uppercase"
+                >Comparison Feature</th
+              >
+              <th class="p-6 font-bold tracking-wider text-slate-400 uppercase"
+                >{info.name}</th
+              >
+              <th
+                class="bg-indigo-50/50 p-6 font-bold tracking-wider text-indigo-600 uppercase"
+                >RefearnApp</th
               >
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             <tr>
-              <td class="p-6 font-semibold">Pricing Structure</td>
+              <td class="p-6 font-semibold text-slate-900">Software License</td>
+              <td class="p-6 text-slate-500">Proprietary (Closed)</td>
+              <td class="bg-indigo-50/30 p-6 font-bold text-indigo-700"
+                >Open Source (AGPL v3)</td
+              >
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold text-slate-900"
+                >Hosting & Infrastructure</td
+              >
+              <td class="p-6 text-slate-500">Cloud Only</td>
+              <td class="bg-indigo-50/30 p-6 font-bold text-slate-900"
+                >Cloud or Self-Hostable</td
+              >
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold text-slate-900">Data Sovereignty</td>
+              <td class="p-6 text-slate-400" set:html={crossIcon} />
+              <td
+                class="bg-indigo-50/30 p-6 text-indigo-600"
+                set:html={checkIcon}
+              />
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold text-slate-900">Pricing Model</td>
               <td class="p-6 text-slate-500">Subscription Only</td>
-              <td class="bg-primary/5 p-6 font-bold text-slate-900"
-                >Cloud or Self-Host</td
+              <td class="bg-indigo-50/30 p-6 font-bold text-slate-900"
+                >{pricingModelLabel}</td
               >
             </tr>
             <tr>
-              <td class="p-6 font-semibold">Software Type</td>
-              <td class="p-6 text-slate-500">Closed Source</td>
-              <td class="bg-primary/5 p-6 font-bold text-green-600"
-                >Open Source (Free Code)</td
-              >
-            </tr>
-            <tr>
-              <td class="p-6 font-semibold">Monthly Base Price</td>
-              <td class="p-6 text-red-500">{info.price}</td>
-              <td class="bg-primary/5 p-6 font-bold text-slate-900">$35/mo</td>
-            </tr>
-            <tr>
-              <td class="p-6 font-semibold">Revenue Limits</td>
+              <td class="p-6 font-semibold text-slate-900">Revenue Caps</td>
               <td class="p-6 text-red-500">Commonly Capped</td>
-              <td class="bg-primary/5 p-6 font-bold text-green-600"
+              <td class="bg-indigo-50/30 p-6 font-bold text-green-600"
                 >Unlimited Growth</td
               >
             </tr>
             <tr>
-              <td class="p-6 font-semibold">Self-Host Export</td>
-              <td class="p-6 text-red-500">Impossible</td>
-              <td class="bg-primary/5 p-6 font-bold text-green-600"
-                >Included (Free)</td
+              <td class="p-6 font-semibold text-slate-900"
+                >Custom Domain & Branding</td
               >
-            </tr>
-            <tr>
-              <td class="p-6 font-semibold">White-labeling</td>
-              <td class="p-6 text-slate-500">Enterprise Only</td>
-              <td class="bg-primary/5 p-6 font-bold text-slate-900"
-                >Standard ($55/mo)</td
+              <td class="p-6 text-slate-500">Enterprise Add-on</td>
+              <td class="bg-indigo-50/30 p-6 font-bold text-slate-900"
+                >Standard ({PRICES.CUSTOM_DOMAIN_ADDON})</td
               >
             </tr>
           </tbody>
         </table>
       </div>
       <p class="mt-4 text-center text-xs text-slate-400 italic md:hidden">
-        Swipe horizontally to compare features
+        ← Swipe horizontally to compare →
       </p>
     </div>
 
-    <div class="rounded-3xl bg-slate-900 p-8 text-center text-white md:p-12">
-      <h2 class="mb-4 text-2xl font-bold md:text-3xl">
-        Stop overpaying for your affiliate stack
-      </h2>
-      <p class="mb-8 text-slate-400">
-        Join founders who prioritize data ownership and fair pricing.
-      </p>
-      <a
-        href="/#pricing"
-        class="inline-block rounded-xl bg-white px-8 py-4 text-lg font-bold text-slate-900 transition-all hover:scale-105 active:scale-95"
+    <div class="mt-32 mb-16">
+      <h3 class="mb-8 text-center text-2xl font-bold text-slate-900">
+        Explore other professional alternatives
+      </h3>
+      <div
+        class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4"
       >
-        Get Started for $35/mo
-      </a>
+        {
+          otherCompetitors.map((c) => (
+            <a
+              href={`/alternative/${c.slug}`}
+              class="flex items-center justify-center rounded-xl border border-slate-200 bg-white p-4 text-center text-sm font-semibold text-slate-600 transition-all hover:border-indigo-600 hover:text-indigo-600 hover:shadow-sm"
+            >
+              {c.name}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="mb-24">
+      <PricingCTA variant="footer" />
     </div>
   </main>
 
