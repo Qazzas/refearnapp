@@ -214,7 +214,20 @@ export default function Links({
                           currency: displayCurrency,
                         }).format(Number(orgData.commissionValue))}
                   </strong>{" "}
-                  commission on every sale!
+                  commission on one-time payments
+                  {orgData.commissionDurationValue && (
+                    <>
+                      {" "}and for{" "}
+                      <strong>
+                        {orgData.commissionDurationValue}{" "}
+                        {orgData.commissionDurationValue === 1
+                          ? orgData.commissionDurationUnit
+                          : `${orgData.commissionDurationUnit}s`}
+                      </strong>{" "}
+                      on subscriptions
+                    </>
+                  )}
+                  !
                 </>
               ) : (
                 "Track your referral links and their performance"
