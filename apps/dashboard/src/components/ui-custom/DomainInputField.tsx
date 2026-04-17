@@ -102,9 +102,13 @@ export function DomainInputField({
       {process.env.NEXT_PUBLIC_SELF_HOSTED === "true" &&
         domainType !== "platform" &&
         domainValue !== "" && (
-          <p className="text-sm mt-1 text-red-600 font-medium">
-            ⚠️ Custom domains are not supported in self-hosted mode.
-          </p>
+          <div className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded">
+            <p className="text-xs text-blue-700">
+              ℹ️ <strong>Self-hosted mode:</strong> You will need to point this
+              domain&#39;s A/CNAME record to your VPS IP and add it to your
+              proxy (Coolify/Traefik).
+            </p>
+          </div>
         )}
     </div>
   )

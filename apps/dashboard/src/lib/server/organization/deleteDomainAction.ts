@@ -3,10 +3,6 @@ import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
 import { deleteDomainFromVercel } from "@/lib/server/internal/manageVercelDomain"
 import { AppError } from "@/lib/exceptions"
-import {
-  deleteDomainFromCloudflare,
-  getCloudflareDomainStatus,
-} from "@/lib/server/internal/manageCloudflareDomains"
 
 export async function deleteDomainAction({
   orgId,
@@ -37,9 +33,11 @@ export async function deleteDomainAction({
   }
   // Inside deleteDomainAction...
   if (domain.type !== "DEFAULT") {
-    if (process.env.IS_SELF_HOSTED === "true") {
-      const cfData = await getCloudflareDomainStatus(domain.domainName)
-      await deleteDomainFromCloudflare(cfData.id)
+    const isSelfHosted = process.env.IS_SELF_HOSTED === "true"
+    if (isSelfHosted) {
+      console.log(
+        `Self-hosted: Removing domain ${domain.domainName} from local DB.`
+      )
     } else {
       await deleteDomainFromVercel(domain.domainName)
     }

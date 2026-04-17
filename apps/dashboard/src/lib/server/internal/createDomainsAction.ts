@@ -6,7 +6,6 @@ import { addDomainToVercel } from "@/lib/server/internal/manageVercelDomain"
 import { and, eq, ne } from "drizzle-orm"
 import { isReservedDomain } from "@/lib/constants/domains"
 import { AppError } from "@/lib/exceptions"
-import { addDomainToCloudflare } from "@/lib/server/internal/manageCloudflareDomains"
 
 export async function createDomainsAction({
   orgId,
@@ -56,17 +55,15 @@ export async function createDomainsAction({
       })
     }
   }
-  if (isSelfHosted) {
-    await addDomainToCloudflare(finalDomain)
-  } else {
+  if (!isSelfHosted) {
     await addDomainToVercel(finalDomain)
   }
   await db.insert(websiteDomain).values({
     orgId,
     domainName: finalDomain,
     type: mapped.type,
-    dnsStatus: mapped.dnsStatus,
-    isVerified: mapped.isVerified,
+    dnsStatus: isSelfHosted ? "Verified" : mapped.dnsStatus,
+    isVerified: isSelfHosted ? true : mapped.isVerified,
     isActive: false,
     isPrimary: false,
     isRedirect: false,
