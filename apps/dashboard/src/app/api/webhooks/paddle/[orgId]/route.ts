@@ -99,7 +99,7 @@ export const POST = handleRoute<Params>(
           rawCurrency,
           decimals
         )
-
+        const isPaidAmount = parseFloat(amountInUSD) > 0
         // 2. Resolve Attribution (Initialize with undefined to satisfy TS)
         let promoRecord = null
         let affiliateLinkRecord
@@ -251,7 +251,7 @@ export const POST = handleRoute<Params>(
         if (promoRecord) {
           await updatePromoStats(promoRecord.id, amountInUSD)
         }
-        if (finalAffiliateId && finalOrgId) {
+        if (finalAffiliateId && finalOrgId && isPaidAmount && commission > 0) {
           await notifyAffiliateSale({
             orgId: finalOrgId,
             affiliateId: finalAffiliateId,

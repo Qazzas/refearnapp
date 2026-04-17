@@ -200,14 +200,14 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           promoRecord,
           trialDays
         )
-        await notifyAffiliateSale({
-          orgId: organizationRecord.id,
-          affiliateId: affiliateLinkRecord.affiliateId,
-          saleAmount: amount.toString(),
-          commissionAmount: commission.toString(),
-          currency: "USD",
-        })
       }
+      await notifyAffiliateSale({
+        orgId: organizationRecord.id,
+        affiliateId: affiliateLinkRecord.affiliateId,
+        saleAmount: amount.toString(),
+        commissionAmount: commission.toString(),
+        currency: "USD",
+      })
       break
     }
 
@@ -326,14 +326,17 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           } else {
             calculatedCommission = parseFloat(commValue)
           }
-
-          await notifyAffiliateSale({
-            orgId: resolvedOrgId,
-            affiliateId: finalAffiliateId,
-            saleAmount: convertedAmount.toString(),
-            commissionAmount: calculatedCommission.toFixed(2),
-            currency: "USD",
-          })
+          if (calculatedCommission > 0) {
+            await notifyAffiliateSale({
+              orgId: resolvedOrgId,
+              affiliateId: finalAffiliateId,
+              saleAmount: convertedAmount.toString(),
+              commissionAmount: calculatedCommission.toFixed(2),
+              currency: "USD",
+            })
+          } else {
+            console.log("ℹ️ Commission is 0.00, skipping email notification.")
+          }
         }
       }
       break
