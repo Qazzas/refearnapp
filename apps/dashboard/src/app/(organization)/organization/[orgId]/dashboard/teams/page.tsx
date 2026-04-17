@@ -24,7 +24,7 @@ const TeamsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
   const plan = await getUserPlan()
-  const licenseResult = await getLicense(orgId)
+  const licenseResult = await getLicense()
   if (licenseResult !== null) {
     if (!licenseResult.ok) {
       return (

@@ -1,4 +1,4 @@
-export async function getLicense(orgId: string) {
+export async function getLicense() {
   if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") return null
 
   // Return a static Ultimate license for self-hosted installations

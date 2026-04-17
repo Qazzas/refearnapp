@@ -32,7 +32,7 @@ export default async function DashboardLayout({
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   const updateResult = isSelfHosted ? await checkVersion() : null
   const updateInfo = updateResult?.ok ? updateResult.data : null
-  const licenseResult = await getLicense(orgId)
+  const licenseResult = await getLicense()
   const licenseData = licenseResult?.ok ? licenseResult.data : null
   return (
     <SidebarProvider affiliate={false} orgId={orgId}>

@@ -35,7 +35,7 @@ export default async function AnalyticsLayout({
   topAffiliates,
 }: AnalyticsLayoutProps) {
   const orgId = await getValidatedOrgFromParams({ params })
-  const licenseResult = await getLicense(orgId)
+  const licenseResult = await getLicense()
   if (licenseResult !== null) {
     if (!licenseResult.ok) {
       return (

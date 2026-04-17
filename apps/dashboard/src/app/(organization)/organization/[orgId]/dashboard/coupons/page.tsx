@@ -23,7 +23,7 @@ export async function generateMetadata({
 const couponsPage = async ({ params }: OrgIdProps) => {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireOrganizationWithOrg(orgId)
-  const licenseResult = await getLicense(orgId)
+  const licenseResult = await getLicense()
   if (licenseResult !== null) {
     if (!licenseResult.ok) {
       return (
