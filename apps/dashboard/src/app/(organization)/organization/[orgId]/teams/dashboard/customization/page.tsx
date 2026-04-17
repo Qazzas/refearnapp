@@ -23,7 +23,7 @@ export async function generateMetadata({
 export default async function CustomizationServerPage({ params }: OrgIdProps) {
   const orgId = await getValidatedOrgFromParams({ params })
   await requireTeamWithOrg(orgId)
-  const licenseResult = await getLicense(orgId)
+  const licenseResult = await getLicense()
   const plan = await getUnifiedPlan(orgId)
   let licenseData = null
 

@@ -150,7 +150,7 @@ export async function syncDiscordAccess(orgId: string, code: string) {
     let payload: any = { code }
 
     if (isSelfHosted) {
-      const licenseResult = await getLicense(orgId)
+      const licenseResult = await getLicense()
       const license = licenseResult?.data
 
       // Local check: Verify license exists and is active before proceeding

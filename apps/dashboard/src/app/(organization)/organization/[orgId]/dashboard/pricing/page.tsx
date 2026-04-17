@@ -19,7 +19,7 @@ export async function generateMetadata({
 }
 export default async function PricingPage({ params }: OrgIdProps) {
   const orgId = await getValidatedOrgFromParams({ params })
-  const licenseResult = await getLicense(orgId)
+  const licenseResult = await getLicense()
   const plan = await getUserPlan()
   const showSubscription = !(
     (plan?.type === "PURCHASE" &&

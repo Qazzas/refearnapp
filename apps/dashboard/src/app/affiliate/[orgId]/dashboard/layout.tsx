@@ -34,7 +34,7 @@ export default async function DashboardLayout({
 
   const affiliate = affiliateResponse.data
   const unseenCouponsCount = await getUnseenCouponsCount(orgId, affiliate.id)
-  const licenseResult = await getLicense(orgId)
+  const licenseResult = await getLicense()
   const licenseData = licenseResult?.ok ? licenseResult.data : null
   return (
     <CustomizationProvider affiliate orgId={orgId}>
