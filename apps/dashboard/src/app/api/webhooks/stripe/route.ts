@@ -15,7 +15,8 @@ import { AppError } from "@/lib/exceptions"
 import { convertReferral } from "@/util/ConvertReferral"
 import { updatePromoStats } from "@/util/updatePromoStats"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
-import { getOrgIdFromLink } from "@/util/getOrgFromLink"
+import { getLink } from "@/util/getOrgFromLink"
+import { notifyAffiliateSale } from "@/services/notifyAffiliateSale"
 
 export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -199,6 +200,13 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           promoRecord,
           trialDays
         )
+        await notifyAffiliateSale({
+          orgId: organizationRecord.id,
+          affiliateId: affiliateLinkRecord.affiliateId,
+          saleAmount: amount.toString(),
+          commissionAmount: commission.toString(),
+          currency: "USD",
+        })
       }
       break
     }
@@ -252,6 +260,7 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           )
           return NextResponse.json({ ok: true })
         }
+        const linkRecord = await getLink(historicalRecord?.affiliateLinkId)
         const placeholder = await db.query.affiliateInvoice.findFirst({
           where: (table, { eq, and }) =>
             and(
@@ -262,8 +271,7 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
         })
 
         const resolvedOrgId =
-          promoRecord?.organizationId ??
-          (await getOrgIdFromLink(historicalRecord?.affiliateLinkId ?? null))
+          promoRecord?.organizationId ?? linkRecord?.organizationId
 
         if (!resolvedOrgId) {
           console.log("⚠️ No organization ID found, skipping.")
@@ -275,6 +283,8 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           console.log("⚠️ Organization not found, skipping.")
           break
         }
+        const finalAffiliateId =
+          promoRecord?.affiliateId ?? linkRecord?.affiliateId
         const affiliateLinkId: string | null = promoRecord
           ? null
           : (historicalRecord?.affiliateLinkId ?? null)
@@ -298,6 +308,33 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           placeholder?.id || null,
           promoRecord?.id || null
         )
+        if (finalAffiliateId) {
+          const commValue =
+            promoRecord?.commissionValue ??
+            organizationRecord.commissionValue ??
+            "0"
+          const commType = (
+            promoRecord?.commissionType ??
+            organizationRecord.commissionType ??
+            "percentage"
+          ).toLowerCase()
+
+          let calculatedCommission = 0
+          if (commType === "percentage") {
+            calculatedCommission =
+              (parseFloat(convertedAmount) * parseFloat(commValue)) / 100
+          } else {
+            calculatedCommission = parseFloat(commValue)
+          }
+
+          await notifyAffiliateSale({
+            orgId: resolvedOrgId,
+            affiliateId: finalAffiliateId,
+            saleAmount: convertedAmount.toString(),
+            commissionAmount: calculatedCommission.toFixed(2),
+            currency: "USD",
+          })
+        }
       }
       break
     }

@@ -23,6 +23,7 @@ import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
 import { updatePromoStats } from "@/util/updatePromoStats"
 import { convertPaddleReferral } from "@/util/convertPaddleReferral"
+import { notifyAffiliateSale } from "@/services/notifyAffiliateSale"
 
 type Params = { orgId: string }
 
@@ -225,7 +226,12 @@ export const POST = handleRoute<Params>(
             ? "subscription_update"
             : "subscription_create"
         }
-
+        const finalAffiliateId =
+          promoRecord?.affiliateId ?? affiliateLinkRecord?.affiliateId
+        const finalOrgId =
+          orgId ||
+          promoRecord?.organizationId ||
+          affiliateLinkRecord?.organizationId
         await db.insert(affiliateInvoice).values({
           paymentProvider: "paddle",
           transactionId,
@@ -244,6 +250,15 @@ export const POST = handleRoute<Params>(
         })
         if (promoRecord) {
           await updatePromoStats(promoRecord.id, amountInUSD)
+        }
+        if (finalAffiliateId && finalOrgId) {
+          await notifyAffiliateSale({
+            orgId: finalOrgId,
+            affiliateId: finalAffiliateId,
+            saleAmount: amountInUSD.toString(),
+            commissionAmount: commission.toFixed(2),
+            currency: "USD",
+          })
         }
         break
       }
