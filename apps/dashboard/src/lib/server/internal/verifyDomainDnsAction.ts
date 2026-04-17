@@ -6,10 +6,6 @@ import {
   verifyDomainOnVercel,
 } from "@/lib/server/internal/manageVercelDomain"
 import { AppError } from "@/lib/exceptions"
-import {
-  getCloudflareDomainStatus,
-  refreshCloudflareVerification,
-} from "@/lib/server/internal/manageCloudflareDomains"
 
 export async function verifyDomainDnsAction({
   orgId,
@@ -18,6 +14,7 @@ export async function verifyDomainDnsAction({
   orgId: string
   domainId: string
 }) {
+  const isSelfHosted = process.env.IS_SELF_HOSTED === "true"
   let isFullyActive = false
   const [domain] = await db
     .select({
@@ -31,15 +28,8 @@ export async function verifyDomainDnsAction({
     throw new AppError({ ok: false, toast: "Domain not found" })
   }
 
-  if (process.env.IS_SELF_HOSTED === "true") {
-    let cfStatus = await getCloudflareDomainStatus(domain.domainName)
-    if (cfStatus.status !== "active" || cfStatus.sslStatus !== "active") {
-      await refreshCloudflareVerification(cfStatus.id)
-      cfStatus = await getCloudflareDomainStatus(domain.domainName)
-    }
-
-    isFullyActive =
-      cfStatus.status === "active" && cfStatus.sslStatus === "active"
+  if (isSelfHosted) {
+    isFullyActive = true
   } else {
     const verifyData = (await verifyDomainOnVercel(domain.domainName)) as any
     const configData = (await getVercelDomainConfig(domain.domainName)) as any

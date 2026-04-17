@@ -172,8 +172,7 @@ export function ManageDomainsTable({
   const createDomainMutation = useAppMutation(createManageDomains, {
     affiliate,
   })
-  const isSubmitDisabled =
-    isSelfHosted && domainType !== "platform" && domainType !== null
+  const isSubmitDisabled = false
   const copyToClipboard = (text: string) => {
     navigator.clipboard
       .writeText(text)
@@ -370,37 +369,46 @@ export function ManageDomainsTable({
       >
         {actionDialog?.type === "verify-dns" && (
           <div className="space-y-3 text-sm">
-            {process.env.NEXT_PUBLIC_SELF_HOSTED === "true" ? (
-              /* ☁️ SELF-HOSTED: Cloudflare CNAME Logic */
+            {isSelfHosted ? (
               <div className="space-y-4">
-                <div className="p-2 bg-blue-50 border border-blue-100 rounded text-blue-800 text-[10px] leading-relaxed">
-                  Point your domain to your worker instance:{" "}
-                  <b>{cleanCnameTarget}</b>
+                <div className="p-3 bg-amber-50 border border-amber-100 rounded text-amber-900 text-xs">
+                  <strong>Self-Hosted Setup:</strong> Point your domain to your
+                  VPS IP address. Make sure your Reverse Proxy (Coolify,
+                  Traefik, Nginx) is configured to accept this domain.
                 </div>
-                <div className="rounded-md border p-3 bg-gray-50 font-mono text-xs space-y-1">
-                  <div>
-                    <b>Type:</b> CNAME
-                  </div>
-                  <div>
-                    <b>Name:</b>{" "}
-                    {actionDialog.domainName?.includes(".") &&
-                    actionDialog.domainType !== "CUSTOM_DOMAIN"
-                      ? actionDialog.domainName.split(".")[0]
-                      : "@"}
-                  </div>
-                  <div className="break-all flex items-center justify-between">
-                    <div>
-                      <b>Value:</b> {cleanCnameTarget}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(cleanCnameTarget)}
-                    >
-                      Copy
-                    </Button>
-                  </div>
+                <div className="rounded-md border p-3 bg-gray-50 font-mono text-xs space-y-2">
+                  {actionDialog.domainType === "CUSTOM_DOMAIN" ? (
+                    <>
+                      <div>
+                        <b>Type:</b> A
+                      </div>
+                      <div>
+                        <b>Name:</b> @
+                      </div>
+                      <div>
+                        <b>Value:</b>{" "}
+                        {process.env.NEXT_PUBLIC_VPS_IP || "YOUR_VPS_IP"}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <b>Type:</b> CNAME
+                      </div>
+                      <div>
+                        <b>Name:</b> {actionDialog.domainName?.split(".")[0]}
+                      </div>
+                      <div>
+                        <b>Value:</b>{" "}
+                        {process.env.NEXT_PUBLIC_APP_DOMAIN || "yourdomain.com"}
+                      </div>
+                    </>
+                  )}
                 </div>
+                <p className="text-[10px] text-gray-500">
+                  Once records are added, add this domain to your{" "}
+                  <b>Coolify/Traefik</b> dashboard.
+                </p>
               </div>
             ) : (
               /* 🔺 NORMAL HOSTING: Vercel A/CNAME Logic */
