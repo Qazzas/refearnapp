@@ -96,13 +96,13 @@ const prices = computed(() => {
     return { pro: '199', ult: '299', cycle: 'one-time', saved: null };
   }
   if (cycle.value === 'MONTHLY') {
-    return { pro: '40', ult: '60', cycle: '/ month', saved: null };
+    return { pro: '29', ult: '39', cycle: '/ month', saved: null };
   }
   return {
-    pro: '32',
-    ult: '48',
+    pro: '24',
+    ult: '33',
     cycle: '/ month',
-    saved: { pro: 96, ult: 144 },
+    saved: { pro: 58, ult: 78 },
   };
 });
 </script>

@@ -40,9 +40,9 @@ export const CURRENT_BILLING_MODE = CURRENT_MODE_CONFIG.default;
 
 // 6. Price Points (Centralized for reusability)
 export const PRICES = {
-  SUBSCRIPTION: '$40/mo',
+  SUBSCRIPTION: '$29/mo',
   PURCHASE: '$199',
-  CUSTOM_DOMAIN_ADDON: '$40/mo',
+  CUSTOM_DOMAIN_ADDON: '$29/mo',
 } as const;
 
 // 6. UI text config (unchanged)
