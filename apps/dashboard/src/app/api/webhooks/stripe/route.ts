@@ -171,12 +171,17 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
       if (promoRecord) {
         await updatePromoStats(promoRecord.id, amount)
       }
-      if (affiliateLinkRecord && !promoRecord) {
+      const winningAffiliateId =
+        promoRecord?.affiliateId ?? affiliateLinkRecord?.affiliateId
+      if (winningAffiliateId) {
         await convertReferral(
           session,
-          affiliateLinkRecord.id,
+          organizationRecord.id,
+          winningAffiliateId,
+          promoRecord ? null : affiliateLinkRecord?.id,
           amount,
-          commission
+          commission,
+          promoRecord?.id
         )
       }
 
@@ -203,7 +208,7 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
       }
       await notifyAffiliateSale({
         orgId: organizationRecord.id,
-        affiliateId: affiliateLinkRecord.affiliateId,
+        affiliateId: winningAffiliateId,
         saleAmount: amount.toString(),
         commissionAmount: commission.toString(),
         currency: "USD",

@@ -206,14 +206,6 @@ export const POST = handleRoute<Params>(
           commission =
             parseFloat(amountInUSD) < 0 ? 0 : parseFloat(finalCommissionValue)
         }
-        if (email && affiliateLinkRecord?.affiliateId) {
-          await convertPaddleReferral({
-            email,
-            affiliateId: affiliateLinkRecord.affiliateId,
-            amount: amountInUSD.toString(),
-            commission: commission,
-          })
-        }
 
         // 6. Reason & Insert
         let reason: "one_time" | "subscription_create" | "subscription_update" =
@@ -232,6 +224,20 @@ export const POST = handleRoute<Params>(
           orgId ||
           promoRecord?.organizationId ||
           affiliateLinkRecord?.organizationId
+        if (finalAffiliateId && finalOrgId) {
+          await convertPaddleReferral({
+            email: email,
+            customerId: customerId,
+            affiliateId: finalAffiliateId,
+            organizationId: finalOrgId,
+            affiliateLinkId: promoRecord
+              ? null
+              : affiliateLinkRecord?.id || null,
+            promotionCodeId: promoRecord?.id || null,
+            amount: amountInUSD.toString(),
+            commission: commission,
+          })
+        }
         await db.insert(affiliateInvoice).values({
           paymentProvider: "paddle",
           transactionId,
