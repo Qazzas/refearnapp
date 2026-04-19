@@ -14,7 +14,7 @@ export async function verifyDomainDnsAction({
   orgId: string
   domainId: string
 }) {
-  const isSelfHosted = process.env.IS_SELF_HOSTED === "true"
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   let isFullyActive = false
   const [domain] = await db
     .select({

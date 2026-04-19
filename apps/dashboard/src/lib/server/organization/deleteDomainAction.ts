@@ -33,7 +33,7 @@ export async function deleteDomainAction({
   }
   // Inside deleteDomainAction...
   if (domain.type !== "DEFAULT") {
-    const isSelfHosted = process.env.IS_SELF_HOSTED === "true"
+    const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
     if (isSelfHosted) {
       console.log(
         `Self-hosted: Removing domain ${domain.domainName} from local DB.`

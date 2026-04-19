@@ -38,7 +38,7 @@ export async function createDomainsAction({
     })
     return
   }
-  const isSelfHosted = process.env.IS_SELF_HOSTED === "true"
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   if (!isSelfHosted) {
     const existingCustomDomains = await db
       .select()
