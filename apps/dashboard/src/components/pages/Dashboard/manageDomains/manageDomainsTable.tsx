@@ -54,10 +54,6 @@ export function ManageDomainsTable({
   affiliate = false,
   isTeam = false,
 }: AffiliatesTableManageDomainsProps) {
-  const cleanCnameTarget = (process.env.NEXT_PUBLIC_CNAME_TARGET || "")
-    .replace(/^https?:\/\//, "")
-    .split("/")[0]
-    .toLowerCase()
   useVerifyTeamSession(orgId, isTeam)
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
 
@@ -173,11 +169,6 @@ export function ManageDomainsTable({
     affiliate,
   })
   const isSubmitDisabled = false
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => console.log("Copied to clipboard"))
-  }
   const tableData = useMemo(() => {
     return data?.rows ?? []
   }, [data])
@@ -278,16 +269,6 @@ export function ManageDomainsTable({
                     ref={formRef}
                     onSubmit={domainForm.handleSubmit((data) => {
                       if (!domainType) return
-                      if (isSelfHosted && domainType !== "platform") {
-                        showCustomToast({
-                          type: "error",
-                          title: "Custom domains not supported",
-                          description:
-                            "In self-hosted mode, please use your primary domain subdomains. Custom domain support is coming soon.",
-                          affiliate: false,
-                        })
-                        return
-                      }
                       createDomainMutation.mutate(
                         {
                           orgId,
